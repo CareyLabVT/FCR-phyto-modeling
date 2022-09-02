@@ -1,0 +1,14 @@
+EXO_chla_2018_2021.csv
+
+Columns:
+Reservoir: Three-letter code corresponding to sampled reservoir; FCR = Falling Creek Reservoir
+Site: Sampling site within each reservoir; 50 = Deep hole or site nearest to dam in the reservoir, attached to the catwalk
+DateTime: Date and time of sampling. All data were collected in the eastern standard time zone of the U.S.A., with daylight savings time not observed, GMT -5
+EXOChla_RFU_1: Total Chlorophyll a at 1.6 meter depth as measured by the EXO Sonde in RFU (these are raw, unconverted units provided for reference but should probably not be used as a model target)
+EXOChla_ugL_1: Total Chlorophyll a at 1.6 meter depth as measured by the EXO Sonde in ugL (use as model target)
+Flag_Chla_RFU: Data flag for EXO2 chlorophyll data measured in Relative Fluorescence Units (EXOChla_RFU_1)
+Flag_Chla_ugL: Data flag for EXO2 chlorophyll data measured in micrograms per liter (EXOChla_ugL_1)
+
+Flag codes:
+Need to follow up w/ Adrienne here
+
