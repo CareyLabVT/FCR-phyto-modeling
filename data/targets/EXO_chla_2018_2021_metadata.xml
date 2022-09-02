@@ -1,0 +1,2009 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2" packageId="edi.271.6" xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd" system="edi">
+  <access authSystem="https://pasta.edirepository.org/authentication" order="allowFirst" scope="document">
+    <allow>
+      <principal>uid=ccarey,o=EDI,dc=edirepository,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>public</principal>
+      <permission>read</permission>
+    </allow>
+  </access>
+  <dataset>
+    <title>Time series of high-frequency sensor data measuring water temperature, dissolved oxygen, pressure, conductivity, 
+         specific conductance, total dissolved solids, chlorophyll a, phycocyanin, and fluorescent dissolved organic matter at discrete depths 
+         in Falling Creek Reservoir, Virginia, USA in 2018-2021</title>
+    <creator>
+      <individualName>
+        <givenName>Cayelan</givenName>
+        <givenName>C.</givenName>
+        <surName>Carey</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>cayelan@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Adrienne</givenName>
+        <surName>Breef-Pilz</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>abreefpilz@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0002-6759-0063</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Whitney</givenName>
+        <givenName>M .</givenName>
+        <surName>Woelmer</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>wwoelmer@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0001-5147-3877</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Bethany</givenName>
+        <givenName>J.</givenName>
+        <surName>Bookout</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>bethanyb18@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0001-8394-926X</userId>
+    </creator>
+    <pubDate>2022-02-01</pubDate>
+    <abstract>
+      <para>Depth profiles of water temperature on 1m intervals from 0.1 to 9 m depth; dissolved oxygen at 5 and 9 m depth; pressure at 9 m depth; and temperature, dissolved oxygen, conductivity, specific conductance, chlorophyll a, phycocyanin, total dissolved solids, fluorescent dissolved organic matter, and pressure  at ~1.6 m depth were collected with a suite of high-frequency sensors at Falling Creek Reservoir (Vinton, Virginia, USA) on the 10-minute scale in 2018-2021. Falling Creek Reservoir is owned and managed by the Western Virginia Water Authority as a primary drinking water source for Roanoke, Virginia. This data product consists of one dataset compiled from water temperature data measured at multiple depths by thermistors, two dissolved oxygen sensors at multiple depths, pressure measured at one depth, and a YSI EXO2 sonde that measures temperature, dissolved oxygen, pressure, conductivity, specific conductance, chlorophyll a, phycocyanin, total dissolved solids, and fluorescent dissolved organic matter, at one depth, all measured at the deepest site of the reservoir adjacent to the dam. </para>
+    </abstract>
+    <keywordSet>
+      <keyword>Carey Lab</keyword>
+      <keyword>Virginia Tech</keyword>
+      <keyword>fDOM</keyword>
+      <keyword>dissolved organic matter</keyword>
+      <keyword>Western Virginia Water Authority</keyword>
+      <keyword>Falling Creek Reservoir</keyword>
+      <keywordThesaurus>carey lab controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>lakes</keyword>
+      <keyword>water quality</keyword>
+      <keyword>water temperature</keyword>
+      <keyword>dissolved oxygen</keyword>
+      <keyword>conductivity</keyword>
+      <keyword>specific conductance</keyword>
+      <keyword>chlorophyll a</keyword>
+      <keyword>pressure</keyword>
+      <keyword>physical properties</keyword>
+      <keyword>fluorescence</keyword>
+      <keywordThesaurus>lter controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>lake</keyword>
+      <keyword>reservoir</keyword>
+      <keyword>reservoirs</keyword>
+      <keyword>high-frequency sensors</keyword>
+      <keywordThesaurus>cuahsi controlled vocabulary</keywordThesaurus>
+    </keywordSet>
+    <additionalInfo>
+      <para>Author Contribution Statement-&#13;
+CCC is the PI on the project, designed the sensor array, coordinated the purchasing and deployment, and helped install the sensors. ABP is the point person for the dataset along with lead of maintenance, data management and QAQC for 2021. BB was the point person in 2018-2020 for maintaining the sensors and ensuring the data were streaming from the sensors to the cloud; WW was a co-point person during these years for data publishing.  </para>
+      <para>In 2018-2021, hypolimnetic oxygenation water quality management occurred in Falling Creek Reservoir. For a detailed description of the hypolimnetic oxygenation engineered system, see Gerling et al. (2014). &#13;
+Below is the oxgenation schedule and when it was operating:&#13;
+2018: 23 April-30 July; 9 August-10 September;&#13;
+2019: 3 June-17 June; 8 July-19 July; 5 August-19 August; 2 September-1 December;&#13;
+2020: 29 June-11 September; 25 September-2 December;&#13;
+2021: 11 June-26 June; 26 July-14 September(different controller for oxygen-not sure how well it worked); 14 September-6 December(regular oxygen controller)  </para>
+      <para>&#13;
+Gerling, A.B., Browne, R.G., Gantzer, P.A., Mobley, M.H., Little, J.C., and C.C. Carey. 2014. First report of the successful operation of a side stream supersaturation hypolimnetic oxygenation system in a eutrophic, shallow reservoir.  Water Research. 67: 129-143. doi: 10.1016/j.watres.2014.09.002</para>
+    </additionalInfo>
+    <intellectualRights>
+      <para>This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.</para>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>Falling Creek Reservoir is located in Vinton, Virginia, USA</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-79.839249</westBoundingCoordinate>
+          <eastBoundingCoordinate>-79.836009</eastBoundingCoordinate>
+          <northBoundingCoordinate>37.309589</northBoundingCoordinate>
+          <southBoundingCoordinate>37.30266</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>2018-07-05</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2021-12-31</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <maintenance>
+      <description>ongoing</description>
+    </maintenance>
+    <contact>
+      <individualName>
+        <givenName>Cayelan</givenName>
+        <givenName>C.</givenName>
+        <surName>Carey</surName>
+      </individualName>
+      <organizationName>Virginia Tech</organizationName>
+      <electronicMailAddress>cayelan@vt.edu</electronicMailAddress>
+      <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+    </contact>
+    <methods>
+      <methodStep>
+        <description>
+          <para>Methods:&#13;
+Data from multiple water quality sensors were collected at the deep hole of Falling Creek Reservoir in 2018-2021 using water temperature thermistors, dissolved oxygen sensors, pressure sensors, and a YSI EXO2 sonde. Profiles were collected every ten minutes from July 2018 to December 2021. We deployed the thermistors and 5 and 9 m dissolved oxygen sensors in July 2018 and the EXO2 sonde at 1 m depth was deployed in August 2018. The EXO2 sonde was moved from 1.0 m to 1.6 m depth on 2019-05-20 at 12:40:00 (1.6 m is the depth of one of the outtake valves for drinking water treatment). As the EXO2 sonde has been moored near the outtake valve at 1.6 m (assuming full pond), the exact depth of the EXO2 sonde varied slightly over time due to small water level changes in the reservoir. We deployed a pressure transducer at 9 m in May 2020 to help track water level changes. </para>
+          <para>At the time of deployment in summer 2018, the thermistor string was factory-calibrated and verified against a NIST-traceable thermistor to meet measurement precision. The in situ dissolved oxygen sensors were calibrated using a one point calibration according to the standards and practices outlined in the user manual. The YSI EXO2 Sonde sensors, except for temperature, were user-calibrated as outlined in the user manual and KOR EXO software. &#13;
+The reservoir has an oxygenation system that has been manipulated for whole ecosystem experiments throughout the deployment of the sensors which results in various oxygen conditions because of this different levels of QAQC are done to the sensors but especially the dissolved oxygen sensors at 5m and 9m. See Additional Info for the oxygenations system schedule. </para>
+          <para>Maintenance/Issues&#13;
+All maintenance, calibration times and sensor issues are recorded in the FCR_CAT_MaintenanceLog_2018_2021.txt. The text below explains the issues and how they were dealt with in the data. &#13;
+Maintenance data gaps&#13;
+The sensor string was regularly brought up to the surface for routine maintenance, dates and times of which were recorded in the FCR_CAT_MaintenanceLog_2018_2021.txt file. To account for this, we used an automated QAQC script (FCR_catwalk_QAQC_function_2021.R) which indexed the dates and times recorded in the maintenance log and set the data to NA and the Flag_All and other Flag columns to 1. Any data points outside of the immediate time frame that the sensor string was up that do not reflect ambient conditions due to sensor re-equilibration were also set to NA and Flag_All to 1 manually and the corresponding Flag column.   </para>
+          <para>Missing Data Gaps:</para>
+          <para>Missing Data Gaps EXO: &#13;
+2018-08-20 14:30-2018-08-27 17:50; 2018-09-25 10:40-2018-10-01 11:00; 2020-12-02 12:50-2020-12-27 11:50-removed for maintenance; 2021-04-26 11:00-13:00-Removed for calibration; 2021-12-13 10:25:00- 2021-12-14 12:25:00; 2021-06-15 11:40-2021-06-18 10:20-Connection issue so no data was streaming; 2021-12-13 10:25:00- 2021-12-14 12:25:00 -Removed for cleaning&#13;
+Dissolved Oxygen sondes at 5 and 9 m&#13;
+Maintenance performed on the sensors-&#13;
+When the oxygenation system is first activated, we have observed a rapid fouling of the 9m Do probe, which we typically flag with a  5 or 6.&#13;
+ 2021-&#13;
+At 9m there were some high oxygen readings on 2021-06-07-2021-06-08 about 3 hours after the temperature string had been pulled up. There was no oxygen at 9m, as the oxygenation system had not been turned on yet,  so these readings were changed to NA and flagged. &#13;
+The oxygenation was first turned on 11 June at 9:40EST but we were having issues with the oxygen regulator so we were unsure how well the system was working until the regulator was fixed and deployed on 14 September at 13:30 EST. During this time we have flagged the data with a flag of 5 because of the fluctuations from the system. &#13;
+The temperature string was tangled after some maintenance on June 18th, 2021 at 10:00 and was fixed on June 21, 2021 at 10:00. It was tangled again on July 21st, 2021 13:20 and fixed on July 26th, 2021 at 12:00. Consequently, there was a data gap for both DO sensors with a data flag of 1 in the Flag_All column and individual flag columns of the sensors affected. The 9m RDO-PRO_X sensor was calibrated on August 18th, 2021 with a two point calibration using 100 percent air saturation and a 0 percent saturation with a sodium sulfite solution. On August 24, 2021, the anti-fouling caps on the RDO-PRO-X sensors were removed as they were causing fouling especially in anoxic hypolimnion. The RDO-PRO-X sensor cap at 5m was replaced on August 31st, 2021 and checked with a 100 percent air saturation and 0 percent saturation.</para>
+          <para>2020-On August 7, 2020, the RDO-PRO-X Sensor caps at 5 m and 9 m were replaced. Both dissolved oxygen sensors were calibrated on August 17, 2020 using a one point 100 percent air saturation calibration. </para>
+          <para>QAQC methods: After any maintenance on the DO sensors, Do measurements for the next two hours are changed to NAs to give ample time for the sensors to equilibrate. There were two periods in the summer of 2019 and four periods in the summer of 2020 when hypolimnetic DO sondes gave low readings that did not align with simultaneous measurements from a high-resolution CTD profiler (likely due to fouling). We adjusted these values using linear or square root functions to best match the CTD and present those data in a separate column (original values are retained and data are flagged for this column with Flag = 6). The equations for each adjustment are given below, as well as in the R code provided with this data product.&#13;
+5 meter oxygen sonde:&#13;
+This equation will give you the values in the RDO_mgL_5_adjusted and RDOsat_percent_5_adjusted: &#13;
+2019-08-11 00:00:00 to 2019-08-12 12:40:00&#13;
+- DO (mg/L) = DO observed plus the square root of the difference between the current time and 2019-08-11 00:00:00 in minutes, divided by 30&#13;
+- DO (percent saturation) = DO observed plus the square root of the difference between the current time and 2019-08-11 00:00:00 in minutes, divided by 30/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C&#13;
+9 meter oxygen sonde&#13;
+This equation will give you the values in the RDO_mgL_9_adjusted and RDOsat_percent_9_adjusted: &#13;
+2019-08-05 12:45:00 to 2019-08-12 12:40:00&#13;
+- DO (mg/L) = DO observed plus the square root of the difference between the current time and 2019-08-05 12:45:00 in minutes, divided by 70&#13;
+- DO (percent saturation) = DO observed plus the square root of the difference between the current time and 2019-08-05 12:45:00 in minutes, divided by 70/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C</para>
+          <para>2019-09-02 13:00:00 to 2019-09-27 12:30:00&#13;
+- DO (mg/L) = DO observed plus the difference between the current time and 2019-09-02 13:00:00 in minutes, divided by 30000&#13;
+- DO (percent saturation) = DO observed plus the difference between the current time and 2019-09-02 13:00:00 in minutes, divided by 30000/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C</para>
+          <para>2020-08-11 07:00:00 to 2020-08-17 12:50:00&#13;
+- DO (mg/L) = DO observed plus the difference between the current time and 2020-08-11 07:00:00 in minutes, divided by 6500&#13;
+- DO (percent saturation) = DO observed plus the difference between the current time and 2020-08-11 07:00:00 in minutes, divided by 6500/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C</para>
+          <para>2020-08-19 20:00:00 to 2020-08-24 10:40:00&#13;
+- DO (mg/L) = DO observed plus the difference between the current time and 2020-08-19 20:00:00 in minutes, divided by 6500&#13;
+- DO (percent saturation) = DO observed plus the difference between the current time and 2020-08-19 20:00:00 in minutes, divided by 6500/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C</para>
+          <para>2020-08-26 12:00:00 to 2020-09-02 10:50:00&#13;
+- DO (mg/L) = DO observed plus the difference between the current time and 2020-08-26 12:00:00 in minutes, divided by 10000&#13;
+- DO (percent saturation) = DO observed plus the difference between the current time and 2020-08-26 12:00:00 in minutes, divided by 10000/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C</para>
+          <para>2020-09-05 06:00:00 to 2020-09-09 17:50:00&#13;
+- DO (mg/L) = DO observed plus the difference between the current time and 2020-09-05 06:00:00 in minutes, divided by 3000&#13;
+- DO (percent saturation) = DO observed plus the difference between the current time and 2020-09-05 06:00:00 in minutes, divided by 3000/11.3*100, with 11.3/100 being the potential saturation of oxygen in water at 10 degrees C</para>
+          <para>&#13;
+ &#13;
+Water temperature (thermistors)</para>
+          <para>2021:&#13;
+Thermistors at 1m(SN 3724) and 4m(SN 3747) were reading higher than normal (See below late October-December 2020) and were removed on January 7, 2021 14:30 and replaced on February 26, 2021 12:00 with SN 3966 and SN 4013. No data was recorded at those depths and was flagged in the Flag_All column and individual flag columns of the sensors affected. </para>
+          <para>The temperature string was tangled after some maintenance on June 18th, 2021 at 10:00 and was fixed on June 21, 2021 at 10:00. It was tangled again on July 21st, 2021 13:20 and fixed on July 26th, 2021 at 12:00. Consequently, there was a data gap for all the temperature sensors with a data flag of 1 in the Flag_All column and individual flag columns of the sensors affected. &#13;
+ &#13;
+2020:&#13;
+The temperature string was tangled after some maintenance on October 9th, 2020 and was fixed on October 11, 2020. Consequently, there was a data gap for the temperature sensors at 5, 6, 7, 8 and 9 m from October 9-11, 2020, with a data flag of 1 in the Flag_All column and individual flag columns of the sensors affected.</para>
+          <para>On October 19, 2020, the NexSens T-Node FR Thermistor (Serial No. 3718) deployed at 0.1 m stopped working and read NA until October 20, when we took the thermistor from 2 m and put it at 0.1 m. There was a data gap at 2m from October 20-22, 2020. We put the NexSens T-Node Thermistor (Serial No. 3903) from Beaverdam Reservoir, another one of our sites, at 0.1 m in FCR and returned the 2 m thermistor back to its original depth at  2 m on October 22, 2020. Consequently, there was a data gap for 0.1 m temperature from October 19-20, 2020 and a data gap for 2 m temperature from October 20-22, 2020, all flagged with data code 1 .</para>
+          <para>In late October-December 2020, two of the Nexus T-Node FR Thermistors (at 1 m and 4 m) appeared to be reading water temperatures higher than the sensors deployed above them. On 7 Jan 2021, we put the 2 suspect thermistors and 4 other thermistors adjacently located (0.1, 2, 3, and 9 m) in a water bath in the field for an hour. The water bath showed that thermistors at 1 m and 4m were exhibiting higher readings than the others in the bath. The 1 m thermistor was reading about 0.2496℃ higher, and the 4 m thermistor was reading about 0.3862℃. To correct for this discrepancy, we created an offset for both the 1 m and 4 m thermistors from November 1, 2020 to December 31, 2020 (the time period in which the thermistors were consistently exhibiting higher temperature readings). First, we took the average temperature of the thermistors directly above and below the suspect ones for each 10-min interval observation during November 1 to December 31, 2020. Second, we calculated the difference between the suspect thermistor’s reading and its neighbor average, which we averaged over the entire time period to calculate a mean offset. Third, this mean offset was subtracted from the observed thermistor reading on each observation. For example, for the 1 m thermistor we took the average of the 0.1 m thermistor and the 2m thermistor for the neighbor average at each time interval, then we found the difference between the 1 m thermistor and the neighbor average to calculate the offset value for the entire November 1-December 31 period. The offset value for the 1 m thermistor was 0.22617oC and for the 4m thermistor was 0.18122oC. The offset was subtracted from the 1 m thermistor values from October 29, 2020 13:00EST to the end of 2020 and the offset for the 4m thermistor was subtracted from the raw values on October 31, 2020 05:00EST to the end of 2020.  These times were chosen because the broken thermistors were reading consistently higher than the one above them. The observations that received an offset were flagged with data code 8.</para>
+          <para>Pressure Transducer at 9 m</para>
+          <para>The temperature string was tangled after some maintenance on June 18th, 2021 at 10:00 and was fixed on June 21, 2021 at 10:00. It was tangled again on July 21st, 2021 13:20 and fixed on July 26th, 2021 at 12:00. Consequently, there was a data gap for data from the pressure transducer with a data flag of 1 in the Flag_All column and individual flag columns of the sensors affected. </para>
+          <para>&#13;
+EXO sonde&#13;
+2021 Maintenance:&#13;
+On March 22, 2021, the dissolved oxygen sensor and depth sensor were calibrated. The dissolved oxygen sensor was calibrated with a one point 100 percent air saturation. On April 16, 2021, the fluorescent dissolved organic matter(fDOM) sensor was calibrated with a one point calibration in DI water or a 0 point calibration. The chlorophyll sensor was checked with DI water but was not calibrated. Due to a bad calibration of the fDOM sensor it was recalibrated on April 26, 2021 and all data were set to NA during that time. On June 15, 2021 a one point 100 percent air saturation calibration was done on the dissolved oxygen sensor. On August 16, 2021 a two point calibration was done on the dissolved oxygen sensor with 100 percent air saturation and a 0 percent calibration.  On December 13, 2021 the EXO was brought in the lab for a deep clean, o ring maintenance, and zero calibration check of chlorophyll and fDOm and redeployed the next day. </para>
+          <para>&#13;
+2020 Maintenance:&#13;
+On August 7, 2020, the YSI EXO (1.6 m) Optical Dissolved Oxygen Sensor Cap (Serial No. 20E101629) was replaced, and the dissolved oxygen sensor was calibrated on August 17, 2020 using a one point 100 percent air saturation calibration. The EXO 1.6 m dissolved oxygen sensor was recalibrated on 15 September 2020, 19 October 2020, and 27 December 2020 using a one point 100 percent air saturation calibration.</para>
+          <para>The YSI EXO sonde was removed from the reservoir on December 2, 2020 for manufacturer cleaning, maintenance, and calibration. It was re-deployed in the reservoir on December 27, 2020. Below is the status of each sensor: pass or fail, and the calibration, or maintenance  information. All sensors were calibrated by the manufacturer on December 21, 2020 unless otherwise stated. </para>
+          <para>YSI EXO2 Sonde Serial No. 18D103367, Pass&#13;
+Replaced power-communication circuit board due to issues at final testing, depth sensor passed&#13;
+Wiped Conductivity/Temperature Sensor Serial No. 18C102992, Pass&#13;
+Temperature reads 20.78 °C in a 20.70 °C bath with a cell constant of 0.47 &#13;
+Conductivity reads zero sp cond. in air.&#13;
+Central Wiper for Conductivity/Temperature Sensor Serial No. 18D101236, Pass&#13;
+Replaced head &amp; motor O-rings&#13;
+Dissolved Oxygen Sensor Serial No. 18D101168, Pass&#13;
+Probe ODO Gain: 1.24&#13;
+Total Algae Sensor Serial No. 18D102222, Pass&#13;
+Chlorophyll-a: Probe reads 14.73 RFU in 16.4 standard-calibrated to standard. Probe reads 58.65 µg/L in 66 standard-calibrated to standard.  &#13;
+Phycocyanin: Probe reads 13.36 RFU in 16 standard-calibrated. Probe reads 13.37 µg/L in 16 standard-calibrated to standard&#13;
+fDOM Sensor Serial No. 18C100625, Pass&#13;
+Probe reads 275.69 uncalibrated QSU in 300 QSU standard- calibrated to 300QSU. Probe reads 92.18 uncalibrated RFU in 100 RFU standard- calibrated to 100 RFU</para>
+          <para>&#13;
+EXO Chlorophyll-a and Phycocyanin QAQC&#13;
+The chlorophyll-a and phycocyanin sensor data underwent a QAQC process to remove extreme outliers (see ‘chla and phyco qaqc’ section of FCR_catwalk_QAQC_function_2018_2021.R script). Outliers were defined as absolute values greater than four standard deviations from previous and subsequent measurements for each individual observation. These outliers were set to NA and identified in the Flag_Chla or Flag_Phyco column as a value of 2. In October 1st, 2018- March 3rd, 2019 outliers were identified as the absolute values greater than four standard deviations from the average measurement. These outliers were set to NA and flagged as 4 in the Flag_Chla or Flag_Phyo. After March 3rd, 2019 outlier values identified this what were left in the dataset and flagged as 5 for questionable value. </para>
+          <para>EXO fDOM QAQC&#13;
+fDOM sensor data underwent a QAQC process to remove extreme outliers (see ‘fdom qaqc’ section of FCR_catwalk_QAQC_function_2018_2021.R script). Outliers were defined as absolute values greater than two standard deviations from previous and subsequent measurements for each individual observation. These outliers were set to NA and identified in the Flag_fDOM column as a value of 2. Any value greater than 4 standard deviations above the mean was flagged with a 5 and left in the dataset.  </para>
+          <para>EXO Conductivity, specific conductance and Total Dissolved Solids(TDS) &#13;
+Conductivity, specific conductance and TDS sensor data underwent a QAQC process to remove extreme outliers (see ‘fdom cond, spcond and TDS’ section of FCR_catwalk_QAQC_function_2018_2021.R script). Outliers were defined as absolute values greater than two standard deviations from previous and subsequent measurements for each individual observation. These outliers were set to NA and identified in the Flag_fDOM column as a value of 2.  Any value greater than 4 standard deviations above the mean was flagged with a 5 and left in the dataset.  During the summer of 2020 there were some high conductivity events. Any value above 42 microsemanis for conductivity and specific conductivity were flagged and over 30 mg/L for TDS were flagged as 5 but not removed from the data set. </para>
+          <para>Instruments, manual, and serial numbers used in 2018,  2019, 2020 and 2021:&#13;
+Multiple sensors and instruments were added over time; below we note serial numbers of sensors with accompanying depths and provide links to the accompanying instrument manuals.</para>
+          <para>NexSens T-Node FR Thermistors (July 2018 - current)&#13;
+https://www.fondriest.com/pdf/nexsens_t-node_fr_manual.pdf&#13;
+Serial No. 3718; Depth 0.1m (July 2018- October 19, 2020)&#13;
+Serial No. 3741; Depth 0.1m (October 20-22, 2020)&#13;
+Serial No. 3903: Depth 0.1m (October 22, 2020- current)&#13;
+Serial No. 3724; Depth 1m (July 2018-January 7, 2021)&#13;
+Serial No. 3966; Depth 1m (February 26, 2021-current)&#13;
+Serial No. 3741; Depth 2m (July 2018-October 20, 2020; October 22, 2020-current)&#13;
+Serial No. 3746; Depth 3m&#13;
+Serial No. 3747; Depth 4m (July 2018-January 7, 2021)&#13;
+Serial No. 4013; Depth 4m (February 26, 2021-current)&#13;
+Serial No. 3751; Depth 5m&#13;
+Serial No. 3786; Depth 6m&#13;
+Serial No. 3823; Depth 7m&#13;
+Serial No. 3851; Depth 8m&#13;
+Serial No. 3857; Depth 9m</para>
+          <para>InSitu RDO Pro-X Dissolved Oxygen Sensor (July 2018 - December 2021)&#13;
+https://in-situ.com/wp-content/uploads/2014/11/RDO_PRO-X_Manual.pdf&#13;
+Serial No. 584491; Depth 5m&#13;
+Calibration from July 5, 2018 to December 19, 2018; slope = 1.0361, offset = 0.00&#13;
+Calibration from August 17, 2020 to September 15, 2020; slope = 1.1074, offset = 0.00&#13;
+Calibration from October 19, 2020 to current; slope = 1.1447, offset = 0.00&#13;
+Serial No. 584488; Depth 9m&#13;
+Calibration from July 5, 2018 to August 20, 2018; slope = 1.0743, offset = 0.00&#13;
+Calibration from August 20, 2018 to December 19, 2018; slope = 1.0000, offset = 0.00&#13;
+Calibration from August 17, 2020 to September 15, 2020; slope = 1.1656, offset = 0.00&#13;
+Calibration from September 15, 2020 to October 19, 2020; slope = 1.0916, offset= 0.00&#13;
+Calibration from October 19, 2020 to August 17, 2021; slope=1.1221; offset=0.00&#13;
+Calibration from August 17, 2021 to current; slope is 1.1534; offset is 0.0054. </para>
+          <para>Campbell Scientific Stainless-Steel Pressure Transducer CS451 (May 2020-current)&#13;
+https://s.campbellsci.com/documents/us/manuals/cs451-cs456.pdf&#13;
+Serial No. 29010799</para>
+          <para>&#13;
+YSI EXO2 Sonde Serial No. 18D103367 (August 2018 - December 2021)&#13;
+https://www.ysi.com/File%20Library/Documents/Manuals/EXO-User-Manual-Web.pdf &#13;
+Wiped Conductivity/Temperature Sensor Serial No. 18C102992&#13;
+Central Wiper for Conductivity/Temperature Sensor Serial No. 18D101236&#13;
+Total Algae Sensor Serial No. 18D102222&#13;
+fDOM Sensor Serial No. 18C100625&#13;
+Calibration on April 16, 2021; pre: 1.38 RFU, 4.68 QSU; post: 0.00 RFU, -0.01 QSU - that was a bad calibration&#13;
+Calibration on April 26, 2021; pre: 0.34 RFU, 1.13 QSU ; post: 0.00 RFU, 0.00 QSU&#13;
+Pressure Transducer Serial No. 17K100864&#13;
+Dissolved Oxygen Sensor Serial No. 18D101168&#13;
+YSI EXO Optical Dissolved Oxygen Sensor Cap Serial No. 18C105373 (August 2018- August 7, 2020)&#13;
+YSI EXO Optical Dissolved Oxygen Sensor Cap Serial No. 20E101629 (August 7, 2020-December 2021)	&#13;
+Calibration from August 17, 2020 to September 15, 2020; DO Gain=1.13&#13;
+Calibration from September 15, 2020 to October 19, 2020; DO Gain=1.11&#13;
+Calibration from October 19, 2020 to December 2, 2020; DO Gain=1.12&#13;
+Calibration fromDecember 27, 2020 to December 31, 2020; DO Gain=1.10&#13;
+Calibration from March 22, 2021 to June 15, 2021; DO Gain=1.10&#13;
+Calibration from June 15, 2021 to August 16, 2021; DO Gain=1.13&#13;
+Calibration from August 16, 2021 to current; DO Gain= 1.10&#13;
+</para>
+        </description>
+      </methodStep>
+    </methods>
+    <project>
+      <title>No project title to report</title>
+      <personnel>
+        <individualName>
+          <givenName>Cayelan</givenName>
+          <givenName>C.</givenName>
+          <surName>Carey</surName>
+        </individualName>
+        <organizationName>Virginia Tech</organizationName>
+        <electronicMailAddress>cayelan@vt.edu</electronicMailAddress>
+        <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+        <role>Principal Investigator</role>
+      </personnel>
+      <funding>Western Virginia Water Authority</funding>
+      <relatedProject>
+        <title>SCC-IRG Track 2: Resilient Water Systems: Integrating Environmental Sensor Networks and Real-Time Forecasting to Adaptively Manage Drinking Water Quality and Build Social Trust</title>
+        <personnel>
+          <individualName>
+            <givenName>Cayelan</givenName>
+            <givenName>C.</givenName>
+            <surName>Carey</surName>
+          </individualName>
+          <organizationName>Virginia Tech</organizationName>
+          <electronicMailAddress>cayelan@vt.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation 1737424</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Collaborative Research: Consequences of changing oxygen availability for carbon cycling in freshwater ecosystems</title>
+        <personnel>
+          <individualName>
+            <givenName>Cayelan</givenName>
+            <givenName>C.</givenName>
+            <surName>Carey</surName>
+          </individualName>
+          <organizationName>Virginia Tech</organizationName>
+          <electronicMailAddress>cayelan@vt.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation 1753639</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Collaborative Research: CIBR: Cyberinfrastructure Enabling End-to-End Workflows for Aquatic Ecosystem Forecasting</title>
+        <personnel>
+          <individualName>
+            <givenName>Cayelan</givenName>
+            <givenName>C.</givenName>
+            <surName>Carey</surName>
+          </individualName>
+          <organizationName>Virginia Tech</organizationName>
+          <electronicMailAddress>cayelan@vt.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0001-8835-4476</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation 1933016</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Collaborative Research: CIBR: Cyberinfrastructure Enabling End-to-End Workflows for Aquatic Ecosystem Forecasting</title>
+        <personnel>
+          <individualName>
+            <givenName>Renato</givenName>
+            <givenName>J.</givenName>
+            <surName>Figueiredo</surName>
+          </individualName>
+          <organizationName>University of Florida</organizationName>
+          <electronicMailAddress>renato@acis.ufl.edu</electronicMailAddress>
+          <userId directory="https://orcid.org">https://orcid.org/0000-0001-9841-6060</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation 1933102</funding>
+      </relatedProject>
+    </project>
+    <dataTable>
+      <entityName>FCR_Catwalk_2018_2021.csv</entityName>
+      <entityDescription>FCR Catwalk Sensor String</entityDescription>
+      <physical>
+        <objectName>FCR_Catwalk_2018_2021.csv</objectName>
+        <size unit="bytes">68181413</size>
+        <authentication method="MD5">899ef4ea626068b0f8a7ad2e7f89bb77</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\r\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>Reservoir</attributeName>
+          <attributeDefinition>Three-letter code corresponding to sampled reservoir; FCR = Falling Creek Reservoir</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Three-letter code corresponding to sampled reservoir; FCR = Falling Creek Reservoir</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Site</attributeName>
+          <attributeDefinition>Sampling site within each reservoir; 50 = Deep hole or site nearest to dam in the reservoir, attached to the catwalk</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+                <bounds>
+                  <minimum exclusive="false">50</minimum>
+                  <maximum exclusive="false">50</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DateTime</attributeName>
+          <attributeDefinition>Date and time of sampling. All data were collected in the eastern standard time zone of the U.S.A., with daylight savings time not observed, GMT -5</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD hh:mm:ss</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_surface</attributeName>
+          <attributeDefinition>Water temperature at the surface as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.103906</minimum>
+                  <maximum exclusive="false">32.14754</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_1</attributeName>
+          <attributeDefinition>Water temperature at 1 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.437647</minimum>
+                  <maximum exclusive="false">29.90374</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_2</attributeName>
+          <attributeDefinition>Water temperature at 2 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.737665</minimum>
+                  <maximum exclusive="false">28.73498</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_3</attributeName>
+          <attributeDefinition>Water temperature at 3 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.720422</minimum>
+                  <maximum exclusive="false">25.95062</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_4</attributeName>
+          <attributeDefinition>Water temperature at 4 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.806665</minimum>
+                  <maximum exclusive="false">22.0729</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_5</attributeName>
+          <attributeDefinition>Water temperature at 5 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.754449</minimum>
+                  <maximum exclusive="false">20.24789</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_6</attributeName>
+          <attributeDefinition>Water temperature at 6 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.807947</minimum>
+                  <maximum exclusive="false">17.53546</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_7</attributeName>
+          <attributeDefinition>Water temperature at 7 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.815729</minimum>
+                  <maximum exclusive="false">15.87316</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_8</attributeName>
+          <attributeDefinition>Water temperature at 8 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.801202</minimum>
+                  <maximum exclusive="false">14.43685</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ThermistorTemp_C_9</attributeName>
+          <attributeDefinition>Water temperature at 9 meter depth as measured by the thermistor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.824426</minimum>
+                  <maximum exclusive="false">13.82519</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDO_mgL_5</attributeName>
+          <attributeDefinition>Dissolved Oxygen (DO) concentration at 5 meter depth as measured by the RDO Sensor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">16.51595</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDOsat_percent_5</attributeName>
+          <attributeDefinition>Dissolved Oxygen (DO) percent saturation at 5 meter depth as measured by the RDO Sensor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">121.8027</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDO_mgL_5_adjusted</attributeName>
+          <attributeDefinition>One period in summer 2019 appears to have had extensive fouling on the 5 meter oxygen sonde, as evidenced by inexplicably low oxygen readings. We adjusted these values using linear or square root functions to best match simultaneous readings from a high-resolution CTD profile. This column gives the adjusted values. Added in the 2019 revision. Values not adjusted are the same as values from RDO_mgL_5.</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">16.51595</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDOsat_percent_5_adjusted</attributeName>
+          <attributeDefinition>One period in summer 2019 appears to have had extensive fouling on the 5 meter oxygen sonde, as evidenced by inexplicably low oxygen readings. We adjusted these values using linear or square root functions to best match simultaneous readings from a high-resolution CTD profiler. This column gives the adjusted values. Added in the 2019 revision. Values not adjusted are the same as values from RDOsat_percent_5.</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">121.8027</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDOTemp_C_5</attributeName>
+          <attributeDefinition>Water temperature as measured by the DO sonde at 5 meter depth as measured by the RDO Sensor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.744415</minimum>
+                  <maximum exclusive="false">20.1016</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDO_mgL_9</attributeName>
+          <attributeDefinition>Dissolved Oxygen (DO) concentration at 9 meter depth as measured by the RDO Sensor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">14.51486</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDOsat_percent_9</attributeName>
+          <attributeDefinition>Dissolved Oxygen (DO) percent saturation at 9 meter depth as measured by the RDO Sensor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">110.6383</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDO_mgL_9_adjusted</attributeName>
+          <attributeDefinition>Two periods in summer 2019 and four periods in 2020 appears to have had extensive fouling on the 9 meter oxygen sonde, as evidenced by inexplicably low oxygen readings. We adjusted these values using linear or square root functions to best match simultaneous readings from a high-resolution CTD profiler. This column gives the adjusted values. Added in the 2019 and 2020 revision. Values not adjusted are the same as values from RDO_mgL_9.</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">14.80429</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDOsat_percent_9_adjusted</attributeName>
+          <attributeDefinition>Two periods in summer 2019 and four periods in 2020 appears to have had extensive fouling on the 9 meter oxygen sonde, as evidenced by inexplicably low oxygen readings. We adjusted these values using linear or square root functions to best match simultaneous readings from a high-resolution CTD profiler. This column gives the adjusted values. Added in the 2019 and 2020 revision. Values not adjusted are the same as values from RDOsat_percent_9.</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">111.9821</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RDOTemp_C_9</attributeName>
+          <attributeDefinition>Water temperature as measured by the DO sonde at 9 meter depth as measured by the RDO Sensor</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.806366</minimum>
+                  <maximum exclusive="false">13.9314</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOTemp_C_1</attributeName>
+          <attributeDefinition>Water temperature at 1.6 meter depth as measured by the EXO Sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">29.61</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOCond_uScm_1</attributeName>
+          <attributeDefinition>Conductivity at 1.6 meter depth as measured by the EXO Sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microSiemensPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">17.27</minimum>
+                  <maximum exclusive="false">921.93</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOSpCond_uScm_1</attributeName>
+          <attributeDefinition>Specific conductance at 1.6 meter depth as measured by the EXO Sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microSiemensPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">29.31</minimum>
+                  <maximum exclusive="false">951</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOTDS_mgL_1</attributeName>
+          <attributeDefinition>Total Dissolved Solids (TDS) at 1.6 meter depth as measured by the EXO Sonde as measured by the EXO Sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">19.05</minimum>
+                  <maximum exclusive="false">618.15</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXODOsat_percent_1</attributeName>
+          <attributeDefinition>Dissolved Oxygen percent saturation at 1.6 meter depth as measured by the EXO Sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">220.4</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXODO_mgL_1</attributeName>
+          <attributeDefinition>Dissolved Oxygen at 1.6 meter depth as measured by the EXO Sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">18.48</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOChla_RFU_1</attributeName>
+          <attributeDefinition>Total Chlorophyll a at 1.6 meter depth as measured by the EXO Sonde in RFU</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>RelativeFluorescenceUnits</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">29.81</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOChla_ugL_1</attributeName>
+          <attributeDefinition>Total Chlorophyll a at 1.6 meter depth as measured by the EXO Sonde in ugL</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>microgramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.02</minimum>
+                  <maximum exclusive="false">120.6</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOBGAPC_RFU_1</attributeName>
+          <attributeDefinition>Blue-Green Algae Phyocycanin at 1.6 meter depth as measured by the EXO Sonde in RFU</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>RelativeFluorescenceUnits</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">10.16</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOBGAPC_ugL_1</attributeName>
+          <attributeDefinition>Blue-Green Algae Phycoycanin at 1.6 meter depth as measured by the EXO Sonde in ugL</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>milligramsPerLiter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">10.22</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOfDOM_RFU_1</attributeName>
+          <attributeDefinition>Fluorecent Dissolved Organic Matter at 1.6 meter depth as measured by the EXO Sonde in RFU</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>RelativeFluorescenceUnits</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.53</minimum>
+                  <maximum exclusive="false">10.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXOfDOM_QSU_1</attributeName>
+          <attributeDefinition>Fluorescent Dissolved Organic Matter at 1.6 meter depth as measured by the EXO Sondein QSU</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>QuinineSulfateUnits</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">4.65</minimum>
+                  <maximum exclusive="false">31.55</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXO_pressure_psi</attributeName>
+          <attributeDefinition>Gauge pressure of EXO sonde at 1.6m; measured relative to ambient atmospheric pressure</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>psig</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.82</minimum>
+                  <maximum exclusive="false">4.12</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXO_depth_m</attributeName>
+          <attributeDefinition>Depth of the EXO sonde as measured by the EXO sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>meter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0.581</minimum>
+                  <maximum exclusive="false">2.904</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXO_battery_V</attributeName>
+          <attributeDefinition>Voltage of the EXO sonde internal batteries</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>volt</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">5.66</minimum>
+                  <maximum exclusive="false">6.12</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXO_cablepower_V</attributeName>
+          <attributeDefinition>Measure of power being used by the cable connected to the CR6 datalogger as measured by the EXO sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>volt</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">14.69</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>EXO_wiper_V</attributeName>
+          <attributeDefinition>Wiper brush cleaning system activation signal as measured by the EXO sonde</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>volt</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.13</minimum>
+                  <maximum exclusive="false">1.653</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Lvl_psi_9</attributeName>
+          <attributeDefinition>Measure of the pressure from the bottom sensor in the string which is about 9m</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>psig</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">7.698493</minimum>
+                  <maximum exclusive="false">13.70621</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>LvlTemp_C_9</attributeName>
+          <attributeDefinition>Water temperature at the last sensor in the string (about 9m) as measured by the pressure transducer</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">1.801394</minimum>
+                  <maximum exclusive="false">13.19187</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>RECORD</attributeName>
+          <attributeDefinition>The nth record collected since the instrument was turned on or the program was altered</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>number</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">51615</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>CR6_Batt_V</attributeName>
+          <attributeDefinition>The battery voltage of the CR6 at that time</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>volt</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">0</minimum>
+                  <maximum exclusive="false">15.64</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>CR6Panel_Temp_C</attributeName>
+          <attributeDefinition>Panel temperature of the CR6 data logger</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum exclusive="false">-8.25</minimum>
+                  <maximum exclusive="false">42.47</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_All</attributeName>
+          <attributeDefinition>Data flag for all data parameters(ThermistorTemp_C_surface,ThermistorTemp_C_1,ThermistorTemp_C_2,ThermistorTemp_C_3,ThermistorTemp_C_4,ThermistorTemp_C_5,ThermistorTemp_C_6,ThermistorTemp_C_7,ThermistorTemp_C_8,ThermistorTemp_C_9,RDO_mgL_5,RDOsat_percent_5,RDOTemp_C_5,RDO_mgL_9,RDOsat_percent_9,RDOTemp_C_9,EXOTemp_C_1,EXOCond_uScm_1,EXOSpCond _uScm_1,EXOTDS_mgL_1,EXODOsat_percent_1,EXODO_mgL_1,EXOChla_RFU_1,EXOChla_ugL_1, EXOBGAPC_RFU_1, EXOBGAPC _ugL_1,EXOfDOM_RFU_1,EXOfDOM_QSU_1, EXO_pressure,EXO_depth,EXO_battery, EXO_cablepower, EXO_wiper, Lvl_psi_9, LvlTemp_C_9, RECORD, CR6_Batt_V, CR6Panel_Temp_C)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for all data parameters(ThermistorTemp_C_surface,ThermistorTemp_C_1,ThermistorTemp_C_2,ThermistorTemp_C_3,ThermistorTemp_C_4,ThermistorTemp_C_5,ThermistorTemp_C_6,ThermistorTemp_C_7,ThermistorTemp_C_8,ThermistorTemp_C_9,RDO_mgL_5,RDOsat_percent_5,RDOTemp_C_5,RDO_mgL_9,RDOsat_percent_9,RDOTemp_C_9,EXOTemp_C_1,EXOCond_uScm_1,EXOSpCond _uScm_1,EXOTDS_mgL_1,EXODOsat_percent_1,EXODO_mgL_1,EXOChla_RFU_1,EXOChla_ugL_1, EXOBGAPC_RFU_1, EXOBGAPC _ugL_1,EXOfDOM_RFU_1,EXOfDOM_QSU_1, EXO_pressure,EXO_depth,EXO_battery, EXO_cablepower, EXO_wiper, Lvl_psi_9, LvlTemp_C_9, RECORD, CR6_Batt_V, CR6Panel_Temp_C)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_Surf</attributeName>
+          <attributeDefinition>Data flag for temperature data at 0.1m (ThermistorTemp_C_surface)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 0.1m (ThermistorTemp_C_surface)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_1</attributeName>
+          <attributeDefinition>Data flag for temperature data at 1m (ThermistorTemp_C_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 1m (ThermistorTemp_C_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_2</attributeName>
+          <attributeDefinition>Data flag for temperature data at 2m (ThermistorTemp_C_2)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 2m (ThermistorTemp_C_2)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_3</attributeName>
+          <attributeDefinition>Data flag for temperature data at 3m (ThermistorTemp_C_3)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 3m (ThermistorTemp_C_3)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_4</attributeName>
+          <attributeDefinition>Data flag for temperature data at 4m (ThermistorTemp_C_4)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 4m (ThermistorTemp_C_4)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_5</attributeName>
+          <attributeDefinition>Data flag for temperature data at 5m (ThermistorTemp_C_5)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 5m (ThermistorTemp_C_5)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_6</attributeName>
+          <attributeDefinition>Data flag for temperature data at 6m (ThermistorTemp_C_6)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 6m (ThermistorTemp_C_6)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_7</attributeName>
+          <attributeDefinition>Data flag for temperature data at 7m (ThermistorTemp_C_7)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 7m (ThermistorTemp_C_7)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_8</attributeName>
+          <attributeDefinition>Data flag for temperature data at 8m (ThermistorTemp_C_8)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 8m (ThermistorTemp_C_8)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Temp_9</attributeName>
+          <attributeDefinition>Data flag for temperature data at 9m (ThermistorTemp_C_9)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature data at 9m (ThermistorTemp_C_9)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_5_obs</attributeName>
+          <attributeDefinition>Data flag for DO data in milligrams per liter at 5 meter depth (RDO_mgL_5)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for DO data in milligrams per liter at 5 meter depth (RDO_mgL_5)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_5_sat</attributeName>
+          <attributeDefinition>Data flag for DO saturation data at 5 meter depth (RDOsat_percent_5)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for DO saturation data at 5 meter depth (RDOsat_percent_5)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_5_temp</attributeName>
+          <attributeDefinition>Data flag for temperature on the DO sensor at 5 meter depth (RDOTemp_C_5)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature on the DO sensor at 5 meter depth (RDOTemp_C_5)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_9_obs</attributeName>
+          <attributeDefinition>Data flag for DO data in milligrams per liter at 9 meter depth (RDO_mgL_9)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for DO data in milligrams per liter at 9 meter depth (RDO_mgL_9)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_9_sat</attributeName>
+          <attributeDefinition>Data flag for DO saturation data at 9 meter depth (RDOsat_percent_9)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for DO saturation data at 9 meter depth (RDOsat_percent_9)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_9_temp</attributeName>
+          <attributeDefinition>Data flag for temperature on the DO sensor at 9 meter depth (RDOTemp_C_9)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for temperature on the DO sensor at 9 meter depth (RDOTemp_C_9)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_EXOTemp</attributeName>
+          <attributeDefinition>Data flag for EXO2 Temperature data (EXOTemp_C_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 Temperature data (EXOTemp_C_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Cond</attributeName>
+          <attributeDefinition>Data flag for EXO2 conductivity data (EXOCond_uScm_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 conductivity data (EXOCond_uScm_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_SpCond</attributeName>
+          <attributeDefinition>Data flag for EXO2 specific conductance data (EXOSpCond_uScm_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 specific conductance data (EXOSpCond_uScm_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_TDS</attributeName>
+          <attributeDefinition>Data flag for EXO2 total dissolved solids data (EXOTDS_mgL_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 total dissolved solids data (EXOTDS_mgL_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_1_sat</attributeName>
+          <attributeDefinition>Data flag for EXO2 DO saturation data at 1.6 meter depth (EXODOsat_percent_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 DO saturation data at 1.6 meter depth (EXODOsat_percent_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_DO_1_obs</attributeName>
+          <attributeDefinition>Data flag for EXO2 DO data in miligrams per liter at 1.6 meter depth (EXODO_mgL_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 DO data in miligrams per liter at 1.6 meter depth (EXODO_mgL_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Chla_RFU</attributeName>
+          <attributeDefinition>Data flag for EXO2 chlorophyll data measured in Relative Fluorescence Units (EXOChla_RFU_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 chlorophyll data measured in Relative Fluorescence Units (EXOChla_RFU_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Chla_ugL</attributeName>
+          <attributeDefinition>Data flag for EXO2 chlorophyll data measured in micrograms per liter (EXOChla_ugL_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 chlorophyll data measured in micrograms per liter (EXOChla_ugL_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Phyco_RFU</attributeName>
+          <attributeDefinition>Data flag for EXO2 phycocyanin data measured in Relative Fluorescence Units (EXOBGAPC_RFU_1) </attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 phycocyanin data measured in Relative Fluorescence Units (EXOBGAPC_RFU_1) </definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_Phyco_ugL</attributeName>
+          <attributeDefinition>Data flag for EXO2 phycocyanin data measured in micrograms per liter(EXOBGAPC _ugL_1) </attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 phycocyanin data measured in micrograms per liter(EXOBGAPC _ugL_1) </definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_fDOM_RFU</attributeName>
+          <attributeDefinition>Data flag for EXO2 fluorescent dissolved organic matter data in Relative Fluorescence Units (EXOfDOM_RFU_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 fluorescent dissolved organic matter data in Relative Fluorescence Units (EXOfDOM_RFU_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_fDOM_QSU</attributeName>
+          <attributeDefinition>Data flag for EXO2 fluorescent dissolved organic matter data in Quinine Sulfate Units(EXOfDOM_QSU_1)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for EXO2 fluorescent dissolved organic matter data in Quinine Sulfate Units(EXOfDOM_QSU_1)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Flag_LvlPres</attributeName>
+          <attributeDefinition>Data flag for pressure transducer at 9m (Lvl_psi_9, LvlTemp_C_9)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>Data flag for pressure transducer at 9m (Lvl_psi_9, LvlTemp_C_9)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>value is missing</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>182886</numberOfRecords>
+    </dataTable>
+    <otherEntity>
+      <entityName>FCR_catwalk_QAQC_function_2018_2021.R</entityName>
+      <entityDescription>Automated QAQC script</entityDescription>
+      <physical>
+        <objectName>FCR_catwalk_QAQC_function_2018_2021.R</objectName>
+        <size unit="bytes">42457</size>
+        <authentication method="MD5">ed62bfbe1ecff6ae8e9408945d87b25f</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>text/plain</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>FCR_catwalk_QAQC_Plots_2018_2021.R</entityName>
+      <entityDescription>Final script to run QAQC</entityDescription>
+      <physical>
+        <objectName>FCR_catwalk_QAQC_Plots_2018_2021.R</objectName>
+        <size unit="bytes">34870</size>
+        <authentication method="MD5">96c2244c01e135bd2957b0db19a6ce7c</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>text/plain</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+    <otherEntity>
+      <entityName>FCR_CAT_MaintenanceLog_2018_2021.txt</entityName>
+      <entityDescription>Maintenance log for catwalk sensors</entityDescription>
+      <physical>
+        <objectName>FCR_CAT_MaintenanceLog_2018_2021.txt</objectName>
+        <size unit="bytes">15749</size>
+        <authentication method="MD5">d8b0551ab1c1e48f8c0d5695e1797762</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>text/plain</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+  </dataset>
+  <additionalMetadata>
+    <metadata>
+      <unitList>
+        <unit id="microSiemensPerCentimeter" multiplierToSI="1.00E-04" name="microSiemensPerCentimeter" parentSI="siemenPerMeter" unitType="conductance">
+          <description>microSiemenPerCentimeter</description>
+        </unit>
+        <unit id="RelativeFluorescenceUnits" multiplierToSI="" name="RelativeFluorescenceUnits" parentSI="" unitType="dimensionless">
+          <description>measurement of the relative amount of fluorescence excitation detected in response to particular wavelength of light</description>
+        </unit>
+        <unit id="QuinineSulfateUnits" multiplierToSI="" name="QuinineSulfateUnits" parentSI="" unitType="dimensionless">
+          <description>measurement of the relative amount of fluorescence excitation detected in response to fluorescent dissolved organic matter</description>
+        </unit>
+        <unit id="psig" multiplierToSI="17.85" name="psig" parentSI="kilogramsPerSquareMeter" unitType="arealMassDensity">
+          <description>pounds per square inch guage</description>
+        </unit>
+      </unitList>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>
