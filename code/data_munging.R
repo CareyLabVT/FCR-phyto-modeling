@@ -7,6 +7,7 @@
 
 library(tidyverse)
 library(lubridate)
+library(data.table)
 
 ##Data download----
 
@@ -74,8 +75,37 @@ download.file(data,destfile = "./data/raw/FCR_Catwalk_2018_2021.csv", method='li
 
 fp <- read_csv("./data/raw/FluoroProbe_2014_2021.csv") %>%
   filter(Reservoir == "FCR" & Site == 50)
-write.csv(fp, "./data/predictors/FluoroProbe_2014_2021_FCR_50.csv")
+write.csv(fp, "./data/predictors/FluoroProbe_2014_2021_FCR_50.csv", row.names = FALSE)
 
-ctd <- read_csv("./data/raw/CTD dataset 2013-2021.csv") %>%
+ctd <- fread("./data/raw/CTD dataset 2013-2021.csv")
+ctd <- tibble(ctd) %>%
+  select(Reservoir, Site, Date, Depth_m, Temp_C, Chla_ugL, PAR_umolm2s, Desc_rate, Flag_Temp, Flag_Chla, Flag_PAR, Flag_DescRate) %>%
+  filter(Reservoir == "FCR" & Site == 50) 
+write.csv(ctd, "./data/predictors/CTD_2013_2021_subset_FCR_50.csv", row.names = FALSE)
+
+secchi <- read_csv("./data/raw/Secchi_depth_2013-2021.csv") %>%
   filter(Reservoir == "FCR" & Site == 50)
-write.csv(fp, "./data/predictors/FluoroProbe_2014_2021_FCR_50.csv")
+write.csv(secchi, "./data/predictors/Secchi_depth_2013-2021_FCR_50.csv", row.names = FALSE)
+
+chemistry <- read_csv("./data/raw/chemistry_2013_2021.csv") %>%
+  filter(Reservoir == "FCR" & Site == 50)
+write.csv(secchi, "./data/predictors/chemistry_2013-2021_FCR_50.csv", row.names = FALSE)
+
+ysipar <- read_csv("./data/raw/YSI_PAR_profiles_2013-2021.csv") %>%
+  filter(Reservoir == "FCR" & Site == 50)
+write.csv(ysipar, "./data/predictors/YSI_PAR_profiles_2013-2021_FCR_50.csv", row.names = FALSE)
+
+chla <- read_csv("./data/raw/manual_chlorophyll_2014_2021.csv") %>%
+  filter(Reservoir == "FCR" & Site == 50)
+write.csv(ysipar, "./data/predictors/manual_chlorophyll_2014_2021_FCR_50.csv", row.names = FALSE)
+
+catwalk <- fread("./data/raw/FCR_Catwalk_2018_2021.csv")
+colnames(catwalk)
+catwalk <- catwalk[,c(1:13,24,30,31,34,35,37,47:56,63,69:70,73:74)]
+colnames(catwalk)
+catwalk <- tibble(catwalk) %>%
+  filter(Reservoir == "FCR" & Site == 50) 
+exo <- catwalk[,c(1:3,15:16,31:32)]
+catwalk_pred <- catwalk[,-c(15:16,31:32)]
+write.csv(exo, "./data/targets/EXO_chla_2018_2021.csv", row.names = FALSE)
+write.csv(catwalk_pred,"./data/predictors/FCR_Catwalk_subset_2018_2021.csv", row.names = FALSE)
