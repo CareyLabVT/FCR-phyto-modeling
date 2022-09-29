@@ -59,12 +59,6 @@ destination <- "./data/raw"
 
 download.file(data,destfile = "./data/raw/FCR_Met_final_2015_2021.csv", method='libcurl')
 
-#download met data from EDI
-data  <- "https://portal.edirepository.org/nis/dataviewer?packageid=edi.389.6&entityid=a5524c686e2154ec0fd0459d46a7d1eb"
-destination <- "./data/raw"
-
-download.file(data,destfile = "./data/raw/FCR_Met_final_2015_2021.csv", method='libcurl')
-
 #download EXO data from EDI
 data  <- "https://portal.edirepository.org/nis/dataviewer?packageid=edi.271.6&entityid=23a191c1870a5b18cbc17f2779f719cf"
 destination <- "./data/raw"
@@ -89,7 +83,7 @@ write.csv(secchi, "./data/predictors/Secchi_depth_2013-2021_FCR_50.csv", row.nam
 
 chemistry <- read_csv("./data/raw/chemistry_2013_2021.csv") %>%
   filter(Reservoir == "FCR" & Site == 50)
-write.csv(secchi, "./data/predictors/chemistry_2013-2021_FCR_50.csv", row.names = FALSE)
+write.csv(chemistry, "./data/predictors/chemistry_2013-2021_FCR_50.csv", row.names = FALSE)
 
 ysipar <- read_csv("./data/raw/YSI_PAR_profiles_2013-2021.csv") %>%
   filter(Reservoir == "FCR" & Site == 50)
