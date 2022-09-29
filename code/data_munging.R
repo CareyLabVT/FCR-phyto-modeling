@@ -88,8 +88,8 @@ secchi <- read_csv("./data/raw/Secchi_depth_2013-2021.csv") %>%
 write.csv(secchi, "./data/predictors/Secchi_depth_2013-2021_FCR_50.csv", row.names = FALSE)
 
 chemistry <- read_csv("./data/raw/chemistry_2013_2021.csv") %>%
-  filter(Reservoir == "FCR" & Site == 50)
-write.csv(chemistry, "./data/predictors/chemistry_2013-2021_FCR_50.csv", row.names = FALSE)
+  filter(Reservoir == "FCR" & (Site == 50 | Site == 100))
+write.csv(chemistry, "./data/predictors/chemistry_2013-2021_FCR_50_100.csv", row.names = FALSE)
 
 ysipar <- read_csv("./data/raw/YSI_PAR_profiles_2013-2021.csv") %>%
   filter(Reservoir == "FCR" & Site == 50)
