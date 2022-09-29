@@ -77,6 +77,12 @@ ctd <- tibble(ctd) %>%
   filter(Reservoir == "FCR" & Site == 50) 
 write.csv(ctd, "./data/predictors/CTD_2013_2021_subset_FCR_50.csv", row.names = FALSE)
 
+met <- fread("./data/raw/FCR_Met_final_2015_2021.csv")
+ctd <- tibble(ctd) %>%
+  select(Reservoir, Site, Date, Depth_m, Temp_C, Chla_ugL, PAR_umolm2s, Desc_rate, Flag_Temp, Flag_Chla, Flag_PAR, Flag_DescRate) %>%
+  filter(Reservoir == "FCR" & Site == 50) 
+write.csv(ctd, "./data/predictors/CTD_2013_2021_subset_FCR_50.csv", row.names = FALSE)
+
 secchi <- read_csv("./data/raw/Secchi_depth_2013-2021.csv") %>%
   filter(Reservoir == "FCR" & Site == 50)
 write.csv(secchi, "./data/predictors/Secchi_depth_2013-2021_FCR_50.csv", row.names = FALSE)
