@@ -447,4 +447,13 @@ colnames(ctd) <- c("Date","daily_median_CTD_Temp_C","flag_daily_median_CTD_Temp_
 
 
 ##MEGAMATRIX----
-
+mega <- left_join(met, inf, by='Date') %>%
+  left_join(., exo, by='Date') %>%
+  left_join(., chla, by='Date') %>%
+  left_join(., chem, by='Date') %>%
+  left_join(., inf_chem, by='Date') %>%
+  left_join(., secchi, by='Date') %>%
+  left_join(., ctd, by='Date')
+colnames(mega)
+mega <- mega[,c(1,10,11,2:9,12:23)]
+write.csv(mega, file = "./data/LSTM_dataset_30SEP22.csv", row.names = FALSE)
