@@ -71,7 +71,7 @@ at_plot <- ggplot(data = met, aes(x = Date, y = median_at_interp, col = Interp_F
   theme_bw()
 at_plot
 
-ggsave(at_plot, filename = "./figures/air_temperature.png",height = 4, width = 6,
+ggsave(at_plot, filename = "./figures/air_temperature.png",height = 4, width = 10,
        units = "in", dpi = 300, dev = "png")
 
 swr_plot <- ggplot(data = met, aes(x = Date, y = median_swr_interp, col = Interp_Flag_ShortwaveRadiationDown_W_m2))+
@@ -81,7 +81,7 @@ swr_plot <- ggplot(data = met, aes(x = Date, y = median_swr_interp, col = Interp
   theme_bw()
 swr_plot
 
-ggsave(at_plot, filename = "./figures/shortwave_radiation.png",height = 4, width = 6,
+ggsave(at_plot, filename = "./figures/shortwave_radiation.png",height = 4, width = 10,
        units = "in", dpi = 300, dev = "png")
 
 #set column names to be consistent for megamatrix
@@ -119,7 +119,7 @@ inf_plot <- ggplot(data = inf, aes(x = Date, y = median_WVWA_Flow_cms_interp, co
   theme_bw()
 inf_plot
 
-ggsave(inf_plot, filename = "./figures/inflow.png",height = 4, width = 6,
+ggsave(inf_plot, filename = "./figures/inflow.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 inf <- inf[,c(1,4,5)]
@@ -162,7 +162,7 @@ exo_temp_plot <- ggplot(data = exo, aes(x = Date, y = median_EXOTemp_C_1_interp,
   theme_bw()
 exo_temp_plot
 
-ggsave(exo_temp_plot, filename = "./figures/exo_water_temperature.png",height = 4, width = 6,
+ggsave(exo_temp_plot, filename = "./figures/exo_water_temperature.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 exo <- exo[,c(1,4,5)]
@@ -208,7 +208,7 @@ chla_plot <- ggplot(data = chla, aes(x = Date, y = median_EXOChla_ugL_1_interp, 
   theme_bw()
 chla_plot
 
-ggsave(chla_plot, filename = "./figures/chla.png",height = 4, width = 6,
+ggsave(chla_plot, filename = "./figures/chla.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 chla <- chla[,c(1,4,5)]
@@ -269,7 +269,7 @@ srp_plot <- ggplot(data = chem, aes(x = Date, y = median_SRP_ugL_interp, col = I
   theme_bw()
 srp_plot
 
-ggsave(srp_plot, filename = "./figures/Site50_srp.png",height = 4, width = 6,
+ggsave(srp_plot, filename = "./figures/Site50_srp.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 din_plot <- ggplot(data = chem, aes(x = Date, y = median_DIN_ugL_interp, col = Interp_Flag_din))+
@@ -279,7 +279,7 @@ din_plot <- ggplot(data = chem, aes(x = Date, y = median_DIN_ugL_interp, col = I
   theme_bw()
 din_plot
 
-ggsave(din_plot, filename = "./figures/Site50_din.png",height = 4, width = 6,
+ggsave(din_plot, filename = "./figures/Site50_din.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 chem <- chem[,c(1,5,7,6,8)]
@@ -335,7 +335,7 @@ inf_srp_plot <- ggplot(data = inf_chem, aes(x = Date, y = median_SRP_ugL_interp,
   theme_bw()
 inf_srp_plot
 
-ggsave(inf_srp_plot, filename = "./figures/inflow_srp.png",height = 4, width = 6,
+ggsave(inf_srp_plot, filename = "./figures/inflow_srp.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 inf_din_plot <- ggplot(data = inf_chem, aes(x = Date, y = median_DIN_ugL_interp, col = Interp_Flag_din))+
@@ -345,7 +345,7 @@ inf_din_plot <- ggplot(data = inf_chem, aes(x = Date, y = median_DIN_ugL_interp,
   theme_bw()
 inf_din_plot
 
-ggsave(inf_din_plot, filename = "./figures/inflow_din.png",height = 4, width = 6,
+ggsave(inf_din_plot, filename = "./figures/inflow_din.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 inf_chem <- inf_chem[,c(1,5,7,6,8)]
@@ -356,14 +356,95 @@ colnames(inf_chem) <- c("Date","daily_median_inflow_srp_interp_ugL","flag_daily_
 #NOTE: pick up here; don't calculate anything from Secchi b/c the algorithm
 #doesn't care about the magnitude of the values anyways; just check flags and 
 #interpolate to daily and be done!
-secchi <- read_csv("./data/predictors/Secchi_depth_2013-2021_FCR_50.csv") 
+secchi <- read_csv("./data/predictors/Secchi_depth_2013-2021_FCR_50.csv") %>%
+  mutate(Date = date(DateTime)) %>%
+  filter(Date >= "2018-08-01" & Date <= "2021-12-31") %>%
+  group_by(Reservoir, Date) %>%
+  summarize(median_Secchi_m = median(Secchi_m, na.rm = TRUE)) %>%
+  filter(Date >= "2018-08-01")
+
+#create daily date vector
+daily_dates <- tibble(get_model_dates(model_start = "2018-08-01", model_stop = "2021-12-31", time_step = 'days'))
+colnames(daily_dates)[1] <- "Date"
+
+#linear interpolation to fill in missing values
+secchi <- left_join(daily_dates, secchi, by = "Date")
+med_Secchi_m <- na.approx(secchi$median_Secchi_m)
+tail(secchi)
+
+secchi$median_Secchi_m_interp <- 1.86
+secchi$median_Secchi_m_interp[6:1224] <- med_Secchi_m
+secchi$median_Secchi_m_interp[1225:1249] <- 1.75
+
+secchi <- secchi %>%
+  mutate(Interp_Flag_secchi = ifelse(is.na(median_Secchi_m),TRUE,FALSE))
+
+secchi_plot <- ggplot(data = secchi, aes(x = Date, y = median_Secchi_m_interp, col = Interp_Flag_secchi))+
+  geom_point(size = 1)+
+  ggtitle("FCR Secchi depth")+
+  ylab("daily Secchi depth (m)")+
+  theme_bw()
+secchi_plot
+
+ggsave(secchi_plot, filename = "./figures/secchi.png",height = 4, width = 8,
+       units = "in", dpi = 300, dev = "png")
+
+secchi <- secchi[,c(1,4,5)]
+colnames(secchi) <- c("Date","daily_median_Secchi_interp_m","flag_daily_median_Secchi_interp_m")
+
 
 ##CTD----
 
 #'use closest function to get 1.6 m, check flags, interpolate
+ctd <- fread("./data/predictors/CTD_2013_2021_subset_FCR_50.csv")
+
+ctd <- tibble(ctd) %>%
+  filter(Flag_Temp == 0) %>%
+  mutate(Date = date(Date)) %>%
+  filter(Date >= "2018-08-01" & Date <= "2021-12-31") %>%
+  select(Date, Depth_m, Temp_C) %>%
+  group_by(Date) %>%
+  slice(which.min(abs(as.numeric(Depth_m) - 1.6))) %>%
+  select(-Depth_m) %>%
+  summarize(median_Temp_C = median(Temp_C, na.rm = TRUE)) 
+  
+  
+
+#create daily date vector
+daily_dates <- tibble(get_model_dates(model_start = "2018-08-01", model_stop = "2021-12-31", time_step = 'days'))
+colnames(daily_dates)[1] <- "Date"
+
+#linear interpolation to fill in missing values
+ctd <- left_join(daily_dates, ctd, by = "Date")
+med_Temp_C <- na.approx(ctd$median_Temp_C)
+tail(ctd)
+
+ctd$median_Temp_C_interp <- 24.5979
+ctd$median_Temp_C_interp[2:1232] <- med_Temp_C
+ctd$median_Temp_C_interp[1233:1249] <- 6.0624
+
+ctd <- ctd %>%
+  mutate(Interp_Flag_wt = ifelse(is.na(median_Temp_C),TRUE,FALSE))
+
+ctd_plot <- ggplot(data = ctd, aes(x = Date, y = median_Temp_C_interp, col = Interp_Flag_wt))+
+  geom_point(size = 1)+
+  ggtitle("FCR water temperature @ 1.6 m")+
+  ylab("daily water temperature (degrees C)")+
+  theme_bw()
+ctd_plot
+
+ggsave(secchi_plot, filename = "./figures/secchi.png",height = 4, width = 8,
+       units = "in", dpi = 300, dev = "png")
+
+ctd <- ctd[,c(1,3,4)]
+colnames(ctd) <- c("Date","daily_median_CTD_Temp_C","flag_daily_median_CTD_Temp_C")
 
 
 ##FLORA----
 
 #'double-check with team about this - do we really want this as a predictor?
 #'I think we want to assimilate these data, not have them as drivers
+
+
+##MEGAMATRIX----
+
