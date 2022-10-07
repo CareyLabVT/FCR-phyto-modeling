@@ -36,7 +36,6 @@ get_model_dates = function(model_start, model_stop, time_step = 'days'){
 
 ##MET----
 met_raw <- fread("./data/raw/FCR_Met_final_2015_2021.csv")
-colnames(met)
 met <- tibble(met_raw) %>%
   select(Reservoir, DateTime, ShortwaveRadiationDown_Average_W_m2, Flag_ShortwaveRadiationDown_Average_W_m2, AirTemp_Average_C, Flag_AirTemp_Average_C) %>%
   filter(!Flag_ShortwaveRadiationDown_Average_W_m2 == 5, !Flag_AirTemp_Average_C == 5) %>%
@@ -81,7 +80,7 @@ swr_plot <- ggplot(data = met, aes(x = Date, y = median_swr_interp, col = Interp
   theme_bw()
 swr_plot
 
-ggsave(at_plot, filename = "./figures/shortwave_radiation.png",height = 4, width = 10,
+ggsave(swr_plot, filename = "./figures/shortwave_radiation.png",height = 4, width = 10,
        units = "in", dpi = 300, dev = "png")
 
 #set column names to be consistent for megamatrix
@@ -433,7 +432,7 @@ ctd_plot <- ggplot(data = ctd, aes(x = Date, y = median_Temp_C_interp, col = Int
   theme_bw()
 ctd_plot
 
-ggsave(secchi_plot, filename = "./figures/secchi.png",height = 4, width = 8,
+ggsave(ctd_plot, filename = "./figures/CTD_water_temperature.png",height = 4, width = 8,
        units = "in", dpi = 300, dev = "png")
 
 ctd <- ctd[,c(1,3,4)]
@@ -444,7 +443,107 @@ colnames(ctd) <- c("Date","daily_median_CTD_Temp_C","flag_daily_median_CTD_Temp_
 
 #'double-check with team about this - do we really want this as a predictor?
 #'I think we want to assimilate these data, not have them as drivers
+#'
+#'07OCT22 the team wants FP in the dataframe :-)
 
+#'get 1.6 m, check flags, interpolate
+fp <- read_csv("./data/predictors/FluoroProbe_2014_2021_FCR_50.csv") %>%
+  filter(Flag_GreenAlgae == 0,
+         Flag_BluegreenAlgae == 0,
+         Flag_BrownAlgae == 0,
+         Flag_MixedAlgae == 0,
+         Flag_TotalConc == 0) %>%
+  mutate(Date = date(DateTime)) %>%
+  filter(Date >= "2018-08-01" & Date <= "2021-12-31") %>%
+  mutate(TotalConcNoMixed_ugL = TotalConc_ugL - MixedAlgae_ugL) %>%
+  select(Date, Depth_m, GreenAlgae_ugL, Bluegreens_ugL, BrownAlgae_ugL, TotalConcNoMixed_ugL) %>%
+  group_by(Date) %>%
+  slice(which.min(abs(as.numeric(Depth_m) - 1.6))) %>%
+  select(-Depth_m) %>%
+  summarize(median_GreenAlgae_ugL = median(GreenAlgae_ugL, na.rm = TRUE),
+            median_Bluegreens_ugL = median(Bluegreens_ugL, na.rm = TRUE),
+            median_BrownAlgae_ugL = median(BrownAlgae_ugL, na.rm = TRUE),
+            median_TotalConcNoMixed_ugL = median(TotalConcNoMixed_ugL, na.rm = TRUE)) 
+
+
+
+#create daily date vector
+daily_dates <- tibble(get_model_dates(model_start = "2018-08-01", model_stop = "2021-12-31", time_step = 'days'))
+colnames(daily_dates)[1] <- "Date"
+
+#linear interpolation to fill in missing values
+fp <- left_join(daily_dates, fp, by = "Date")
+med_GreenAlgae_ugL <- na.approx(fp$median_GreenAlgae_ugL)
+med_Bluegreens_ugL <- na.approx(fp$median_Bluegreens_ugL)
+med_BrownAlgae_ugL <- na.approx(fp$median_BrownAlgae_ugL)
+med_TotalConcNoMixed_ugL <- na.approx(fp$median_TotalConcNoMixed_ugL)
+
+tail(fp)
+
+fp$median_GreenAlgae_ugL_interp <- 3.25
+fp$median_GreenAlgae_ugL_interp[2:1224] <- med_GreenAlgae_ugL
+fp$median_GreenAlgae_ugL_interp[1225:1249] <- 0.00
+
+fp$median_Bluegreens_ugL_interp <- 6.93
+fp$median_Bluegreens_ugL_interp[2:1224] <- med_Bluegreens_ugL
+fp$median_Bluegreens_ugL_interp[1225:1249] <- 2.37
+
+fp$median_BrownAlgae_ugL_interp <- 2.32
+fp$median_BrownAlgae_ugL_interp[2:1224] <- med_BrownAlgae_ugL
+fp$median_BrownAlgae_ugL_interp[1225:1249] <- 30.08
+
+fp$median_TotalConcNoMixed_ugL_interp <- 12.50
+fp$median_TotalConcNoMixed_ugL_interp[2:1224] <- med_TotalConcNoMixed_ugL
+fp$median_TotalConcNoMixed_ugL_interp[1225:1249] <- 32.45
+
+fp <- fp %>%
+  mutate(Interp_Flag_ga = ifelse(is.na(median_GreenAlgae_ugL),TRUE,FALSE),
+         Interp_Flag_bg = ifelse(is.na(median_Bluegreens_ugL),TRUE,FALSE),
+         Interp_Flag_ba = ifelse(is.na(median_BrownAlgae_ugL),TRUE,FALSE),
+         Interp_Flag_tc = ifelse(is.na(median_TotalConcNoMixed_ugL),TRUE,FALSE))
+
+ga_plot <- ggplot(data = fp, aes(x = Date, y = median_GreenAlgae_ugL_interp, col = Interp_Flag_ga))+
+  geom_point(size = 1)+
+  ggtitle("FCR green algae biomass @ 1.6 m")+
+  ylab("daily green algae biomass (ug/L)")+
+  theme_bw()
+ga_plot
+
+ggsave(ga_plot, filename = "./figures/greenAlgae.png",height = 4, width = 8,
+       units = "in", dpi = 300, dev = "png")
+
+bg_plot <- ggplot(data = fp, aes(x = Date, y = median_Bluegreens_ugL_interp, col = Interp_Flag_bg))+
+  geom_point(size = 1)+
+  ggtitle("FCR cyanobacteria biomass @ 1.6 m")+
+  ylab("daily cyanobacteria biomass (ug/L)")+
+  theme_bw()
+bg_plot
+
+ggsave(bg_plot, filename = "./figures/blueGreens.png",height = 4, width = 8,
+       units = "in", dpi = 300, dev = "png")
+
+ba_plot <- ggplot(data = fp, aes(x = Date, y = median_BrownAlgae_ugL_interp, col = Interp_Flag_ba))+
+  geom_point(size = 1)+
+  ggtitle("FCR brown algae biomass @ 1.6 m")+
+  ylab("daily brown algae biomass (ug/L)")+
+  theme_bw()
+ba_plot
+
+ggsave(ba_plot, filename = "./figures/brownAlgae.png",height = 4, width = 8,
+       units = "in", dpi = 300, dev = "png")
+
+tc_plot <- ggplot(data = fp, aes(x = Date, y = median_TotalConcNoMixed_ugL_interp, col = Interp_Flag_tc))+
+  geom_point(size = 1)+
+  ggtitle("FCR total phytoplankton biomass @ 1.6 m")+
+  ylab("daily total phytoplankton biomass (ug/L)")+
+  theme_bw()
+tc_plot
+
+ggsave(tc_plot, filename = "./figures/totalConcNoMixed.png",height = 4, width = 8,
+       units = "in", dpi = 300, dev = "png")
+
+fp <- fp[,c(1,6,10,7,11,8,12,9,13)]
+colnames(fp) <- c("Date","daily_median_GreenAlgae_ugL","flag_daily_median_GreenAlgae_ugL","daily_median_Bluegreens_ugL","flag_daily_median_Bluegreens_ugL","daily_median_BrownAlgae_ugL","flag_daily_median_BrownAlgae_ugL","daily_median_TotalConcNoMixed_ugL","flag_daily_median_TotalConcNoMixed_ugL")
 
 ##MEGAMATRIX----
 mega <- left_join(met, inf, by='Date') %>%
@@ -453,7 +552,10 @@ mega <- left_join(met, inf, by='Date') %>%
   left_join(., chem, by='Date') %>%
   left_join(., inf_chem, by='Date') %>%
   left_join(., secchi, by='Date') %>%
-  left_join(., ctd, by='Date')
+  left_join(., ctd, by='Date') %>%
+  left_join(., fp, by='Date')
 colnames(mega)
-mega <- mega[,c(1,10,11,2:9,12:23)]
-write.csv(mega, file = "./data/LSTM_dataset_30SEP22.csv", row.names = FALSE)
+mega <- mega[,c(1,2:9,12:31,10,11)]
+write.csv(mega, file = "./data/LSTM_dataset_07OCT22.csv", row.names = FALSE)
+col_key <- data.frame(column_names = colnames(mega))
+write.csv(col_key, file = "./data/LSTM_dataset_column_key_07OCT22.csv")
