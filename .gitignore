@@ -4,3 +4,5 @@
 .Ruserdata
 data/raw/*
 data/predictors/FCR_Met_final_2015_2021.csv
+.DS_Store
+data/output.nc

@@ -13,3 +13,11 @@ LSTM_dataset_column_key_07OCT22.csv - guide to column in LSTM_dataset_07OCT22.cs
   column_title: column title
   column_description: description of column contents
   column_type: indicates whether the column contents are a target, feature, or interpolation flag
+
+LSTM_modeled_dataset_10NOV22.csv - environmental and modeled data from Falling Creek Reservoir; includes three years of additional data beyond what is provided in previous datasets; NOTE that not all variables are modeled, specifically, air temperature, shortwave radiation, stream inflow, and concentrations of DIN and SRP in the inflow stream are interpolated from observations to be used as input to the model; all other variables are pulled from model output
+LSTM_modeled_dataset_column_key_10NOV22.csv - guide to column in LSTM_modeled_dataset_10NOV22.csv
+  column_number: position of column in dataframe
+  column_title: column title
+  column_description: description of column contents
+  column_type: indicates whether the column contents are a target, feature, or interpolation flag
+

@@ -1,0 +1,15 @@
+column_number,column_names,column_description,column_type
+1,Date,yyyy-mm-dd,date 
+2,median_AirTemp,daily median of air temperature in degrees Celsius,feature
+3,median_ShortWave,daily median of shortwave radiation in Watts per meter squared,feature
+4,FLOW,daily median of stream inflow into reservoir in cubic meters per second,feature
+5,temp,daily median of modeled water temperature at a depth of 1.6 m in degrees Celsius,feature
+6,srp,daily median of modeled soluble reactive phosphorus at 1.6 m depth in micrograms per liter,feature
+7,din,daily median of modeled dissolved inorganic nitrogen at 1.6 m depth in micrograms per liter,feature
+8,PHS_frp_inflow,daily median of soluble reactive phosphorus in the inflow stream in micrograms per liter,feature
+9,DIN_inflow,daily median of dissolved inorganic nitrogen in the inflow stream in micrograms per liter,feature
+10,kd,daily median of modeled light extinction coefficient per meter at the deepest site of the reservoir,feature
+11,green,daily median of modeled green algae biomass at 1.6 m depth in micrograms per liter,feature
+12,cyano,daily median of modeled cyanobacteria biomass at 1.6 m depth in micrograms per liter,feature
+13,brown,daily median of modeled brown algae biomass at 1.6 m depth in micrograms per liter,feature
+14,chla,daily median of modeled chlorophyll-a at 1.6 m depth in micrograms per liter,target
