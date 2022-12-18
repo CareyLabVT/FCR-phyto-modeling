@@ -9,43 +9,6 @@ editor: visual
 
 The example code below is pulled from <https://bradduthie.github.io/blog/individual-based-models-in-r/>.
 
-## Thoughts on adapting this for phytos in FCR
-
-1.  Instead of x_loc and y_loc, would have just y_loc for depth (1-D)
-    1.  eventually would need to think about how to make this align with the variable layers in GLM-AED, but for now start with a fixed layer thickness (maybe 0.1 m)
-
-    2.  location of individuals should be seeded based on depth profile (basically, draw from a distribution that IS the depth profile --\> convert depth profile to a probability distribution (how?), then assign position of individuals based on that); basically, depth stays the same and the biomass needs to be converted into a probability; there is probably (hopefully?) a standard way to do this OR just assign numbers of individuals to a depth based on biomass at that depth (e.g., one individual per ug/L) and have growth/death act on that as an agent
-2.  Individual vs. agents
-    1.  for now, start with individuals, then figure out agents; eventually could an "agent" just be translated into biomass via a conversion factor, sort of like Xcc in AED?; OR see above where one individual is one ug/L
-
-    2.  for now, start with one taxon to get the model working, but eventually could seed individual characteristics based on proportion of FP groups at a given depth
-3.  What processes do we want to model, and how?
-    1.  Start with the basics
-
-        1.  movement: buoyancy and sinking; would need water density (or temperature) as an input
-
-            1.  how will boundaries work? the surface will be sticky (particles stay there), and the bottom will be death (particles die there; OR maybe wait and see b/c maybe they always die before they get to the bottom?)
-
-        2.  growth: this can be modeled similarly to the simple process model, with dependence on temperature and light; skip nutrients for now; importantly, the **probability** of growth is determined by temp/light
-
-        3.  mortality: again, similar to process model; the **probability** of death is determined by temp-based respiration + some fixed probability due to grazing/virus/all the other things
-
-    2.  What timestep do we want to work on?
-
-        1.  Ideally, hourly, and why not start there? I think it's reasonable...right now we just need to show forecasts over a pretty short time period
-
-    3.  Other practicalities: what data do we use to implement this to get to the figure that is needed for the proposal?
-
-        1.  first instinct is to work w/ 2021 data for hindcasting, b/c I have that in hand from previous project
-
-        2.  calibrate using data from 2019? b/c that will be 365\*24 timesteps, which is a lot
-
-        3.  validate using data from 2020
-
-        4.  when get to hindcasting, could use persistence forecast of temp + NOAA drivers as one scenario, then GLM forecast of temp + NOAA drivers as other scenario
-
-        5.  for cal/val, SHOULD do a stacked product of NOAA forecasts instead of met observed, per Freya's NEON forecasting challenge workflow
-
 ```{r}
 # =============================================================================
 # Movement function
