@@ -18,17 +18,25 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
     3.  Create "sticky" boundaries (individuals who move past the boundary are put back at the edge) - check
 
-    4.  Seed individuals based on a depth profile from 0-9.3 m in 0.1 m increments, using an actual FP profile as a starting point
+    4.  Seed individuals based on a depth profile from 0-9.3 m in 0.1 m increments, using an actual FP profile as a starting point - check
 
     5.  Eliminate birth and death for now and predators altogether - check
 
-    6.  Alter plot so that you can see how individuals are moving over depth/time
+    6.  Alter plot so that you can see how individuals are moving over depth/time - check
+2.  Movement of individuals given static water temp profile using turbulence/diffusion equation
+    1.  Create a new dataframe for environmental conditions that can be referenced during model run (columns for now are depth, water temperature)
+
+    2.  Figure out what other environmental conditions/traits need to be specified to provide all the correct information to eq. 9 of Hassan Ranjbar, Hamilton, et al.
+
+    3.  Add necessary environmental conditions/traits to environmental dataframe and inds, respectively
+
+    4.  Edit "movement" function to use eq. 9 instead of random movement
 
 ```{r}
 # =============================================================================
 # Movement function
 # =============================================================================
-movement <- function(inds, yloc = 3, ymax = 9.3){
+movement <- function(inds, yloc = 2, ymax = 9.3){
     total_inds   <- dim(inds)[1]; # Get the number of individuals in inds
     move_dists   <- c(-0.1, 0, 0.1);  # Define the possible distances to move
     y_move       <- sample(x = move_dists, size = total_inds, replace = TRUE);
@@ -92,13 +100,27 @@ death <- function(inds, xlen = 8, ylen = 8, dcol = 5, xcol = 2, ycol = 3){
 # ----- Initialise individuals (prey)
 # TMRW: pick back up here
 # Pull in an example FP profile
-# Assign all depths in between 0.1 m increments to the relevant increment (e.g., anything between 0.06 - 0.15 is 0.1; anything between 0.16 and 0.25 is 0.2; etc.)
-# Create inds by looping through each depth increment, summing the total number of ug/L in that increment, and then creating that number of individuals at that depth
-# Use this to initialize sim
-inds           <- array(data = 0, dim = c(40, 5));
-inds[,1]       <- rnorm(n = dim(inds)[1], mean = 23, sd = 3);
-inds[,2]       <- sample(x = 1:8, size = dim(inds)[1], replace = TRUE);
-inds[,3]       <- sample(x = 1:8, size = dim(inds)[1], replace = TRUE);
+fp <- read_csv("./data/FluoroProbe_2018-08-02_FCR_50.csv")
+
+# Create inds by looping through each depth increment and then creating that number of individuals at that depth based on ug/L
+depths <- seq(from = 0.1, to = 9.3, by = 0.1)
+
+inds <- NULL
+
+for(i in 1:length(depths)){
+  temp <- fp[i,]
+  
+  temp.df <- array(data = 0, dim = c(round(temp$TotalConcNoMixed_ugL,0),2))
+  temp.df[,1] <- 1
+  temp.df[,2] <- depths[i]
+  
+  inds <- rbind(inds, temp.df)
+}
+colnames(inds) <- c("PFG","yloc")
+
+check <- data.frame(inds) %>%
+  group_by(yloc) %>%
+  summarize(sum(PFG))
 
 # ---- Start the simulation as before
 ts         <- 0;
@@ -116,23 +138,26 @@ while(ts < time_steps){
 # =============================================================================
 # Print the results
 # =============================================================================
-ind_abund <- array(data = NA, dim = c(40, 3));
+ind_yloc <- array(data = NA, dim = c(40,length(depths)+1));
+colnames(ind_yloc) <- c("timestep",depths)
 for(i in 1:40){
-    ind_abund[i, 1] <- i;                      # Save the time step
-    ind_abund[i, 2] <- dim(inds_hist[[i]])[1]; # rows in inds_hist[[i]]
-    ind_abund[i, 3] <- dim(pred_hist[[i]])[1]; # rows in pred_hist[[i]]
+  for(j in 1:length(depths)){
+    ind_yloc[i, 1] <- i;                      # Save the time step
+    ind_yloc[i, j+1] <- length(inds_hist[[i]][which(inds_hist[[i]][,2] == depths[j]),1]); # Save the number of individuals at each depth
+  }
 }
-colnames(ind_abund) <- c("time_step", "abundance", "predators");
-print(ind_abund);
+print(ind_yloc);
 
 # =============================================================================
 # Plot the results
 # =============================================================================
-par(mar = c(5, 5, 1, 1));
-plot(x = ind_abund[,2], type = "l", lwd = 3, ylim = c(0, 80), 
-     xlab = "time step", ylab = "Population abundance", cex.axis = 1.5, 
-     cex.lab = 1.5);
-points(x = ind_abund[,3], type = "l", lwd = 3, col = "red");
-legend(x = 0, y = 80, legend = c("Predator", "Prey"), col = c("red", "black"),
-       cex = 1.25, lty = c("solid", "solid"), lwd = c(3, 3));
+plot_yloc <- data.frame(ind_yloc) %>%
+  gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
+  mutate(Depth_m = as.double(substring(Depth_m, 2)))
+head(plot_yloc)
+
+ggplot(data = plot_yloc, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
+  geom_path()+
+  scale_y_reverse()+
+  theme_classic()
 ```
