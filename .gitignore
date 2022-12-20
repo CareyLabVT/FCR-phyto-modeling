@@ -5,5 +5,5 @@
 Eco-KGML/data/raw/*
 Eco-KGML/data/predictors/FCR_Met_final_2015_2021.csv
 .DS_Store
-Eco-KGML/data/output.nc
+**/output.nc
 Eco-KGML/figures/
