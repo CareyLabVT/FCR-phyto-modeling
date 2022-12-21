@@ -24,15 +24,34 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
     6.  Alter plot so that you can see how individuals are moving over depth/time - check
 2.  Movement of individuals given static water temp profile using turbulence/diffusion equation
-    1.  Create a new dataframe for environmental conditions that can be referenced during model run (columns for now are depth, water temperature)
+    1.  Create a new dataframe for environmental conditions that can be referenced during model run (columns for now are depth, water temperature); start w/ constant water temperature so can see if phytos move towards constant distribution across depth over time - check
 
-    2.  Figure out what other environmental conditions/traits need to be specified to provide all the correct information to eq. 9 of Hassan Ranjbar, Hamilton, et al.
+    2.  Figure out what other environmental conditions/traits need to be specified to provide all the correct information to eq. 9 of Hassan Ranjbar, Hamilton, et al. - check
+
+        1.  cell density: \~950 kg m-3 for buoyant cyanos; \~1100 kg m-3 for diatoms (reference Reynolds 2006)
+
+        2.  cell diameter: in meters; thinking somewhere in 10-20 um for FCR since cells usually small
+
+        3.  cell shape: use 1 as a starting point (assuming spherical shape)
 
     3.  Add necessary environmental conditions/traits to environmental dataframe and inds, respectively
 
+        1.  need to calculate dynamic (absolute) viscosity of water; use Korson et al. 1969
+
+        2.  what eq to use to calculate water density from temperature? think might assume pure water for now and use Kell equation (Kell, 1975), then can go from there
+
     4.  Edit "movement" function to use eq. 9 instead of random movement
 
+        1.  first, just incorporate buoyancy/sinking rate term and make sure phytos are behaving as expected
+
+        2.  next, worry about random walk to simulate turbulent transport
+
 ```{r}
+# =============================================================================
+# Load packages
+# =============================================================================
+library(tidyverse)
+
 # =============================================================================
 # Movement function
 # =============================================================================
@@ -95,9 +114,9 @@ death <- function(inds, xlen = 8, ylen = 8, dcol = 5, xcol = 2, ycol = 3){
 }
 
 # =============================================================================
-# Simulate predator-prey dynamics
+# Simulate phytoplankton dynamics
 # =============================================================================
-# ----- Initialise individuals (prey)
+# ----- Initialise individuals (phytos)
 # TMRW: pick back up here
 # Pull in an example FP profile
 fp <- read_csv("./data/FluoroProbe_2018-08-02_FCR_50.csv")
@@ -111,16 +130,19 @@ for(i in 1:length(depths)){
   temp <- fp[i,]
   
   temp.df <- array(data = 0, dim = c(round(temp$TotalConcNoMixed_ugL,0),2))
-  temp.df[,1] <- 1
+  temp.df[,1] <- 1 #placeholder for taxon ID or some other trait
   temp.df[,2] <- depths[i]
   
   inds <- rbind(inds, temp.df)
 }
 colnames(inds) <- c("PFG","yloc")
 
-check <- data.frame(inds) %>%
-  group_by(yloc) %>%
-  summarize(sum(PFG))
+# ----- Initialise environment (water temperature)
+
+env <- array(data = 0, dim = c(length(depths),2))
+  env[,1] <- 10 #water temperature; constant for now
+  env[,2] <- depths
+colnames(env) <- c("wt","yloc")
 
 # ---- Start the simulation as before
 ts         <- 0;

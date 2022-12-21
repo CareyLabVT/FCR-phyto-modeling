@@ -25,7 +25,7 @@ fp <- read_csv("./HABs-ABM/data/FluoroProbe_2014_2021.csv") %>%
 fp2 <- fp %>%
   filter(date(DateTime) == "2018-08-02" & Depth_m <= 9.3) %>%
   mutate(TotalConcNoMixed_ugL = TotalConc_ugL - MixedAlgae_ugL) %>%
-  select(DateTime, Depth_m, GreenAlgae_ugL, Bluegreens_ugL, BrownAlgae_ugL, TotalConcNoMixed_ugL)
+  select(DateTime, Depth_m, GreenAlgae_ugL, Bluegreens_ugL, BrownAlgae_ugL, TotalConcNoMixed_ugL, Temp_degC)
 
 # Assign all depths in between 0.1 m increments to the relevant increment (e.g., anything 
 # between 0.06 - 0.15 is 0.1; anything between 0.16 and 0.25 is 0.2; etc.)
