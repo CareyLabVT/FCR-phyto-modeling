@@ -102,18 +102,20 @@ out <- data.frame(lake = character(),
                   DIN.inf = double(),
                   PHS_frp.inf = double(),
                   PHY_TCHLA_1.5 = double(),
-                  PHY_CHLOROPCH3_1.5 = double(),
-                  PHY_CRYSOPCH1_1.5 = double(),
-                  PHY_CYANOPCH2_1.5 = double(),
-                  PHY_DIATOMPCH4_1.5 = double(),
                   PHS_frp_1.5 = double(),
                   NIT_amm_1.5 = double(),
                   NIT_nit_1.5 = double(),
                   temp_1.5 = double(),
-                  extc_coef_1.5 = double())
+                  extc_coef_1.5 = double(),
+                  brown = double(),
+                  cyano = double(),
+                  green = double())
 
-vars <- c("PHY_TCHLA","PHY_CHLOROPCH3","PHY_CYANOPCH2",
-          "PHY_DIATOMPCH4","PHS_frp","NIT_amm","NIT_nit","temp","extc_coef")
+vars <- c("PHY_TCHLA","PHS_frp","NIT_amm","NIT_nit","temp","extc_coef")
+phyto.M <- c("PHY_CYANOPCH1","PHY_CYANONPCH2","PHY_CHLOROPCH3",
+             "PHY_DIATOMPCH4")
+phyto.S <- c("PHY_CRYSOPCH1","PHY_CYANONPCH2","PHY_CHLOROPCH3",
+             "PHY_DIATOMPCH4")
 
 #' Notes: phyto groups are not the same
 #' Mendota has two cyano groups, one of which is N-fixing
@@ -141,7 +143,8 @@ for(i in 1:length(lakes)){
              time = date(time)) %>%
       group_by(lake, scenario, time) %>%
       summarize(AirTemp = median(AirTemp, na.rm = TRUE),
-                ShortWave = median(ShortWave, na.rm = TRUE))
+                ShortWave = median(ShortWave, na.rm = TRUE)) %>%
+      filter(time >= "2003-11-08" & time <= "2014-12-31")
     
     # Pull discharge data from inflow files and append to met
     if(lakes[i] == "Mendota"){
@@ -202,6 +205,42 @@ for(i in 1:length(lakes)){
       temp <- left_join(temp,var,by = "time")
       
     }
+    
+    phyto.temp <- temp[,"time"]
+    
+    if(lakes[i] == "Mendota"){
+      for(p in 1:length(phyto.M)){
+        depths = 1.5
+        
+        var <- get_var(nc_file, var_name = phyto.M[p], reference="surface", z_out=depths) %>%
+          rename(time = DateTime)
+        
+        phyto.temp <- left_join(phyto.temp,var,by = "time")
+      }
+      
+      phytos1 <- phyto.temp %>%
+        mutate(cyano = PHY_CYANOPCH1_1.5 + PHY_CYANONPCH2_1.5) %>%
+        rename(brown = PHY_DIATOMPCH4_1.5,
+               green = PHY_CHLOROPCH3_1.5) %>%
+        select(time, brown, cyano, green)
+    } else {
+      for(p in 1:length(phyto.S)){
+        depths = 1.5
+        
+        var <- get_var(nc_file, var_name = phyto.S[p], reference="surface", z_out=depths) %>%
+          rename(time = DateTime)
+        
+        phyto.temp <- left_join(phyto.temp,var,by = "time")
+      }
+      
+      phytos1 <- phyto.temp %>%
+        mutate(brown = PHY_CRYSOPCH1_1.5 + PHY_DIATOMPCH4_1.5) %>%
+        rename(cyano = PHY_CYANONPCH2_1.5,
+               green = PHY_CHLOROPCH3_1.5) %>%
+        select(time, brown, cyano, green)
+    }
+    
+    temp <- left_join(temp, phytos1, by = "time")
       
     # Append data to other lake-scenario combinations
     out <- rbind(out, temp)
@@ -211,3 +250,25 @@ for(i in 1:length(lakes)){
 
 sim_vars(file = nc_file)
 #remember to sum NIT_amm and NIT_nit after
+
+out1 <- out %>%
+  mutate(DIN = NIT_amm_1.5 + NIT_nit_1.5) %>%
+  rename(Date = time,
+         median_AirTemp = AirTemp,
+         median_ShortWave = ShortWave,
+         srp = PHS_frp_1.5,
+         din = DIN,
+         PHS_frp_inflow = PHS_frp.inf,
+         DIN_inflow = DIN.inf,
+         kd = extc_coef_1.5,
+         chla = PHY_TCHLA_1.5,
+         temp = temp_1.5) %>%
+  select(-NIT_amm_1.5,-NIT_nit_1.5)
+
+check <- read_csv("./Eco-KGML/data/LSTM_modeled_dataset_10NOV22.csv")
+colnames(check)
+
+out2 <- out1[,c("lake","scenario",colnames(check))]
+write.csv(out2,"./Eco-KGML/data/LSTM_modeled_dataset_Mendota_Sunapee_21DEC22.csv",row.names = FALSE)
+col_key <- data.frame(column_names = colnames(out2))
+write.csv(col_key, file = "./Eco-KGML/data/LSTM_modeled_dataset_Mendota_Sunapee_column_key_21DEC22.csv")
