@@ -56,13 +56,15 @@ library(tidyverse)
 # Movement function
 # =============================================================================
 movement <- function(inds, yloc = 2, ymax = 9.3){
-    total_inds   <- dim(inds)[1]; # Get the number of individuals in inds
-    dens         <- (999.83952 + 16.945176*env[,1] - 0.0079870401*env[,1]^2 - 0.000046170461*env[,1]^3 + 0.00000010556302*env[,1]^4 -
-0.00000000028054253*env[,1]^5)/(1 + 0.016879850*env[,1]) #Kell equation for water density (Kell, 1975)
-    log_ratio_visc         <- exp((20 - env[,1])/(env[,1] + 96)*(1.2364 - 0.00137*(20 - env[,1]) + 0.0000057*(20 - env[,1])^2)) #stuck here figuring out how to get back to viscosity at target temp from log10(ratio of viscosity at target temp/viscosity at 20 degrees C)
-    visc         <- exp(log_ratio_visc)
-    move_dists   <- c(-0.1, 0, 0.1);  # Define the possible distances to move
-    y_move       <- sample(x = move_dists, size = total_inds, replace = TRUE);
+  
+    cell_diam <- inds[,3] # Get the cell diameters of all individuals
+    cell_dens <- inds[,4] # Get the cell diameters of all individuals
+    cell_shape <- inds[,5] # Get the cell diameters of all individuals
+
+    dens <- (999.83952 + 16.945176*env[,1] - 0.0079870401*env[,1]^2 - 0.000046170461*env[,1]^3 + 0.00000010556302*env[,1]^4 - 0.00000000028054253*env[,1]^5) / (1 + 0.016879850*env[,1]) #Kell equation for water density (Kell, 1975)
+    visc <- 10^(20 - env[,1])/(env[,1] + 96)*(1.2364 - 0.00137*(20 - env[,1]) + 0.0000057*(20 - env[,1])^2) #this actually calculates the ratio of viscosity at target temp/viscosity at 20 degrees C, but viscosity at 20 degrees C is ~ 1
+    w_s <- (9.8081*cell_diam^2*(dens - cell_dens))/(18*cell_shape*visc) # Define the velocity given cell diameter
+    y_move       <- w_s*60*60 # Calculate total distance moved over an hour
     inds[, yloc] <- inds[, yloc] + y_move;
     # =========   The reflecting boundary is added below
     for(i in 1:total_inds){ 
@@ -133,13 +135,27 @@ inds <- NULL
 for(i in 1:length(depths)){
   temp <- fp[i,]
   
-  temp.df <- array(data = 0, dim = c(round(temp$TotalConcNoMixed_ugL,0),2))
+  temp.df <- array(data = 0, dim = c(round(temp$TotalConcNoMixed_ugL,0),5))
   temp.df[,1] <- 1 #placeholder for taxon ID or some other trait
   temp.df[,2] <- depths[i]
-  
+
   inds <- rbind(inds, temp.df)
 }
-colnames(inds) <- c("PFG","yloc")
+
+#create cell diameter trait
+mean_diam = 0.000015 # 15 um in meters
+sd_diam = 0.000005 # 5 um in meters
+inds[,3] <- rnorm(dim(inds)[1], mean = mean_diam, sd = sd_diam)
+
+#create cell density trait
+mean_dens = 1050 # In range for chlorophytes
+sd_dens = 12 # To make sure they all sink
+inds[,4] <- rnorm(dim(inds)[1], mean_dens, sd_dens)
+
+#create cell shape trait
+inds[,5] <- 1 # make them all spherical for now
+
+colnames(inds) <- c("PFG","yloc","cell_diam","cell_dens","cell_shape")
 
 # ----- Initialise environment (water temperature)
 
