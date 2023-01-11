@@ -200,7 +200,8 @@ for(i in 1:length(lakes)){
       depths = 1.5
       
       var <- get_var(nc_file, var_name = vars[k], reference="surface", z_out=depths) %>%
-        rename(time = DateTime)
+        mutate(time = date(DateTime)) %>%
+        select(-DateTime)
       
       temp <- left_join(temp,var,by = "time")
       
@@ -228,7 +229,8 @@ for(i in 1:length(lakes)){
         depths = 1.5
         
         var <- get_var(nc_file, var_name = phyto.S[p], reference="surface", z_out=depths) %>%
-          rename(time = DateTime)
+          mutate(time = date(DateTime)) %>%
+          select(-DateTime)
         
         phyto.temp <- left_join(phyto.temp,var,by = "time")
       }
