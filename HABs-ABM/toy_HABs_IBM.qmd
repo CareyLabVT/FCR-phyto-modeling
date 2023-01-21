@@ -42,9 +42,15 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
     4.  Edit "movement" function to use eq. 9 instead of random movement
 
-        1.  first, just incorporate buoyancy/sinking rate term and make sure phytos are behaving as expected
+        1.  first, just incorporate buoyancy/sinking rate term and make sure phytos are behaving as expected in stratified and unstratified conditions - check
 
-        2.  next, worry about random walk to simulate turbulent transport
+        2.  next, worry about random walk to simulate turbulent transport --\> I need velocity to do this I think; bring up in plumbing mtg
+
+    5.  Edit "death" function
+
+        1.  agents that reach the sediments die - check
+
+        2.  agents can also senesce and die; this requires a column to keep track of cell age, and different taxa could have different age limits; check Reynolds et al. 2006 for estimates for appropriate agent lifespans
 
 ```{r}
 # =============================================================================
