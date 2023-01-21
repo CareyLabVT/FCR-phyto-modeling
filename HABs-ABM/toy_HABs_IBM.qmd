@@ -44,7 +44,7 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
         1.  first, just incorporate buoyancy/sinking rate term and make sure phytos are behaving as expected in stratified and unstratified conditions - check
 
-        2.  next, worry about random walk to simulate turbulent transport --\> I need velocity to do this I think; bring up in plumbing mtg
+        2.  next, worry about random walk to simulate turbulent transport --\> I need velocity to do this I think? or maybe not?; look at S&H book and bring up in plumbing mtg
 
     5.  Edit "death" function
 
