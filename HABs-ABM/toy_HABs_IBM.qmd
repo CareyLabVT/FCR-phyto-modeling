@@ -116,22 +116,17 @@ birth <- function(inds, lambda = 0.5, repr_col = 4){
 # =============================================================================
 # Death function
 # =============================================================================
-death <- function(inds, xlen = 8, ylen = 8, dcol = 5, xcol = 2, ycol = 3){
-    for(xdim in 1:xlen){      # For each row `xdim` of the landscape...
-        for(ydim in 1:ylen){  # For each col `ydim` of the landscape...
-            # Get the total number of individuals on the landscape cell
-            on_cell <- sum( inds[, xcol] == xdim & inds[, ycol]  == ydim);
-            # Only do something if on_cell is more than one
-            if(on_cell > 1){
-                # Get all of the occupants on the cell
-                occupants <- which(inds[, xcol] == xdim & inds[, ycol] == ydim);
-                # Sample all but one random occupants to die
-                rand_occ  <- sample(x = occupants, size = on_cell - 1);
-                # Then add their death to the last column of inds
-                inds[rand_occ, dcol] <- 1;
-            }
+death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3){
+  total_inds <- dim(inds)[1] # Get the number of individuals in inds
+  
+  for(i in 1:total_inds){ 
+        if(inds[i, yloc] >= ymax){         # If it moved to or past the maximum depth
+            inds[i, dcol] <- 1;        # Then it dies
         }
-    }
+  }
+  
+  inds            <- inds[inds[, 6] == 0,]; # Retain living
+
     return(inds);
 }
 
@@ -164,11 +159,11 @@ for(i in 1:length(depths)){
   max_diam.g = 25 # 25 um in meters
 
   #create cell density trait
-  min_dens.d = 1070 # In range for chlorophytes
+  min_dens.d = 1070 # In range for diatoms
   max_dens.d = 1130 # To make sure they all sink
   
-  min_dens.c = 920 # In range for chlorophytes
-  max_dens.c = 980 # To make sure they all sink
+  min_dens.c = 920 # In range for cyanos
+  max_dens.c = 980 # To make sure they all float
   
   min_dens.g = 1020 # In range for chlorophytes
   max_dens.g = 1080 # To make sure they all sink
@@ -181,21 +176,21 @@ for(i in 1:length(depths)){
   shape.g = 1 # make them all spherical for now
 
   #populate depths with traits
-  temp.df.d <- array(data = 0, dim = c(round(temp$BrownAlgae_ugL,0),5))
+  temp.df.d <- array(data = 0, dim = c(round(temp$BrownAlgae_ugL,0),6))
   temp.df.d[,1] <- 1 #placeholder for taxon ID or some other trait
   temp.df.d[,2] <- depths[i]
   temp.df.d[,3] <- runif(dim(temp.df.d)[1], min = min_diam.d, max = max_diam.d)
   temp.df.d[,4] <- runif(dim(temp.df.d)[1], min = min_dens.d, max = max_dens.d)
   temp.df.d[,5] <- shape.d
 
-  temp.df.c <- array(data = 0, dim = c(round(temp$Bluegreens_ugL,0),5))
+  temp.df.c <- array(data = 0, dim = c(round(temp$Bluegreens_ugL,0),6))
   temp.df.c[,1] <- 2 #placeholder for taxon ID or some other trait
   temp.df.c[,2] <- depths[i]
   temp.df.c[,3] <- runif(dim(temp.df.c)[1], min = min_diam.c, max = max_diam.c)
   temp.df.c[,4] <- runif(dim(temp.df.c)[1], min = min_dens.c, max = max_dens.c)
   temp.df.c[,5] <- shape.c
   
-  temp.df.g <- array(data = 0, dim = c(round(temp$GreenAlgae_ugL,0),5))
+  temp.df.g <- array(data = 0, dim = c(round(temp$GreenAlgae_ugL,0),6))
   temp.df.g[,1] <- 3 #placeholder for taxon ID or some other trait
   temp.df.g[,2] <- depths[i]
   temp.df.g[,3] <- runif(dim(temp.df.g)[1], min = min_diam.g, max = max_diam.g)
@@ -207,12 +202,18 @@ for(i in 1:length(depths)){
   inds <- rbind(inds, temp.df)
 }
 
-colnames(inds) <- c("PFG","yloc","cell_diam","cell_dens","cell_shape")
+colnames(inds) <- c("PFG","yloc","cell_diam","cell_dens","cell_shape","dcol")
 
 # ----- Initialise environment (water temperature)
 
 env <- array(data = 0, dim = c(length(depths),4))
-  env[,1] <- 10 #water temperature; constant for now
+  # env[,1] <- 5 #water temperature;  no stratification
+  env[,1] <- c(rev(seq(from = 15, to = 20, by = ((20-15)/(40-1)))),
+               rev(seq(from = 12, to = 15, by = ((15-12)/(10-1)))),
+               rev(seq(from = 10, to = 12, by = ((12-10)/(43-1))))) #water temperature; stronger stratification
+  # env[,1] <- c(rev(seq(from = 13, to = 15, by = ((15-13)/(40-1)))),
+  #              rev(seq(from = 11, to = 13, by = ((13-11)/(10-1)))),
+  #              rev(seq(from = 10, to = 11, by = ((11-10)/(43-1))))) #water temperature; weaker stratification
   env[,2] <- round(depths,1)
 colnames(env) <- c("wt","yloc","dens","visc")
 
@@ -223,8 +224,7 @@ inds_hist  <- NULL;
 while(ts < time_steps){
     inds            <- movement(inds); 
     #inds            <- birth(inds, lambda = 1.5);
-    #inds            <- death(inds);
-    #inds            <- inds[inds[, 5] == 0,]; # Retain living
+    inds            <- death(inds);
     ts              <- ts + 1; 
     inds_hist[[ts]] <- inds;
 }
@@ -267,7 +267,7 @@ for(i in 1:time_steps){
 plot_yloc.d <- data.frame(ind_yloc[[1]]) %>%
   gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
-head(plot_yloc.d)
+#head(plot_yloc.d)
 
 ggplot(data = plot_yloc.d, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
   geom_path()+
@@ -277,7 +277,7 @@ ggplot(data = plot_yloc.d, aes(x = ugL, y = Depth_m, group = timestep, color = t
 plot_yloc.c <- data.frame(ind_yloc[[2]]) %>%
   gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
-head(plot_yloc.c)
+#head(plot_yloc.c)
 
 ggplot(data = plot_yloc.c, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
   geom_path()+
@@ -287,7 +287,7 @@ ggplot(data = plot_yloc.c, aes(x = ugL, y = Depth_m, group = timestep, color = t
 plot_yloc.g <- data.frame(ind_yloc[[3]]) %>%
   gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
-head(plot_yloc.g)
+#head(plot_yloc.g)
 
 ggplot(data = plot_yloc.g, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
   geom_path()+
