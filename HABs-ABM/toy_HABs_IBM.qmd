@@ -54,13 +54,15 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
         3.  after build in light-dependent growth, could also keep track of light exposure and if an agent has seen no light for 24 hrs, it dies
 
+        4.  what to do about endless cyano scums accumulating at the surface? (i.e., how to kill them? photorespiration?)
+
     6.  Edit "growth" function
 
-        1.  temperature-dependent growth rate, adapted from AED; probability of doubling is determined by temperature
+        1.  temperature-dependent growth rate, adapted from AED; probability of doubling is determined by temperature - check
 
         2.  add light column to environment
 
-        3.  light-dependent growth rate, adapted from AED; probability of doubling is determined by maximum probability between temp and light functions
+        3.  light-dependent growth rate, adapted from AED; probability of doubling is determined by maximum (or minimum? or multiplied?) probability between temp and light functions
 
 ```{r}
 # =============================================================================
@@ -120,16 +122,130 @@ movement <- function(inds, yloc = 2, ymax = 9.3){
 # =============================================================================
 # Birth function
 # =============================================================================
-birth <- function(inds, lambda = 0.5, repr_col = 4){
+## define traits for PFTs
+traits_lst <- list(
+  #create cell diameter trait
+  min_diam.d = 10, # 10 um 
+  max_diam.d = 25, # 25 um in meters
+  
+  min_diam.c = 10, # 10 um 
+  max_diam.c = 25, # 25 um in meters
+  
+  min_diam.g = 10, # 10 um 
+  max_diam.g = 25, # 25 um in meters
+
+  #create cell density trait
+  min_dens.d = 1070, # In range for diatoms
+  max_dens.d = 1130, # To make sure they all sink
+  
+  min_dens.c = 920, # In range for cyanos
+  max_dens.c = 980, # To make sure they all float
+  
+  min_dens.g = 1020, # In range for chlorophytes
+  max_dens.g = 1080, # To make sure they all sink
+  
+  #create cell shape trait
+  shape.d = 1, # make them all spherical for now
+  
+  shape.c = 1, # make them all spherical for now
+  
+  shape.g = 1, # make them all spherical for now
+  
+  #create temperature sensitivity traits
+  Tmin = c(4,4,4),
+  Topt = c(20,23,15),
+  Tmax = c(26,30,20)
+)
+
+birth <- function(inds, repr_col = 7, traits = traits_lst){
     total_inds       <- dim(inds)[1]; # Get the number of individuals in inds
     ind_cols         <- dim(inds)[2]; # Total inds columns
-    inds[, repr_col] <- rpois(n = total_inds, lambda = lambda); 
-    total_off        <- sum(inds[, repr_col]);
-    # ---- We now have the total number of new offspring; now add to inds
-    new_inds     <- array(data = 0, dim = c(total_off, ind_cols));
-    new_inds[,1] <- rnorm(n = dim(new_inds)[1], mean = 23, sd = 3);
-    new_inds[,2] <- sample(x = 1:8, size = dim(new_inds)[1], replace = TRUE);
-    new_inds[,3] <- sample(x = 1:8, size = dim(new_inds)[1], replace = TRUE);
+    
+    #unpack traits
+    min_diam.d = traits$min_diam.d
+    max_diam.d = traits$max_diam.d
+    min_diam.c = traits$min_diam.c
+    max_diam.c = traits$max_diam.c
+    min_diam.g = traits$min_diam.g
+    max_diam.g = traits$max_diam.g
+    min_dens.d = traits$min_dens.d
+    max_dens.d = traits$max_dens.d
+    min_dens.c = traits$min_dens.c
+    max_dens.c = traits$max_dens.c
+    min_dens.g = traits$min_dens.g
+    max_dens.g = traits$max_dens.g
+    shape.d = traits$shape.d
+    shape.c = traits$shape.c
+    shape.g = traits$shape.g
+    Tmin = traits$Tmin
+    Topt = traits$Topt
+    Tmax = traits$Tmax
+    
+    ###Temp-dependent growth
+    for(i in 1:total_inds){
+      
+      #get water temp where individual is located
+      TEMP <- env[which(env[,2] == round(inds[i,2],1)),1]
+      
+      if(inds[i,1] == 1){ #diatoms
+    fT = ((TEMP - Tmin[1]) / (Topt[1] - Tmin[1])) *((Tmax[1] - TEMP) / (Tmax[1] - Topt[1])) ^((Tmax[1] - Topt[1]) / (Topt[1] - Tmin[1]))
+  if(fT < 0 | is.na(fT)){fT <- 0}
+      }
+      
+      if(inds[i,1] == 2){ #cyanos
+    fT = ((TEMP - Tmin[2]) / (Topt[2] - Tmin[2])) *((Tmax[2] - TEMP) / (Tmax[2] - Topt[2])) ^((Tmax[2] - Topt[2]) / (Topt[2] - Tmin[2]))
+  if(fT < 0 | is.na(fT)){fT <- 0}
+      }
+      
+      if(inds[i,1] == 3){ #green algae
+    fT = ((TEMP - Tmin[3]) / (Topt[3] - Tmin[3])) *((Tmax[3] - TEMP) / (Tmax[3] - Topt[3])) ^((Tmax[3] - Topt[3]) / (Topt[3] - Tmin[3]))
+  if(fT < 0 | is.na(fT)){fT <- 0}
+      }
+      
+    inds[i, repr_col] <- rbinom(n = 1, size = 1, prob = fT/24) 
+
+    }
+    
+    #make array for offspring
+    new_inds <- array(data = 0, dim = c(0, ind_cols))
+    
+    #figure out how many offspring of each PFT per depth
+    for(j in 1:length(env[,2])){
+      
+    total_off_d <- sum(inds[which(inds[,1] == 1 & round(inds[,2],1) == env[j,2]), repr_col])
+    total_off_c <- sum(inds[which(inds[,1] == 2 & round(inds[,2],1) == env[j,2]), repr_col])
+    total_off_g <- sum(inds[which(inds[,1] == 3 & round(inds[,2],1) == env[j,2]), repr_col])
+
+    # ---- We now have the total number of new offspring for each PFT at this depth; now add traits
+    
+    #diatoms
+    temp.df.d <- array(data = 0, dim = c(total_off_d, ind_cols))
+    temp.df.d[,1] <- 1 #placeholder for taxon ID or some other trait
+  temp.df.d[,2] <- env[j,2]
+  temp.df.d[,3] <- runif(dim(temp.df.d)[1], min = min_diam.d, max = max_diam.d)
+  temp.df.d[,4] <- runif(dim(temp.df.d)[1], min = min_dens.d, max = max_dens.d)
+  temp.df.d[,5] <- shape.d
+  
+    #cyanos
+    temp.df.c <- array(data = 0, dim = c(total_off_c, ind_cols))
+    temp.df.c[,1] <- 2 #placeholder for taxon ID or some other trait
+  temp.df.c[,2] <- env[j,2]
+  temp.df.c[,3] <- runif(dim(temp.df.c)[1], min = min_diam.c, max = max_diam.c)
+  temp.df.c[,4] <- runif(dim(temp.df.c)[1], min = min_dens.c, max = max_dens.c)
+  temp.df.c[,5] <- shape.c
+    
+    #green algae
+    temp.df.g <- array(data = 0, dim = c(total_off_g, ind_cols))
+    temp.df.g[,1] <- 3 #placeholder for taxon ID or some other trait
+  temp.df.g[,2] <- env[j,2]
+  temp.df.g[,3] <- runif(dim(temp.df.g)[1], min = min_diam.g, max = max_diam.g)
+  temp.df.g[,4] <- runif(dim(temp.df.g)[1], min = min_dens.g, max = max_dens.g)
+  temp.df.g[,5] <- shape.g
+  
+  temp.df <- rbind(temp.df.d, temp.df.c, temp.df.g)
+  new_inds <- rbind(new_inds, temp.df)
+    }
+    
     # ---- Our new offspring can now be attached in the inds array
     inds <- rbind(inds, new_inds);
     return(inds);
@@ -141,10 +257,11 @@ birth <- function(inds, lambda = 0.5, repr_col = 4){
 # Death function
 # =============================================================================
 death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1,
-                  graze_d = 0.6/24, graze_c = 0.1/24, graze_g = 0.4/24){
+                  graze_d = 0.8/24, graze_c = 0.4/24, graze_g = 0.6/24){
   total_inds <- dim(inds)[1] # Get the number of individuals in inds
   
   for(i in 1:total_inds){ 
+
     if(inds[i, yloc] >= ymax){# If it moved to or past the maximum depth
       inds[i, dcol] <- 1;        # Then it dies
     }
@@ -177,7 +294,7 @@ fp <- read_csv("./data/FluoroProbe_2018-08-02_FCR_50.csv")
 # Create inds by looping through each depth increment and then creating that number of individuals at that depth based on ug/L
 depths <- seq(from = 0.1, to = 9.3, by = 0.1)
 
-inds <- NULL
+inds <- array(data = 0, dim = c(0, 7))
 
 for(i in 1:length(depths)){
   
@@ -212,21 +329,21 @@ for(i in 1:length(depths)){
   shape.g = 1 # make them all spherical for now
 
   #populate depths with traits
-  temp.df.d <- array(data = 0, dim = c(round(temp$BrownAlgae_ugL,0),6))
+  temp.df.d <- array(data = 0, dim = c(round(temp$BrownAlgae_ugL,0),7))
   temp.df.d[,1] <- 1 #placeholder for taxon ID or some other trait
   temp.df.d[,2] <- depths[i]
   temp.df.d[,3] <- runif(dim(temp.df.d)[1], min = min_diam.d, max = max_diam.d)
   temp.df.d[,4] <- runif(dim(temp.df.d)[1], min = min_dens.d, max = max_dens.d)
   temp.df.d[,5] <- shape.d
 
-  temp.df.c <- array(data = 0, dim = c(round(temp$Bluegreens_ugL,0),6))
+  temp.df.c <- array(data = 0, dim = c(round(temp$Bluegreens_ugL,0),7))
   temp.df.c[,1] <- 2 #placeholder for taxon ID or some other trait
   temp.df.c[,2] <- depths[i]
   temp.df.c[,3] <- runif(dim(temp.df.c)[1], min = min_diam.c, max = max_diam.c)
   temp.df.c[,4] <- runif(dim(temp.df.c)[1], min = min_dens.c, max = max_dens.c)
   temp.df.c[,5] <- shape.c
   
-  temp.df.g <- array(data = 0, dim = c(round(temp$GreenAlgae_ugL,0),6))
+  temp.df.g <- array(data = 0, dim = c(round(temp$GreenAlgae_ugL,0),7))
   temp.df.g[,1] <- 3 #placeholder for taxon ID or some other trait
   temp.df.g[,2] <- depths[i]
   temp.df.g[,3] <- runif(dim(temp.df.g)[1], min = min_diam.g, max = max_diam.g)
@@ -238,7 +355,7 @@ for(i in 1:length(depths)){
   inds <- rbind(inds, temp.df)
 }
 
-colnames(inds) <- c("PFG","yloc","cell_diam","cell_dens","cell_shape","dcol")
+colnames(inds) <- c("PFG","yloc","cell_diam","cell_dens","cell_shape","dcol","repr")
 ```
 
 ```{r}
@@ -259,15 +376,21 @@ colnames(env) <- c("wt","yloc","dens","visc")
 ```{r}
 # ---- Start the simulation as before
 ts         <- 0;
-time_steps <- 48;
+time_steps <- 24*7;
 inds_hist  <- NULL;
+start_time <- Sys.time()
 while(ts < time_steps){
     inds            <- movement(inds); 
-    #inds            <- birth(inds, lambda = 1.5);
+    inds            <- birth(inds);
     inds            <- death(inds);
     ts              <- ts + 1; 
     inds_hist[[ts]] <- inds;
+    print(ts)
+    print(length(inds[,1]))
 }
+end_time <- Sys.time()
+run_time = end_time - start_time
+print(run_time)
 ```
 
 ```{r}
