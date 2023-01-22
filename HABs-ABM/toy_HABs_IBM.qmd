@@ -52,7 +52,7 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
         2.  agents can also be grazed, which should occur at different rates depending on the taxon; see p. 299 of Reynolds; "brown algae" and green algae should have highest rate, as Cryptomonas is \~100%, Asterionella is \>50% in the summer, and small chlorophytes ("Ankyra"), such as found in FCR, are almost 100% - check
 
-        3.  after build in light-dependent growth, could also keep track of light exposure and if an agent has seen no light for 24 hrs, it dies
+        3.  **after build in light-dependent growth, could also keep track of light exposure and if an agent has seen no light for 24 hrs, it dies**
 
         4.  what to do about endless cyano scums accumulating at the surface? (i.e., how to kill them? photorespiration?)
 
@@ -60,9 +60,9 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
         1.  temperature-dependent growth rate, adapted from AED; probability of doubling is determined by temperature - check
 
-        2.  add light column to environment
+        2.  **add light column to environment; this will be calculated based on some incoming SWR and some Kd**
 
-        3.  light-dependent growth rate, adapted from AED; probability of doubling is determined by maximum (or minimum? or multiplied?) probability between temp and light functions
+        3.  **light-dependent growth rate, adapted from AED; probability of doubling is determined by maximum (or minimum? or multiplied?) probability between temp and light functions**
 
 ```{r}
 # =============================================================================
