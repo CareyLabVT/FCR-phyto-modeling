@@ -44,7 +44,9 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
         1.  first, just incorporate buoyancy/sinking rate term and make sure phytos are behaving as expected in stratified and unstratified conditions - check
 
-        2.  next, worry about random walk to simulate turbulent transport --\> I need velocity to do this I think? or maybe not?; look at S&H book and bring up in plumbing mtg
+        2.  next, worry about random walk to simulate turbulent transport --\> key here is if we want to use Visser's random walk formulation (which is well-established and probably a good choice) need to calculate vertical diffusivity from water temperature
+
+        3.  alternatively, if we are not going into forecasting mode and are just "coupling" to GLM, use CCC's sim to get u_mean output for each layer and assume cells are transported along with that --\> nope, this will not work b/c u_mean is actually u_star, which is the water friction velocity, not a flow field
 
     5.  Edit "death" function
 
@@ -467,32 +469,35 @@ for(i in 1:time_steps){
 # Plot the results
 # =============================================================================
 plot_yloc.d <- data.frame(ind_yloc[[1]]) %>%
-  gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
+  gather(X0.1:X9.3, key = "Depth_m",value = "num_agents") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
 #head(plot_yloc.d)
 
-ggplot(data = plot_yloc.d, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
+ggplot(data = plot_yloc.d, aes(x = num_agents, y = Depth_m, group = timestep, color = timestep))+
   geom_path()+
   scale_y_reverse()+
-  theme_classic()
+  theme_classic()+
+  ggtitle("Brown algae")
 
 plot_yloc.c <- data.frame(ind_yloc[[2]]) %>%
-  gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
+  gather(X0.1:X9.3, key = "Depth_m",value = "num_agents") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
 #head(plot_yloc.c)
 
-ggplot(data = plot_yloc.c, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
+ggplot(data = plot_yloc.c, aes(x = num_agents, y = Depth_m, group = timestep, color = timestep))+
   geom_path()+
   scale_y_reverse()+
-  theme_classic()
+  theme_classic()+
+  ggtitle("Cyanobacteria")
 
 plot_yloc.g <- data.frame(ind_yloc[[3]]) %>%
-  gather(X0.1:X9.3, key = "Depth_m",value = "ugL") %>%
+  gather(X0.1:X9.3, key = "Depth_m",value = "num_agents") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
 #head(plot_yloc.g)
 
-ggplot(data = plot_yloc.g, aes(x = ugL, y = Depth_m, group = timestep, color = timestep))+
+ggplot(data = plot_yloc.g, aes(x = num_agents, y = Depth_m, group = timestep, color = timestep))+
   geom_path()+
   scale_y_reverse()+
-  theme_classic()
+  theme_classic()+
+  ggtitle("Green algae")
 ```
