@@ -54,6 +54,8 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
         3.  alternatively, if we are not going into forecasting mode and are just "coupling" to GLM, use CCC's sim to get u_mean output for each layer and assume cells are transported along with that --\> nope, this will not work b/c u_mean is actually u_star, which is the water friction velocity, not a flow field
 
+            1.  however, that will be really helpful when coupling GLM b/c we can get density and u_star from GLM output easily; however I'm not clear on how u_star can be a vector over depth; I thought it was one value per profile; need to check GLM output on this
+
     5.  Edit "death" function
 
         1.  agents that reach the sediments die - check
