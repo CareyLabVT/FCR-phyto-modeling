@@ -90,7 +90,7 @@ library(rLakeAnalyzer)
 # =============================================================================
 # Movement function
 # =============================================================================
-movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd){
+movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd = 3){
   
   total_inds <- dim(inds)[1]
   
@@ -105,7 +105,7 @@ movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd){
   env[,4] <- (10^(((20 - env[,1])/(env[,1] + 96))*(1.2364 - 0.00137*(20 - env[,1]) + 0.0000057*(20 - env[,1])^2)))*1000 #this actually calculates the ratio of viscosity at target temp/viscosity at 20 degrees C, but viscosity at 20 degrees C is ~ 1
   
   #specify model timestep
-  del_t = 6 #convert seconds to one hour
+  del_t = 60 #in seconds
     
   #calculate u_star (shear velocity)
   td = thermo.depth(wtr = env[,1], depths = env[,2])
@@ -117,7 +117,6 @@ movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd){
       
     curr_dens <- env[which(env[,2] == round(inds[j,2],1)),3]
     curr_visc <- env[which(env[,2] == round(inds[j,2],1)),4]
-    u_star <- env[which(env[,2] == round(inds[j,2],1)),6]
 
     w_s <- ((9.8081*cell_diam[j]^2*(cell_dens[j] - curr_dens))/(18*cell_shape[j]*curr_visc))/100000 # Define the cell velocity given cell diameter, density, and shape
     
@@ -149,7 +148,6 @@ movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd){
   z_t1 <- elev + K_prime*elev*del_t + runif(1, min = -1,max = 1)*sqrt((2*K*(elev + 0.5*K_prime*elev*del_t)*del_t)/(1/3)) + w_s*del_t
   
   ####### end test code #######################################################
-    
   inds[j, yloc] <- 9.3 - z_t1
   
     }
@@ -159,6 +157,9 @@ movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd){
     for(i in 1:total_inds){ 
         if(inds[i, yloc] > ymax){         # If it moved past the maximum depth
             inds[i, yloc] <- ymax;        # Then move it back to the maximum depth
+        }
+        if(inds[i, yloc] < 0.5){            # If it is close to top boundary
+            inds[i, yloc] <- runif(1, min = 0.01, max = 1)*0.5;           # Create random mixed layer
         }
         if(inds[i, yloc] < 0.1){            # If it moved below 0.1 (above surface)
             inds[i, yloc] <- 0.1;           # Then move it back to 0.1 (surface)
@@ -332,7 +333,7 @@ birth <- function(inds, repr_col = 7, traits = traits_lst){
 # Death function
 # =============================================================================
 death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1,
-                  graze_d = 0.35, graze_c = 0.25, graze_g = 0.35, light_exp = 8){
+                  graze_d = 0.3, graze_c = 0.25, graze_g = 0.25, light_exp = 8){
   total_inds <- dim(inds)[1] # Get the number of individuals in inds
   
   for(i in 1:total_inds){ 
@@ -351,7 +352,7 @@ death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1,
     #update light exposure; individuals with no light for 24 hrs or more die
     SWR <- env[which(env[,2] == round(inds[i,2],1)),5]
     if(SWR < 1){inds[i, light_exp] <- inds[i, light_exp] + 1}
-    if(inds[i, light_exp] >= 24){inds[i, dcol] <- 1}
+    if(inds[i, light_exp] >= 24*60){inds[i, dcol] <- 1}
     
     #anything at sediments dies
     if(inds[i, yloc] >= ymax){# If it moved to or past the maximum depth
@@ -455,18 +456,16 @@ env <- array(data = 0, dim = c(length(depths),5))
   env[,5] <- exp(log(75) - 0.5*depths)
 colnames(env) <- c("wt","yloc","dens","visc","light")
 
-#set wnd environment
-wnd <- 3
 ```
 
 ```{r}
 # ---- Start the simulation as before
 ts         <- 0;
-time_steps <- 48;
+time_steps <- 60;
 inds_hist  <- NULL;
 start_time <- Sys.time()
 while(ts < time_steps){
-    inds            <- movement(inds); 
+    inds            <- movement(inds, env); 
     inds            <- birth(inds);
     inds            <- death(inds);
     ts              <- ts + 1; 
