@@ -68,6 +68,10 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
             1.  solved this by switching out light-dependent growth to one with photoinhibition - check
 
+        5.  what to do about taxa dying off altogether?
+
+            1.  maybe have a "seed bank" where there can't be fewer than 1 individual per PFT per depth (that individual is always saved to potentially repopulate)
+
     6.  Edit "growth" function
 
         1.  temperature-dependent growth rate, adapted from AED; probability of doubling is determined by temperature - check
@@ -94,7 +98,7 @@ The example code below is pulled from <https://bradduthie.github.io/blog/individ
 
                 1.  calibrate on 2021-08-09; validate on 2021-08-16
 
-            7.  revise model code to pull in GLM-AED output to update water temperature profiles
+            7.  revise model code to pull in GLM-AED output to update water temperature profiles - check
 
         2.  goal of running for 12-24 hr, depending on run times
 
@@ -251,9 +255,9 @@ traits_lst <- list(
   
   #create temperature sensitivity traits
   Tmin = c(4,4,4),
-  Topt = c(15,23,20),
-  Tmax = c(20,30,26),
-  I_S = c(8,12,10)
+  Topt = c(21,23,22),
+  Tmax = c(28,30,29),
+  I_S = c(200,200,200)
 )
 
 birth <- function(inds, repr_col = 7, traits = traits_lst){
@@ -324,7 +328,7 @@ birth <- function(inds, repr_col = 7, traits = traits_lst){
     
       }
       
-    inds[i, repr_col] <- rbinom(n = 1, size = 1, prob = (fT*fI))
+    inds[i, repr_col] <- rbinom(n = 1, size = 1, prob = (fT*fI/60))
 
     }
     
@@ -378,7 +382,7 @@ birth <- function(inds, repr_col = 7, traits = traits_lst){
 # =============================================================================
 # Death function
 # =============================================================================
-death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1, graze_d = 0.32, graze_c = 0.27, graze_g = 0.27, light_exp = 8){
+death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1, graze_d = 0.35/60, graze_c = 0.35/60, graze_g = 0.35/60, light_exp = 8){
   total_inds <- dim(inds)[1] # Get the number of individuals in inds
   
   for(i in 1:total_inds){ 
@@ -415,7 +419,9 @@ death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1, graze_d = 0.32,
 # ========================================================
 # Update environment
 # ========================================================
-update_env <- function(env, wtemp, swr, time_steps, ts){
+update_env <- function(env, wtemp, swr, time_steps = 60*2, tstep = ts){
+  
+  ts = tstep
   
   update_times <- seq(from = 60, to = time_steps, by = 60)
   
@@ -434,6 +440,8 @@ update_env <- function(env, wtemp, swr, time_steps, ts){
     env[,5] <- exp(as.double(log(swr[row,2])) - 0.5*depths)
 
   }
+  
+  return(env)
   
 }
 ```
@@ -546,7 +554,7 @@ colnames(env) <- c("wt","yloc","dens","visc","light")
 ```{r}
 # ---- Start the simulation as before
 ts         <- 0;
-time_steps <- 60*2;
+time_steps <- 60*15;
 inds_hist  <- NULL;
 start_time <- Sys.time()
 while(ts < time_steps){
@@ -554,7 +562,7 @@ while(ts < time_steps){
     inds            <- birth(inds);
     inds            <- death(inds);
     ts              <- ts + 1; 
-    env             <- update_env(env, wtemp, swr, time_steps, ts);
+    env             <- update_env(env, wtemp, swr, time_steps = time_steps, tstep = ts);
     inds_hist[[ts]] <- inds;
     print(ts)
     print(length(inds[,1]))
@@ -606,36 +614,36 @@ for(i in 1:time_steps){
 # =============================================================================
 
 ##plot the environment (for static simulations)
-plot_env = data.frame(wt = env[,1],
-                      yloc = env[,2],
-                      swr = env[,5])
-
-ggplot(data = plot_env, aes(x = wt, y = yloc))+
-  geom_path()+
-  scale_y_reverse()+
-  theme_classic()+
-  xlab("degrees C")+
-  ylab("Depth (m)")+
-  ggtitle("Water temperature (degrees C)")
-
-ggplot(data = plot_env, aes(x = swr, y = yloc))+
-  geom_path()+
-  scale_y_reverse()+
-  theme_classic()+
-  xlab("W m^-2")+
-  ylab("Depth (m)")+
-  ggtitle("Shortwave radiation")
+# plot_env = data.frame(wt = env[,1],
+#                       yloc = env[,2],
+#                       swr = env[,5])
+# 
+# ggplot(data = plot_env, aes(x = wt, y = yloc))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   theme_classic()+
+#   xlab("degrees C")+
+#   ylab("Depth (m)")+
+#   ggtitle("Water temperature (degrees C)")
+# 
+# ggplot(data = plot_env, aes(x = swr, y = yloc))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   theme_classic()+
+#   xlab("W m^-2")+
+#   ylab("Depth (m)")+
+#   ggtitle("Shortwave radiation")
 
 ##plot initial conditions
-fp_plot <- fp %>%
-  gather(GreenAlgae_ugL:TotalConcNoMixed_ugL, key = "spectral_group", value = "ugL")
-ggplot(data = fp_plot, aes(x = ugL, y = Depth_inc, group = spectral_group, color = spectral_group))+
-  geom_path()+
-  scale_y_reverse()+
-  theme_classic()+
-  xlab("ugL")+
-  ylab("Depth (m)")+
-  ggtitle("Initial conditions: FP cast")
+# fp_plot <- fp %>%
+#   gather(GreenAlgae_ugL:TotalConcNoMixed_ugL, key = "spectral_group", value = "ugL")
+# ggplot(data = fp_plot, aes(x = ugL, y = Depth_inc, group = spectral_group, color = spectral_group))+
+#   geom_path()+
+#   scale_y_reverse()+
+#   theme_classic()+
+#   xlab("ugL")+
+#   ylab("Depth (m)")+
+#   ggtitle("Initial conditions: FP cast")
 
 ##plot IBM output
 plot_yloc.d <- data.frame(ind_yloc[[1]]) %>%
