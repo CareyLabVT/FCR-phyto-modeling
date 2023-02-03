@@ -209,7 +209,7 @@ movement <- function(inds, env, yloc = 2, ymax = 9.3, wnd = 3){
             inds[i, yloc] <- ymax;        # Then move it back to the maximum depth
         }
         if(inds[i, yloc] < 0.5){            # If it is close to top boundary
-            inds[i, yloc] <- runif(1, min = 0.01, max = 1)*0.5;           # Create random mixed layer
+            inds[i, yloc] <- runif(1, min = 0.1, max = 0.5);           # Create random mixed layer
         }
         if(inds[i, yloc] < 0.1){            # If it moved below 0.1 (above surface)
             inds[i, yloc] <- 0.1;           # Then move it back to 0.1 (surface)
@@ -255,8 +255,8 @@ traits_lst <- list(
   
   #create temperature sensitivity traits
   Tmin = c(4,4,4),
-  Topt = c(21,23,22),
-  Tmax = c(28,30,29),
+  Topt = c(23,23,23),
+  Tmax = c(30,30,30),
   I_S = c(200,200,200)
 )
 
@@ -328,7 +328,7 @@ birth <- function(inds, repr_col = 7, traits = traits_lst){
     
       }
       
-    inds[i, repr_col] <- rbinom(n = 1, size = 1, prob = (fT*fI/60))
+    inds[i, repr_col] <- rbinom(n = 1, size = 1, prob = fT*fI/60)
 
     }
     
@@ -409,7 +409,7 @@ death <- function(inds, dcol = 6, yloc = 2, ymax = 9.3, pft = 1, graze_d = 0.35/
     }
   }
   
-  inds            <- inds[inds[, 6] == 0,]; # Retain living
+  inds            <- inds[inds[, dcol] == 0,]; # Retain living
 
     return(inds);
 }
@@ -657,6 +657,15 @@ ggplot(data = plot_yloc.d, aes(x = num_agents, y = Depth_m, group = timestep, co
   theme_classic()+
   ggtitle("Brown algae")
 
+plot_ts.d <- plot_yloc.d %>%
+  filter(Depth_m >= 0.1 & Depth_m <= 2) %>%
+  group_by(timestep) %>%
+  summarize(surface_agents = mean(num_agents))
+
+ggplot(data = plot_ts.d, aes(x = timestep, y = surface_agents))+
+  geom_line()+
+  theme_bw()
+
 plot_yloc.c <- data.frame(ind_yloc[[2]]) %>%
   gather(X0.1:X9.3, key = "Depth_m",value = "num_agents") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
@@ -668,6 +677,15 @@ ggplot(data = plot_yloc.c, aes(x = num_agents, y = Depth_m, group = timestep, co
   theme_classic()+
   ggtitle("Cyanobacteria")
 
+plot_ts.c <- plot_yloc.c %>%
+  filter(Depth_m >= 0.1 & Depth_m <= 2) %>%
+  group_by(timestep) %>%
+  summarize(surface_agents = mean(num_agents))
+
+ggplot(data = plot_ts.c, aes(x = timestep, y = surface_agents))+
+  geom_line()+
+  theme_bw()
+
 plot_yloc.g <- data.frame(ind_yloc[[3]]) %>%
   gather(X0.1:X9.3, key = "Depth_m",value = "num_agents") %>%
   mutate(Depth_m = as.double(substring(Depth_m, 2)))
@@ -678,4 +696,57 @@ ggplot(data = plot_yloc.g, aes(x = num_agents, y = Depth_m, group = timestep, co
   scale_y_reverse()+
   theme_classic()+
   ggtitle("Green algae")
+
+plot_ts.g <- plot_yloc.g %>%
+  filter(Depth_m >= 0.1 & Depth_m <= 2) %>%
+  group_by(timestep) %>%
+  summarize(surface_agents = mean(num_agents))
+
+ggplot(data = plot_ts.g, aes(x = timestep, y = surface_agents))+
+  geom_line()+
+  theme_bw()
+
+plot_ts.all <- left_join(plot_ts.d, plot_ts.c, by = c("timestep")) %>%
+  left_join(plot_ts.g, by = c("timestep")) %>%
+  rename(diatom = surface_agents.x,
+         cyano = surface_agents.y,
+         green = surface_agents) %>%
+  mutate(total = diatom + cyano + green) %>%
+  gather(diatom:total, key = pft, value = num_agents)
+
+ggplot(data = plot_ts.all, aes(x = timestep, y = num_agents, group = pft, color = pft)) +
+  geom_line()+
+  theme_bw()
+
+plot_ts.prop <- left_join(plot_ts.d, plot_ts.c, by = c("timestep")) %>%
+  left_join(plot_ts.g, by = c("timestep")) %>%
+  rename(diatom = surface_agents.x,
+         cyano = surface_agents.y,
+         green = surface_agents) %>%
+  mutate(total = diatom + cyano + green) %>%
+  mutate(total_prop = total/total*100,
+         diatom_prop = diatom/total*100,
+         cyano_prop = cyano/total*100,
+         green_prop = green/total*100) %>%
+  select(timestep, diatom_prop, cyano_prop, green_prop, total_prop) %>%
+  gather(diatom_prop:total_prop, key = pft, value = prop_agents)
+
+ggplot(data = plot_ts.prop, aes(x = timestep, y = prop_agents, group = pft, color = pft)) +
+  geom_line()+
+  theme_bw()
+
+#Write output to file for plotting for proposal
+write.csv(plot_yloc.d, file = "./ABM_output/ABM_diatom_depthByTimestep.csv", row.names = FALSE)
+write.csv(plot_ts.d, file = "./ABM_output/ABM_diatom_surfaceTimeseries.csv", row.names = FALSE)
+
+write.csv(plot_yloc.c, file = "./ABM_output/ABM_cyano_depthByTimestep.csv", row.names = FALSE)
+write.csv(plot_ts.c, file = "./ABM_output/ABM_cyano_surfaceTimeseries.csv", row.names = FALSE)
+
+write.csv(plot_yloc.g, file = "./ABM_output/ABM_green_depthByTimestep.csv", row.names = FALSE)
+write.csv(plot_ts.g, file = "./ABM_output/ABM_green_surfaceTimeseries.csv", row.names = FALSE)
+
+write.csv(plot_ts.all, file = "./ABM_output/ABM_all_surfaceTimeseries.csv",row.names = FALSE)
+write.csv(plot_ts.prop, file = "./ABM_output/ABM_allProp_surfaceTimeseries.csv",row.names = FALSE)
+
+saveRDS(inds_hist, file = "ABM_output.rds")
 ```

@@ -8,4 +8,5 @@ Eco-KGML/data/predictors/FCR_Met_final_2015_2021.csv
 **/output.nc
 Eco-KGML/figures/
 HABs-ABM/data/FCR_catwalk_EDI_2018_2022.csv
+HABs-ABM/ABM_output.rds
 
