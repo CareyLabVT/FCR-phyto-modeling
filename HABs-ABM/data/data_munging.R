@@ -91,13 +91,18 @@ ggplot(data = fp_ts, aes(x = Date, y = ugL, group = spectral_group, color = spec
   theme_bw()
 
 prof <- fp2 %>%
-  filter(date(DateTime) == "2021-08-16") %>%
+  filter(date(DateTime) == "2021-08-09") %>%
   gather(GreenAlgae_ugL:TotalConcNoMixed_ugL, key = "spectral_group", value = "ugL")
 
 ggplot(data = prof, aes(x = ugL, y = Depth_m, group = spectral_group, color = spectral_group))+
   geom_path()+
   scale_y_reverse()+
   theme_bw()
+
+fp_surface <- prof %>%
+  filter(Depth_m <= 2) %>%
+  group_by(spectral_group) %>%
+  summarize(surface_ugL = mean(ugL, na.rm = TRUE))
 
 #EXO----
 exo <- read_csv("./HABs-ABM/data/FCR_catwalk_EDI_2018_2022.csv") %>%
@@ -108,6 +113,12 @@ ggplot(data = exo, aes(x = DateTime, y = EXOChla_ugL_1))+
   geom_line()+
   theme_bw()
 
+exo_day <- exo %>%
+  filter(date(DateTime) == "2021-08-09")
+
+ggplot(data = exo_day, aes(x = DateTime, y = EXOChla_ugL_1))+
+  geom_line()+
+  theme_bw()
 ##Get model output ----
 
 # Load packages
@@ -136,7 +147,7 @@ var <- get_var(nc_file, var_name = vars[1], reference="surface", z_out=depths) %
 
 temp <- var
 
-for(k in 3:length(vars)){
+for(k in 2:length(vars)){
   
 var <- get_var(nc_file, var_name = vars[k], reference="surface", z_out=depths) %>%
   filter(year(DateTime) == 2021 & month(DateTime) %in% c(6:9)) 
@@ -144,6 +155,8 @@ var <- get_var(nc_file, var_name = vars[k], reference="surface", z_out=depths) %
 temp <- left_join(temp,var,by = "DateTime")
 
 }
+
+write.csv(temp, file = "GLM_output_summer_2021.csv",row.names = FALSE)
 
 #Plot vars
 vars2 <- paste0(vars, "_1.6")
@@ -156,6 +169,14 @@ for (j in 1:length(vars2)){
   print(p)
   
 }
+
+GLM_day <- temp %>%
+  filter(date(DateTime) == "2021-08-09") %>%
+  gather(PHY_tphy_1.6:PHY_cyano_1.6, key = pft, value = mmolCm3)
+
+ggplot(data = GLM_day, aes(x = DateTime, y = mmolCm3, group = pft, color = pft))+
+  geom_line()+
+  theme_bw()
 
 #Pull water temp profiles for calibration date (2021-08-09)
 depths <- seq(from = 0.1, to = 9.3, by = 0.1)
