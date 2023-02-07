@@ -56,13 +56,16 @@ exo <- read_csv("./HABs-ABM/data/FCR_catwalk_EDI_2018_2022.csv") %>%
 
 exo_day <- exo %>%
   filter(date(DateTime) == "2021-08-09")
+exo_no_outliers <- exo %>%
+  filter(date(DateTime) == "2021-08-09") %>%
+  filter(EXOChla_ugL_1 < 15)
 
 #ABM
 
 #function to get model datetimes
-dates <- rep(seq(from=as.POSIXct("2021-08-09 05:01"),to=as.POSIXct("2021-08-09 20:00"),by="min", tz = "UTC"),4)
+dates <- rep(seq(from=as.POSIXct("2021-08-09 05:01"),to=as.POSIXct("2021-08-09 23:00"),by="min", tz = "UTC"),4)
 
-abm <- read_csv("./HABs-ABM/ABM_output/ABM_all_surfaceTimeseries.csv") %>%
+abm <- read_csv("./HABs-ABM/ABM_output/ABM_all_surfaceTimeseries_18hr.csv") %>%
   mutate(DateTime = dates)
 
 abm_prop <- read_csv("./HABs-ABM/ABM_output/ABM_allProp_surfaceTimeseries.csv") %>%
@@ -70,7 +73,10 @@ abm_prop <- read_csv("./HABs-ABM/ABM_output/ABM_allProp_surfaceTimeseries.csv") 
   mutate(prop_agents = prop_agents/100) %>%
   mutate(facet = "pretty")
 
-
+abm_join <- abm %>%
+  filter(pft == "total") %>%
+  mutate(DateTime = force_tz(DateTime, tzone = "UTC")) %>%
+  select(DateTime, num_agents)
 
 #plotting
 
@@ -80,6 +86,7 @@ ggplot(data = GLM_day, aes(x = DateTime, y = mmolCm3, group = pft, color = pft))
 
 ggplot(data = exo_day, aes(x = DateTime, y = EXOChla_ugL_1))+
   geom_line()+
+  #ylim(5,15)+
   theme_bw()
 
 ggplot(data = abm, aes(x = timestep, y = num_agents, group = pft, color = pft)) +
@@ -95,20 +102,27 @@ ggplot(data = glm_prop, aes(x = DateTime, y = prop_mmolCm3, group = pft, color =
   geom_line()+
   theme_bw()
 
-money_df <- tibble(DateTime = seq(from=as.POSIXct("2021-08-09 05:00"),to=as.POSIXct("2021-08-09 20:00"),by="min", tz = "UTC"),
-                         ABM = c(NA,subset(abm$num_agents, abm$pft == "total"))) %>%
+money_df <- tibble(DateTime = seq(from=as.POSIXct("2021-08-09 06:00"),to=as.POSIXct("2021-08-09 20:00"),by="min", tz = "UTC")) %>%
   mutate(DateTime = force_tz(DateTime, tzone = "UTC")) %>%
-  left_join(exo_day, by = "DateTime") %>%
+  left_join(abm_join, by = "DateTime") %>%
+  left_join(exo_no_outliers, by = "DateTime") %>%
   left_join(glm_join, by = "DateTime") %>%
-  gather(ABM:PHY_tchla_1.6, key = data_source, value = phyto)
+  rename(ABM = num_agents) %>%
+  gather(ABM:PHY_tchla_1.6, key = data_source, value = phyto) %>%
+  mutate(data_source = factor(data_source, levels = c("EXOChla_ugL_1","ABM","PHY_tchla_1.6")))
 
 date.breaks = as.POSIXct(c("2021-08-09 06:00","2021-08-09 09:00",
                            "2021-08-09 12:00","2021-08-09 15:00",
                            "2021-08-09 18:00"))
 
 
-fac.labs <- c("IBM (individuals)","Obs. chl-a (ug/L)","GLM-AED chl-a (ug/L)")
+fac.labs <- c("IBM","Observed","Process-based")
 names(fac.labs) <- c("ABM","EXOChla_ugL_1","PHY_tchla_1.6")
+
+ann_text <- data.frame(DateTime = rep(as.POSIXct("2021-08-09 02:00"),times = 3),
+                       phyto = c(12.5, 162.5, 4.65),
+                       lab = c("A", "B", "C"),
+                       data_source = factor(c("EXOChla_ugL_1","ABM","PHY_tchla_1.6"),levels = c("EXOChla_ugL_1","ABM","PHY_tchla_1.6")))
 
 compare <- ggplot(data = money_df, aes(x = DateTime, y = phyto))+
   geom_point(size = 0.5)+
@@ -122,12 +136,16 @@ compare <- ggplot(data = money_df, aes(x = DateTime, y = phyto))+
         ),
         strip.background = element_blank(
         ),
-        axis.text.x = element_blank(),
-        plot.margin = margin(b = 0, r = 5, t = 5),
-        axis.ticks.x = element_blank())+
+        #axis.text.x = element_blank(),
+        plot.margin = margin(b = 0, r = 5, t = 5))+
+        #axis.ticks.x = element_blank()
   ylab("")+
-  xlab("")
+  xlab("")+
+  geom_text(data = ann_text,label = ann_text$lab)
 compare
+
+ggsave(compare, filename = "./HABs-ABM/IBM_plot_v2.tif",height = 4.5, width = 3.5,
+       units = "in", dpi = 300, dev = "tiff")
 
 fac.labs2 <- c("Proportion")
 names(fac.labs2) <- c("pretty")
