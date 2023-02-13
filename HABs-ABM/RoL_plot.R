@@ -115,6 +115,37 @@ date.breaks = as.POSIXct(c("2021-08-09 06:00","2021-08-09 09:00",
                            "2021-08-09 12:00","2021-08-09 15:00",
                            "2021-08-09 18:00"))
 
+base_money_df <- tibble(DateTime = seq(from=as.POSIXct("2021-08-09 06:00"),to=as.POSIXct("2021-08-09 19:00"),by="min", tz = "UTC")) %>%
+  mutate(DateTime = force_tz(DateTime, tzone = "UTC")) %>%
+  left_join(abm_join, by = "DateTime") %>%
+  left_join(exo_no_outliers, by = "DateTime") %>%
+  left_join(glm_join, by = "DateTime") %>%
+  rename(ABM = num_agents) 
+
+jpeg("./HABs-ABM/ABM_vs_obs.jpeg", res = 300, width = 5, height = 3, units = "in")
+par(mar = c(4, 4, 1, 4) + 0.1, mgp = c(2.4,1,0),cex.lab = 1.3)              # Additional space for second y-axis
+plot(base_money_df$DateTime, base_money_df$EXOChla_ugL_1, 
+     type = "p", pch = 16, col = "green", xlab = "Time of day", 
+     ylab = expression(paste("Observed chl-a"," (",mu,"g ",L^-1,")")), 
+     yaxt = "n")
+axis(2, las = 2)
+par(new = TRUE)      
+par(mar = c(4, 4, 1, 4) + 0.1, mgp = c(2.4,1,0),cex.lab = 1.3)              # Additional space for second y-axis# Add new plot
+plot(base_money_df$DateTime, base_money_df$ABM, axes = FALSE, xlab = "", 
+     ylab = "", type = "l", lwd = 2)
+axis(side = 4, at = pretty(range(base_money_df$ABM)), las = 2)      # Add second axis
+mtext(expression("IBM (individuals)"), side = 4, line = 3, cex = 1.3)             # Add second axis label
+legend("topleft", lty = c(NA,1), pch = c(16,NA), lwd = c(NA,2), col = c("green","black"),legend = c("Observed","Modeled"),bty = "n")
+dev.off()
+
+par(mar = c(5, 4, 4, 4) + 0.3)              # Additional space for second y-axis
+plot(x, y1, pch = 16, col = 2)              # Create first plot
+par(new = TRUE)                             # Add new plot
+plot(x, y2, pch = 17, col = 3,              # Create second plot without axes
+     axes = FALSE, xlab = "", ylab = "")
+axis(side = 4, at = pretty(range(y2)))      # Add second axis
+mtext("y2", side = 4, line = 3)             # Add second axis label
+
 
 fac.labs <- c("IBM","Observed","Process-based")
 names(fac.labs) <- c("ABM","EXOChla_ugL_1","PHY_tchla_1.6")
@@ -131,17 +162,17 @@ compare <- ggplot(data = money_df, aes(x = DateTime, y = phyto))+
              labeller = labeller(data_source = fac.labs))+
   theme_bw()+
   theme(strip.placement = "outside", legend.position = "none",
-        strip.text.x = element_text(
-          size = 12, face = "bold"
+        strip.text.y = element_text(
+          size = 12
         ),
         strip.background = element_blank(
         ),
-        #axis.text.x = element_blank(),
+        axis.text.x = element_text(size = 9),
         plot.margin = margin(b = 0, r = 5, t = 5))+
         #axis.ticks.x = element_blank()
   ylab("")+
   xlab("")+
-  geom_text(data = ann_text,label = ann_text$lab)
+  geom_text(data = ann_text,label = ann_text$lab, size = 6)
 compare
 
 ggsave(compare, filename = "./HABs-ABM/IBM_plot_v2.tif",height = 4.5, width = 3.5,
