@@ -15,10 +15,10 @@ Updates on data compilation:
 FCR data - complete
 FCR model output - complete
 
-Mendota data - incomplete; has chl-a, AirTemp, Shortwave, Inflow; missing SRP, DIN, Kd, water temp
+Mendota data - incomplete
 Mendota model output - complete
 
-Sunapee data - incomplete; has chl-a, SRP, DIN, Kd, AirTemp, Shortwave, Inflow; missing water temp
+Sunapee data - incomplete
 Sunapee model output - complete
 
 NEON data - incomplete
