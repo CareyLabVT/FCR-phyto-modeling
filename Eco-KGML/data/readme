@@ -8,3 +8,18 @@ wrangled datasets from FCR, Mendota, Sunapee, and 6 NEON lakes
 
 TransferLearningData.csv
 compiled data for transfer learning project; data are aggregated to daily median values
+
+Updates on data compilation:
+
+27FEB23
+FCR data - complete
+FCR model output - complete
+
+Mendota data - incomplete; has chl-a, AirTemp, Shortwave, Inflow; missing SRP, DIN, Kd, water temp
+Mendota model output - complete
+
+Sunapee data - incomplete; has chl-a, SRP, DIN, Kd, AirTemp, Shortwave, Inflow; missing water temp
+Sunapee model output - complete
+
+NEON data - incomplete
+NEON model output - incomplete

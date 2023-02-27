@@ -274,3 +274,48 @@ out2 <- out1[,c("lake","scenario",colnames(check))]
 write.csv(out2,"./Eco-KGML/data/LSTM_modeled_dataset_Mendota_Sunapee_21DEC22.csv",row.names = FALSE)
 col_key <- data.frame(column_names = colnames(out2))
 write.csv(col_key, file = "./Eco-KGML/data/LSTM_modeled_dataset_Mendota_Sunapee_column_key_21DEC22.csv")
+
+##Re-munging for template at "transfer learning project data template"
+# in Eco-KGML shared drive
+
+dat <- read_csv("./Eco-KGML/data/data_processed/archive/LSTM_modeled_dataset_Mendota_Sunapee_21DEC22.csv")
+colnames(dat)
+
+dat2 <- dat %>%
+  add_column(Site = "buoy",
+             Depth_m = 1.5,
+             DataType = "modeled",
+             Flag_AirTemp_C = 0,
+             Flag_Shortwave_Wm2 = 0,
+             Flag_Inflow_cms = 0,
+             Flag_WaterTemp_C = 0,
+             Flag_SRP_ugL = 0,
+             Flag_DIN_ugL = 0,
+             Flag_LightAttenuation_Kd = 0,
+             Flag_Chla_ugL = 0) %>%
+  rename(Lake = lake,
+         DateTime = Date,
+         AirTemp_C = median_AirTemp,
+         Shortwave_Wm2 = median_ShortWave,
+         Inflow_cms = FLOW,
+         WaterTemp_C = temp,
+         SRP_ugL = srp,
+         DIN_ugL = din,
+         Chla_ugL = chla,
+         LightAttenuation_Kd = kd) %>%
+  mutate(ModelRunType = ifelse(scenario == "baseline","GLMAED_calibrated_observed_met",
+                               ifelse(scenario == "plus1","GLMAED_calibration_temp_plus1",
+                                      ifelse(scenario == "plus2","GLMAED_calibration_temp_plus2",
+                                             ifelse(scenario == "plus3","GLMAED_calibration_temp_plus3",
+                                                    ifelse(scenario == "plus4","GLMAED_calibration_temp_plus4",
+                                                           ifelse(scenario == "plus5","GLMAED_calibration_temp_plus5",
+                                                                  ifelse(scenario == "plus6","GLMAED_calibration_temp_plus6",NA)))))))
+) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+#write to file
+write.csv(dat2, "./Eco-KGML/data/data_processed/ModelOutputMendotaSunapee.csv",row.names = FALSE)
+
