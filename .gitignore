@@ -2,8 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
-Eco-KGML/data/raw/*
-Eco-KGML/data/predictors/FCR_Met_final_2015_2021.csv
+Eco-KGML/data/data_raw/*
+Eco-KGML/data/data_processed/*
 .DS_Store
 **/output.nc
 Eco-KGML/figures/

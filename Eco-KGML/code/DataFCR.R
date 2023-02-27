@@ -708,4 +708,4 @@ dat2 <- dat %>%
          Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
 
 #write to file
-write.csv(dat2, "./Eco-KGML/data/DataFCR.csv",row.names = FALSE)
+write.csv(dat2, "./Eco-KGML/data/data_processed/DataFCR.csv",row.names = FALSE)
