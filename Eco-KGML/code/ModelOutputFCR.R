@@ -337,3 +337,41 @@ mega <- mega[,c(1,3,2,4,7,10,9,6,5,14,11,13,12,8)]
 write.csv(mega, file = "./data/LSTM_modeled_dataset_10NOV22.csv", row.names = FALSE)
 col_key <- data.frame(column_names = colnames(mega))
 write.csv(col_key, file = "./data/LSTM_modeled_dataset_column_key_10NOV22.csv")
+
+##Re-munging for template at "transfer learning project data template"
+# in Eco-KGML shared drive
+
+dat <- read_csv("./Eco-KGML/data/data_processed/LSTM_modeled_dataset_10NOV22.csv")
+colnames(dat)
+
+dat2 <- dat %>%
+  add_column(Lake = "FCR",
+             Site = 50,
+             Depth_m = 1.6,
+             DataType = "modeled",
+             ModelRunType = "GLMAED_calibrated_observed_met") %>%
+  rename(DateTime = Date,
+         AirTemp_C = median_AirTemp,
+         Shortwave_Wm2 = median_ShortWave,
+         Inflow_cms = FLOW,
+         WaterTemp_C = temp,
+         SRP_ugL = srp,
+         DIN_ugL = din,
+         Chla_ugL = chla,
+         LightAttenuation_Kd = kd) %>%
+  add_column(Flag_AirTemp_C = 0,
+         Flag_Shortwave_Wm2 = 0,
+         Flag_Inflow_cms = 0,
+         Flag_WaterTemp_C = 0,
+         Flag_SRP_ugL = 0,
+         Flag_DIN_ugL = 0,
+         Flag_LightAttenuation_Kd = 0,
+         Flag_Chla_ugL = 0) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+#write to file
+write.csv(dat2, "./Eco-KGML/data/data_processed/ModelOutputFCR.csv",row.names = FALSE)
+

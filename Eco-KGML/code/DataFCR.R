@@ -676,7 +676,7 @@ write.csv(col_key, file = "./data/LSTM_dataset_column_key_07OCT22.csv")
 ##Re-munging for template at "transfer learning project data template"
 # in Eco-KGML shared drive
 
-dat <- read_csv("./Eco-KGML/data/LSTM_dataset_07OCT22.csv")
+dat <- read_csv("./Eco-KGML/data/data_processed/LSTM_dataset_07OCT22.csv")
 colnames(dat)
 
 dat2 <- dat %>%
