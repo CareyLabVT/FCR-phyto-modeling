@@ -2,11 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
-Eco-KGML/data/data_raw/*
-Eco-KGML/data/data_processed/*
+Eco-KGML-transfer-learning/data/data_raw/*
+Eco-KGML-transfer-learning/data/data_processed/*
 .DS_Store
 **/output.nc
-Eco-KGML/figures/
+Eco-KGML-transfer-learning/figures/
 HABs-ABM/data/FCR_catwalk_EDI_2018_2022.csv
 HABs-ABM/ABM_output.rds
 HABs-ABM/ABM_output_18hr.rds
