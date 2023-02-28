@@ -4,6 +4,7 @@
 .Ruserdata
 Eco-KGML-transfer-learning/data/data_raw/*
 Eco-KGML-transfer-learning/data/data_processed/*
+multi-model-ensemble/data/*
 .DS_Store
 **/output.nc
 Eco-KGML-transfer-learning/figures/
