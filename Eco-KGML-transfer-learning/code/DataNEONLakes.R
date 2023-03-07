@@ -12,7 +12,20 @@
 
 # Load packages
 # install.packages('pacman')
-pacman::p_load(tidyverse, lubridate, data.table)
+pacman::p_load(tidyverse, lubridate, data.table, zoo)
+
+#define functions
+#' retreive the model time steps based on start and stop dates and time step
+#'
+#' @param model_start model start date in date class
+#' @param model_stop model stop date in date class
+#' @param time_step model time step, defaults to daily timestep
+get_model_dates = function(model_start, model_stop, time_step = 'days'){
+  
+  model_dates = seq.Date(from = as.Date(model_start), to = as.Date(model_stop), by = time_step)
+  
+  return(model_dates)
+}
 
 #read in site info
 sites <- readr::read_csv("./Eco-KGML-transfer-learning/data/data_raw/DataNEONLakes/NEON_Field_Site_Metadata_20220412.csv") |> 
@@ -69,6 +82,79 @@ ggplot(data = wq_cleaned, aes(x = time, y = chla))+
   theme_bw()
 #based on this plot I would think TOOK and PRLA are probably not super-well suited
 #for the project in terms of data availability
+
+#also best years look to be 2019-2021; lots of oddities w/ 2022 data?
+#going to work up 2019-2021
+
+#linear interpolation to fill in missing values
+wq_tl <- wq_cleaned %>%
+  filter(time >= "2019-01-01" & time <= "2021-12-31" & month(time) %in% c(6:10))
+
+check <- wq_tl %>%
+  filter(time == "2019-06-01" | time == "2020-06-01" | time == "2021-06-01" | time == "2019-10-31" | time == "2020-10-31" | time == "2021-10-31")
+
+lakes <- unique(wq_cleaned$site_id)[c(1:3,5,6)]
+
+#create daily date vector
+dates <- c(get_model_dates(model_start = "2019-06-01", model_stop = "2019-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2020-06-01", model_stop = "2020-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2021-06-01", model_stop = "2021-10-31", time_step = 'days'))
+daily_dates <- tibble(dates)
+colnames(daily_dates)[1] <- "time"
+
+years <- c(2019:2021)
+
+final <- NULL
+
+for(i in 1:length(lakes)){
+  
+  for(j in 1:length(years)){
+  
+  mylake <- wq_tl %>%
+    filter(site_id == lakes[i] & year(time) == years[j]) %>%
+    mutate(chla = replace(chla, cumall(is.na(chla)), chla[!is.na(chla)][1]))
+
+  temp <- left_join(subset(daily_dates, year(daily_dates$time) == years[j]), mylake, by = "time") %>%
+    mutate(site_id = ifelse(is.na(site_id),lakes[i],site_id))
+
+  med_chla <- na.approx(temp$chla)
+  
+  num_NA = length(temp$chla) - length(med_chla)
+  
+  if(num_NA > 0){
+    nas <- rep(NA, times = num_NA)
+    med_chla = c(med_chla, nas)
+  }
+  
+  med_chla_final <- na.locf(med_chla)
+  
+  temp$chla_interp <- med_chla_final
+
+  temp <- temp %>%
+  mutate(Interp_Flag_chla = ifelse(is.na(chla),TRUE,FALSE))
+  
+  if(i == 1 & j == 1){
+    final <- temp
+  } else {
+    final <- bind_rows(final, temp)
+  }
+
+}
+}
+
+ggplot(data = final, aes(x = time, y = chla_interp, group = Interp_Flag_chla, color = Interp_Flag_chla))+
+  geom_point()+
+  facet_wrap(vars(site_id), scales = "free", nrow = 2)+
+  theme_bw()
+
+chla_final <- final %>%
+  rename(Lake = site_id,
+         DateTime = time,
+         Chla_ugL = chla_interp) %>%
+  mutate(Flag_Chla_ugL = ifelse(Interp_Flag_chla == TRUE,1,0)) %>%
+  add_column(Depth_m = 0.5,
+             Site = "buoy",
+             )
 
 #Next steps:
 #1. Use Freya's code to pull in water temp data and wrangle that
