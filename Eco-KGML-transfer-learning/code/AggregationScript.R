@@ -19,6 +19,7 @@ DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/Data
 final <- bind_rows(DataFCR, ModelOutputFCR) %>%
   mutate(Site = as.character(Site)) %>%
   bind_rows(., ModelOutputMendotaSunapee) %>%
-  bind_rows(., DataNEONLakes)
+  bind_rows(., DataNEONLakes) %>%
+  filter(month(DateTime) %in% c(6:10))
 
 write.csv(final, "./Eco-KGML-transfer-learning/data/TransferLearningData.csv", row.names = FALSE)
