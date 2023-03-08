@@ -755,5 +755,238 @@ DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/Data
 write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
 
 
+########### Air temp 
+
+#Using this data product for air temp: https://data.neonscience.org/data-products/DP1.00002.001
+
+at <- loadByProduct(dpID="DP1.00002.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
+                     startdate="2019-01", enddate="2021-12", 
+                     package="basic",
+                     tabl="SAAT_30min",
+                     token = Sys.getenv("NEON_TOKEN"),
+                     check.size = F)
+
+# unlist the variables and add to the global environment
+list2env(at, .GlobalEnv)
+
+#format data
+at2 <- SAAT_30min %>%
+  select(siteID, startDateTime, tempSingleMean) %>%
+  mutate(DateTime = date(startDateTime)) %>%
+  rename(Lake = siteID) %>%
+  group_by(Lake, DateTime) %>%
+  summarize(at = median(tempSingleMean, na.rm = TRUE)) %>%
+  arrange(Lake, DateTime)
+
+#plot formatted data
+ggplot(data = at2, aes(x = DateTime, y = at))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+#use BARC and SUGG to fill in for each other here
+barc_at <- at2 %>%
+  filter(Lake == "BARC") %>%
+  rename(BARC = at) %>%
+  ungroup() %>%
+  select(-Lake)
+
+sugg_at <- at2 %>%
+  filter(Lake == "SUGG") %>%
+  rename(SUGG = at) %>%
+  ungroup() %>%
+  select(-Lake)
+
+fl <- left_join(barc_at,sugg_at, by = "DateTime") %>%
+  mutate(BARC = ifelse(is.na(BARC),SUGG,BARC),
+         SUGG = ifelse(is.na(SUGG),BARC,SUGG)) %>%
+  gather(BARC:SUGG, key = "Lake", value = "at")
+
+at3 <- at2 %>%
+  filter(!Lake %in% c("BARC","SUGG"))
+
+at4 <- bind_rows(at3, fl)
+
+#plot formatted data
+ggplot(data = at4, aes(x = DateTime, y = at))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+  
+
+#linear interpolation to fill in missing values
+at_tl <- at4 %>%
+  filter(DateTime >= "2019-01-01" & DateTime <= "2021-12-31" & month(DateTime) %in% c(6:10))
+
+lakes <- c("BARC","SUGG","LIRO","PRPO")
+
+#create daily date vector
+dates <- c(get_model_dates(model_start = "2019-06-01", model_stop = "2019-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2020-06-01", model_stop = "2020-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2021-06-01", model_stop = "2021-10-31", time_step = 'days'))
+daily_dates <- tibble(dates)
+colnames(daily_dates)[1] <- "DateTime"
+
+years <- c(2019:2021)
+
+final <- NULL
+
+for(i in 1:length(lakes)){
+  
+  for(j in 1:length(years)){
+    
+    mylake <- at_tl %>%
+      filter(Lake == lakes[i] & year(DateTime) == years[j]) %>%
+      mutate(at = replace(at, cumall(is.na(at)), at[!is.na(at)][1]))
+    
+    temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j]), mylake, by = "DateTime") %>%
+      mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake))
+    
+    med_at <- na.approx(temp$at)
+    
+    num_NA = length(temp$at) - length(med_at)
+    
+    if(num_NA > 0){
+      nas <- rep(NA, times = num_NA)
+      med_at = c(med_at, nas)
+    }
+    
+    med_at_final <- na.locf(med_at)
+    
+    temp$at_interp <- med_at_final
+    
+    temp <- temp %>%
+      mutate(Interp_Flag_at = ifelse(is.na(at),TRUE,FALSE))
+    
+    if(i == 1 & j == 1){
+      final <- temp
+    } else {
+      final <- bind_rows(final, temp)
+    }
+    
+  }
+}
+
+ggplot(data = final, aes(x = DateTime, y = at_interp, group = Interp_Flag_at, color = Interp_Flag_at))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+at5 <- final %>%
+  rename(AirTemp_C = at_interp) %>%
+  select(Lake, DateTime, AirTemp_C, Interp_Flag_at)
+
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv") %>%
+  select(-AirTemp_C) %>%
+  left_join(., at5, by = c("Lake","DateTime")) %>%
+  mutate(Flag_AirTemp_C = ifelse(Interp_Flag_at == TRUE, 1, 0)) %>%
+  select(-Interp_Flag_at) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
+
+
+########### Shortwave 
+
+#Using this data product for shortwave: https://data.neonscience.org/data-products/DP1.00023.001
+
+sw <- loadByProduct(dpID="DP1.00023.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
+                    startdate="2019-01", enddate="2021-12", 
+                    package="expanded", 
+                    token = Sys.getenv("NEON_TOKEN"),
+                    check.size = F)
+
+# unlist the variables and add to the global environment
+list2env(sw, .GlobalEnv)
+
+#format data
+sec2 <- dep_secchi %>%
+  select(siteID, date, secchiMeanDepth) %>%
+  mutate(DateTime = date(date)) %>%
+  rename(Lake = siteID) %>%
+  select(Lake, DateTime, secchiMeanDepth)
+
+#plot formatted data
+ggplot(data = sec2, aes(x = DateTime, y = secchiMeanDepth))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+#linear interpolation to fill in missing values
+sec_tl <- sec2 %>%
+  filter(DateTime >= "2019-01-01" & DateTime <= "2021-12-31" & month(DateTime) %in% c(6:10))
+
+lakes <- c("BARC","SUGG","LIRO","PRPO")
+
+#create daily date vector
+dates <- c(get_model_dates(model_start = "2019-06-01", model_stop = "2019-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2020-06-01", model_stop = "2020-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2021-06-01", model_stop = "2021-10-31", time_step = 'days'))
+daily_dates <- tibble(dates)
+colnames(daily_dates)[1] <- "DateTime"
+
+years <- c(2019:2021)
+
+final <- NULL
+
+for(i in 1:length(lakes)){
+  
+  for(j in 1:length(years)){
+    
+    mylake <- at_tl %>%
+      filter(Lake == lakes[i] & year(DateTime) == years[j]) %>%
+      mutate(secchiMeanDepth = replace(secchiMeanDepth, cumall(is.na(secchiMeanDepth)), secchiMeanDepth[!is.na(secchiMeanDepth)][1]))
+    
+    temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j]), mylake, by = "DateTime") %>%
+      mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake))
+    
+    med_secchiMeanDepth <- na.approx(temp$secchiMeanDepth)
+    
+    num_NA = length(temp$secchiMeanDepth) - length(med_secchiMeanDepth)
+    
+    if(num_NA > 0){
+      nas <- rep(NA, times = num_NA)
+      med_secchiMeanDepth = c(med_secchiMeanDepth, nas)
+    }
+    
+    med_secchiMeanDepth_final <- na.locf(med_secchiMeanDepth)
+    
+    temp$secchiMeanDepth_interp <- med_secchiMeanDepth_final
+    
+    temp <- temp %>%
+      mutate(Interp_Flag_at = ifelse(is.na(secchiMeanDepth),TRUE,FALSE))
+    
+    if(i == 1 & j == 1){
+      final <- temp
+    } else {
+      final <- bind_rows(final, temp)
+    }
+    
+  }
+}
+
+ggplot(data = final, aes(x = DateTime, y = secchiMeanDepth_interp, group = Interp_Flag_secchiMeanDepth, color = Interp_Flag_secchiMeanDepth))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+sec3 <- final %>%
+  mutate(LightAttenuation_Kd = (1.7/secchiMeanDepth_interp)) %>%
+  select(Lake, DateTime, LightAttenuation_Kd, Interp_Flag_secchiMeanDepth)
+
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv") %>%
+  select(-LightAttenuation_Kd) %>%
+  left_join(., sec3, by = c("Lake","DateTime")) %>%
+  mutate(Flag_LightAttenuation_Kd = ifelse(Interp_Flag_secchiMeanDepth == TRUE, 1, 0)) %>%
+  select(-Interp_Flag_secchiMeanDepth) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
 
 
