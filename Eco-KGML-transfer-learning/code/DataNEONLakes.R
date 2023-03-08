@@ -154,7 +154,28 @@ chla_final <- final %>%
   mutate(Flag_Chla_ugL = ifelse(Interp_Flag_chla == TRUE,1,0)) %>%
   add_column(Depth_m = 0.5,
              Site = "buoy",
-             )
+             DataType = "observed",
+             ModelRunType = NA,
+             AirTemp_C = NA,
+             Shortwave_Wm2 = NA,
+             Inflow_cms = 0,
+             WaterTemp_C = NA,
+             SRP_ugL = NA,
+             DIN_ugL = NA,
+             LightAttenuation_Kd = NA,
+             Flag_AirTemp_C = NA,
+             Flag_Shortwave_Wm2 = NA,
+             Flag_Inflow_cms = 2,
+             Flag_WaterTemp_C = NA,
+             Flag_SRP_ugL = NA,
+             Flag_DIN_ugL = NA,
+             Flag_LightAttenuation_Kd = NA) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+write.csv(chla_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
 
 #Next steps:
 #1. Use Freya's code to pull in water temp data and wrangle that

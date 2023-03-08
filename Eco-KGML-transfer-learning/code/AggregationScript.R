@@ -11,12 +11,14 @@ pacman::p_load(tidyverse, lubridate)
 
 #Read in and combine lakes
 
-DataFCR <- read_csv("./Eco-KGML/data/data_processed/DataFCR.csv")
-ModelOutputFCR <- read_csv("./Eco-KGML/data/data_processed/ModelOutputFCR.csv")
-ModelOutputMendotaSunapee <- read_csv("./Eco-KGML/data/data_processed/ModelOutputMendotaSunapee.csv")
+DataFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataFCR.csv")
+ModelOutputFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputFCR.csv")
+ModelOutputMendotaSunapee <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputMendotaSunapee.csv")
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv")
 
 final <- bind_rows(DataFCR, ModelOutputFCR) %>%
   mutate(Site = as.character(Site)) %>%
-  bind_rows(., ModelOutputMendotaSunapee)
+  bind_rows(., ModelOutputMendotaSunapee) %>%
+  bind_rows(., DataNEONLakes)
 
-write.csv(final, "./Eco-KGML/data/TransferLearningData.csv", row.names = FALSE)
+write.csv(final, "./Eco-KGML-transfer-learning/data/TransferLearningData.csv", row.names = FALSE)
