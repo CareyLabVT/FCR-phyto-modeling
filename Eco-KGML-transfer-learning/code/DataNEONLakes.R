@@ -10,9 +10,17 @@
 #for the NEON forecast challenge, available at:
 #https://github.com/OlssonF/neon4cast-targets/blob/main/aquatics_targets.R
 
+#Next steps:
+#1. Use Freya's code to pull in water temp data and wrangle that - check 8MAR23
+#2. Use more traditional API method to pull in: Secchi, DIN, SRP
+#3. Figure out what data product we want to use for NEON lakes for weather (NLDAS?)
+
 # Load packages
 # install.packages('pacman')
-pacman::p_load(tidyverse, lubridate, data.table, zoo, sparklyr)
+pacman::p_load(tidyverse, lubridate, data.table, zoo, sparklyr, neonUtilities)
+
+#define NEON token
+source("./Eco-KGML-transfer-learning/code/neon_token_source.R")
 
 #define functions
 #' retreive the model time steps based on start and stop dates and time step
@@ -508,9 +516,106 @@ DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/Data
 write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
 
 
+########### Light attenuation
 
-#Next steps:
-#1. Use Freya's code to pull in water temp data and wrangle that
-#2. Use more traditional API method to pull in: Secchi, DIN, SRP
-#3. Figure out what data product we want to use for NEON lakes for weather (NLDAS?)
+#Using this data product for lake Secchi: https://data.neonscience.org/data-products/DP1.20252.001
+
+sec <- loadByProduct(dpID="DP1.20252.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
+                     startdate="2019-01", enddate="2021-12", 
+                     package="expanded", 
+                     token = Sys.getenv("NEON_TOKEN"),
+                     check.size = F)
+
+# unlist the variables and add to the global environment
+list2env(sec, .GlobalEnv)
+
+#format data
+sec2 <- dep_secchi %>%
+  select(siteID, date, secchiMeanDepth) %>%
+  mutate(DateTime = date(date)) %>%
+  rename(Lake = siteID) %>%
+  select(Lake, DateTime, secchiMeanDepth)
+
+#plot formatted data
+ggplot(data = sec2, aes(x = DateTime, y = secchiMeanDepth))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+#linear interpolation to fill in missing values
+sec_tl <- sec2 %>%
+  filter(DateTime >= "2019-01-01" & DateTime <= "2021-12-31" & month(DateTime) %in% c(6:10))
+
+lakes <- c("BARC","SUGG","LIRO","PRPO")
+
+#create daily date vector
+dates <- c(get_model_dates(model_start = "2019-06-01", model_stop = "2019-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2020-06-01", model_stop = "2020-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2021-06-01", model_stop = "2021-10-31", time_step = 'days'))
+daily_dates <- tibble(dates)
+colnames(daily_dates)[1] <- "DateTime"
+
+years <- c(2019:2021)
+
+final <- NULL
+
+for(i in 1:length(lakes)){
   
+  for(j in 1:length(years)){
+    
+    mylake <- sec_tl %>%
+      filter(Lake == lakes[i] & year(DateTime) == years[j]) %>%
+      mutate(secchiMeanDepth = replace(secchiMeanDepth, cumall(is.na(secchiMeanDepth)), secchiMeanDepth[!is.na(secchiMeanDepth)][1]))
+    
+    temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j]), mylake, by = "DateTime") %>%
+      mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake))
+    
+    med_secchiMeanDepth <- na.approx(temp$secchiMeanDepth)
+    
+    num_NA = length(temp$secchiMeanDepth) - length(med_secchiMeanDepth)
+    
+    if(num_NA > 0){
+      nas <- rep(NA, times = num_NA)
+      med_secchiMeanDepth = c(med_secchiMeanDepth, nas)
+    }
+    
+    med_secchiMeanDepth_final <- na.locf(med_secchiMeanDepth)
+    
+    temp$secchiMeanDepth_interp <- med_secchiMeanDepth_final
+    
+    temp <- temp %>%
+      mutate(Interp_Flag_secchiMeanDepth = ifelse(is.na(secchiMeanDepth),TRUE,FALSE))
+    
+    if(i == 1 & j == 1){
+      final <- temp
+    } else {
+      final <- bind_rows(final, temp)
+    }
+    
+  }
+}
+
+ggplot(data = final, aes(x = DateTime, y = secchiMeanDepth_interp, group = Interp_Flag_secchiMeanDepth, color = Interp_Flag_secchiMeanDepth))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+sec3 <- final %>%
+  mutate(LightAttenuation_Kd = (1.7/secchiMeanDepth_interp)) %>%
+  select(Lake, DateTime, LightAttenuation_Kd, Interp_Flag_secchiMeanDepth)
+
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv") %>%
+  select(-LightAttenuation_Kd) %>%
+  left_join(., sec3, by = c("Lake","DateTime")) %>%
+  mutate(Flag_LightAttenuation_Kd = ifelse(Interp_Flag_secchiMeanDepth == TRUE, 1, 0)) %>%
+  select(-Interp_Flag_secchiMeanDepth) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
+
+
+
+
