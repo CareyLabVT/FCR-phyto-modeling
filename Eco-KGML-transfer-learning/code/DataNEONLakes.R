@@ -617,5 +617,143 @@ DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/Data
 write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
 
 
+########### DIN and SRP
+
+#Using this data product for lake nutrients: https://data.neonscience.org/data-products/DP1.20093.001
+
+nuts <- loadByProduct(dpID="DP1.20093.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
+                     startdate="2019-01", enddate="2021-12", 
+                     package="expanded", 
+                     token = Sys.getenv("NEON_TOKEN"),
+                     check.size = F)
+
+# unlist the variables and add to the global environment
+list2env(nuts, .GlobalEnv)
+
+#format data
+#NOTE: c0 means sample collected at 0.5 m and lake not stratified; c1 means
+#sample collected at 0.5 m and lake stratified
+nuts2 <- swc_externalLabDataByAnalyte %>%
+  select(siteID, namedLocation, collectDate, analyte, analyteConcentration, analyteUnits) %>%
+  mutate(DateTime = date(collectDate)) %>%
+  rename(Lake = siteID,
+         Site = namedLocation) %>%
+  select(Lake, DateTime, Site, analyte, analyteConcentration, analyteUnits) %>%
+  filter(analyte == "TDN" | analyte == "TDP") %>%
+  filter(!is.na(analyteConcentration)) %>%
+  filter(grepl("buoy.c0",Site) | grepl("buoy.c1",Site)) %>%
+  group_by(Lake, Site, DateTime, analyte) %>%
+  summarize(analyteConcentration = mean(analyteConcentration, na.rm = TRUE)) %>%
+  ungroup() %>%
+  pivot_wider(names_from = analyte, values_from = analyteConcentration) %>%
+  mutate(DIN_ugL = 1000*TDN,
+         SRP_ugL = 1000*TDP) %>%
+  select(-Site, -TDN, -TDP)
+
+#plot formatted data
+ggplot(data = nuts2, aes(x = DateTime, y = DIN_ugL))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+ggplot(data = nuts2, aes(x = DateTime, y = SRP_ugL))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+#linear interpolation to fill in missing values
+nuts_tl <- nuts2 %>%
+  filter(DateTime >= "2019-01-01" & DateTime <= "2021-12-31" & month(DateTime) %in% c(6:10))
+
+lakes <- c("BARC","SUGG","LIRO","PRPO")
+
+#create daily date vector
+dates <- c(get_model_dates(model_start = "2019-06-01", model_stop = "2019-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2020-06-01", model_stop = "2020-10-31", time_step = 'days'),
+           get_model_dates(model_start = "2021-06-01", model_stop = "2021-10-31", time_step = 'days'))
+daily_dates <- tibble(dates)
+colnames(daily_dates)[1] <- "DateTime"
+
+years <- c(2019:2021)
+
+final <- NULL
+
+for(i in 1:length(lakes)){
+  
+  for(j in 1:length(years)){
+    
+    mylake <- nuts_tl %>%
+      filter(Lake == lakes[i] & year(DateTime) == years[j]) %>%
+      mutate(DIN_ugL = replace(DIN_ugL, cumall(is.na(DIN_ugL)), DIN_ugL[!is.na(DIN_ugL)][1]),
+             SRP_ugL = replace(SRP_ugL, cumall(is.na(SRP_ugL)), SRP_ugL[!is.na(SRP_ugL)][1]))
+    
+    temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j]), mylake, by = "DateTime") %>%
+      mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake))
+    
+    med_DIN_ugL <- na.approx(temp$DIN_ugL)
+    med_SRP_ugL <- na.approx(temp$SRP_ugL)
+    
+    num_NA_DIN = length(temp$DIN_ugL) - length(med_DIN_ugL)
+    num_NA_SRP = length(temp$SRP_ugL) - length(med_SRP_ugL)
+    
+    
+    if(num_NA_DIN > 0){
+      nas <- rep(NA, times = num_NA_DIN)
+      med_DIN_ugL = c(med_DIN_ugL, nas)
+    }
+    if(num_NA_SRP > 0){
+      nas <- rep(NA, times = num_NA_SRP)
+      med_SRP_ugL = c(med_SRP_ugL, nas)
+    }
+    
+    med_DIN_ugL_final <- na.locf(med_DIN_ugL)
+    med_SRP_ugL_final <- na.locf(med_SRP_ugL)
+    
+    
+    temp$DIN_ugL_interp <- med_DIN_ugL_final
+    temp$SRP_ugL_interp <- med_SRP_ugL_final
+    
+    temp <- temp %>%
+      mutate(Interp_Flag_DIN_ugL = ifelse(is.na(DIN_ugL),TRUE,FALSE),
+             Interp_Flag_SRP_ugL = ifelse(is.na(SRP_ugL),TRUE,FALSE))
+    
+    if(i == 1 & j == 1){
+      final <- temp
+    } else {
+      final <- bind_rows(final, temp)
+    }
+    
+  }
+}
+
+ggplot(data = final, aes(x = DateTime, y = DIN_ugL_interp, group = Interp_Flag_DIN_ugL, color = Interp_Flag_DIN_ugL))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+ggplot(data = final, aes(x = DateTime, y = SRP_ugL_interp, group = Interp_Flag_SRP_ugL, color = Interp_Flag_SRP_ugL))+
+  geom_point()+
+  facet_wrap(vars(Lake), scales = "free", nrow = 2)+
+  theme_bw()
+
+nuts3 <- final %>%
+  select(-DIN_ugL, -SRP_ugL) %>%
+  rename(DIN_ugL = DIN_ugL_interp,
+         SRP_ugL = SRP_ugL_interp)
+
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv") %>%
+  select(-DIN_ugL, -SRP_ugL) %>%
+  left_join(., nuts3, by = c("Lake","DateTime")) %>%
+  mutate(Flag_DIN_ugL = ifelse(Interp_Flag_DIN_ugL == TRUE, 1, 0),
+         Flag_SRP_ugL = ifelse(Interp_Flag_SRP_ugL == TRUE, 1, 0)) %>%
+  select(-Interp_Flag_DIN_ugL, -Interp_Flag_SRP_ugL) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+
+write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
+
+
 
 

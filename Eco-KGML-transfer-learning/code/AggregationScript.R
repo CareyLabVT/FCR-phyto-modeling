@@ -22,4 +22,6 @@ final <- bind_rows(DataFCR, ModelOutputFCR) %>%
   bind_rows(., DataNEONLakes) %>%
   filter(month(DateTime) %in% c(6:10))
 
+unique(final$Lake)
+
 write.csv(final, "./Eco-KGML-transfer-learning/data/TransferLearningData.csv", row.names = FALSE)
