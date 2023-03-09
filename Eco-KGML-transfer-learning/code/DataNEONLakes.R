@@ -6,14 +6,10 @@
 #according to template at "transfer learning project data template"
 # in Eco-KGML shared drive
 
-#Note: much of this code is repurposed from code developed for the aquatic targets
+#Note: some of this code is repurposed from code developed for the aquatic targets
 #for the NEON forecast challenge, available at:
 #https://github.com/OlssonF/neon4cast-targets/blob/main/aquatics_targets.R
-
-#Next steps:
-#1. Use Freya's code to pull in water temp data and wrangle that - check 8MAR23
-#2. Use more traditional API method to pull in: Secchi, DIN, SRP
-#3. Figure out what data product we want to use for NEON lakes for weather (NLDAS?)
+#specifically the code for pulling in and wrangling chl-a and water temp data
 
 # Load packages
 # install.packages('pacman')
@@ -523,7 +519,7 @@ write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataN
 sec <- loadByProduct(dpID="DP1.20252.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
                      startdate="2019-01", enddate="2021-12", 
                      package="expanded", 
-                     token = Sys.getenv("NEON_TOKEN"),
+                     token = NEON_TOKEN,
                      check.size = F)
 
 # unlist the variables and add to the global environment
@@ -624,7 +620,7 @@ write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataN
 nuts <- loadByProduct(dpID="DP1.20093.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
                      startdate="2019-01", enddate="2021-12", 
                      package="expanded", 
-                     token = Sys.getenv("NEON_TOKEN"),
+                     token = NEON_TOKEN,
                      check.size = F)
 
 # unlist the variables and add to the global environment
@@ -763,7 +759,7 @@ at <- loadByProduct(dpID="DP1.00002.001", site=c("BARC","SUGG","CRAM","LIRO","PR
                      startdate="2019-01", enddate="2021-12", 
                      package="basic",
                      tabl="SAAT_30min",
-                     token = Sys.getenv("NEON_TOKEN"),
+                     token = NEON_TOKEN,
                      check.size = F)
 
 # unlist the variables and add to the global environment
