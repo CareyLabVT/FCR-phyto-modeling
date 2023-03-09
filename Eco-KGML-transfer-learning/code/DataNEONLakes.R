@@ -895,28 +895,36 @@ write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataN
 
 sw <- loadByProduct(dpID="DP1.00023.001", site=c("BARC","SUGG","CRAM","LIRO","PRLA","PRPO","TOOK"),
                     startdate="2019-01", enddate="2021-12", 
-                    package="expanded", 
-                    token = Sys.getenv("NEON_TOKEN"),
+                    package="basic",
+                    tabl="SLRNR_30min",
+                    token = NEON_TOKEN,
                     check.size = F)
 
 # unlist the variables and add to the global environment
 list2env(sw, .GlobalEnv)
 
 #format data
-sec2 <- dep_secchi %>%
-  select(siteID, date, secchiMeanDepth) %>%
-  mutate(DateTime = date(date)) %>%
+sw2 <- SLRNR_30min %>%
+  select(siteID, startDateTime, inSWMean) %>%
+  mutate(DateTime = date(startDateTime)) %>%
   rename(Lake = siteID) %>%
-  select(Lake, DateTime, secchiMeanDepth)
+  group_by(Lake, DateTime) %>%
+  summarize(sw = median(inSWMean, na.rm = TRUE)) %>%
+  arrange(Lake, DateTime) %>%
+  #inserting some QC here for super-high values
+  mutate(sw = ifelse(sw > 400 | (sw > 3*mean(sw, na.rm = TRUE)),NA,sw))
 
 #plot formatted data
-ggplot(data = sec2, aes(x = DateTime, y = secchiMeanDepth))+
+ggplot(data = sw2, aes(x = DateTime, y = sw))+
   geom_point()+
   facet_wrap(vars(Lake), scales = "free", nrow = 2)+
   theme_bw()
 
+#what to do about outliers here? probably set a hard cap similar to chla?
+#set hard cap of 400 and also eliminated anything that was 3x greater than the mean
+
 #linear interpolation to fill in missing values
-sec_tl <- sec2 %>%
+sw_tl <- sw2 %>%
   filter(DateTime >= "2019-01-01" & DateTime <= "2021-12-31" & month(DateTime) %in% c(6:10))
 
 lakes <- c("BARC","SUGG","LIRO","PRPO")
@@ -936,28 +944,28 @@ for(i in 1:length(lakes)){
   
   for(j in 1:length(years)){
     
-    mylake <- at_tl %>%
+    mylake <- sw_tl %>%
       filter(Lake == lakes[i] & year(DateTime) == years[j]) %>%
-      mutate(secchiMeanDepth = replace(secchiMeanDepth, cumall(is.na(secchiMeanDepth)), secchiMeanDepth[!is.na(secchiMeanDepth)][1]))
+      mutate(sw = replace(sw, cumall(is.na(sw)), sw[!is.na(sw)][1]))
     
     temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j]), mylake, by = "DateTime") %>%
       mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake))
     
-    med_secchiMeanDepth <- na.approx(temp$secchiMeanDepth)
+    med_sw <- na.approx(temp$sw)
     
-    num_NA = length(temp$secchiMeanDepth) - length(med_secchiMeanDepth)
+    num_NA = length(temp$sw) - length(med_sw)
     
     if(num_NA > 0){
       nas <- rep(NA, times = num_NA)
-      med_secchiMeanDepth = c(med_secchiMeanDepth, nas)
+      med_sw = c(med_sw, nas)
     }
     
-    med_secchiMeanDepth_final <- na.locf(med_secchiMeanDepth)
+    med_sw_final <- na.locf(med_sw)
     
-    temp$secchiMeanDepth_interp <- med_secchiMeanDepth_final
+    temp$sw_interp <- med_sw_final
     
     temp <- temp %>%
-      mutate(Interp_Flag_at = ifelse(is.na(secchiMeanDepth),TRUE,FALSE))
+      mutate(Interp_Flag_sw = ifelse(is.na(sw),TRUE,FALSE))
     
     if(i == 1 & j == 1){
       final <- temp
@@ -968,25 +976,23 @@ for(i in 1:length(lakes)){
   }
 }
 
-ggplot(data = final, aes(x = DateTime, y = secchiMeanDepth_interp, group = Interp_Flag_secchiMeanDepth, color = Interp_Flag_secchiMeanDepth))+
+ggplot(data = final, aes(x = DateTime, y = sw_interp, group = Interp_Flag_sw, color = Interp_Flag_sw))+
   geom_point()+
   facet_wrap(vars(Lake), scales = "free", nrow = 2)+
   theme_bw()
 
-sec3 <- final %>%
-  mutate(LightAttenuation_Kd = (1.7/secchiMeanDepth_interp)) %>%
-  select(Lake, DateTime, LightAttenuation_Kd, Interp_Flag_secchiMeanDepth)
+sw3 <- final %>%
+  rename(Shortwave_Wm2 = sw_interp) %>%
+  select(Lake, DateTime, Shortwave_Wm2, Interp_Flag_sw)
 
 DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv") %>%
-  select(-LightAttenuation_Kd) %>%
-  left_join(., sec3, by = c("Lake","DateTime")) %>%
-  mutate(Flag_LightAttenuation_Kd = ifelse(Interp_Flag_secchiMeanDepth == TRUE, 1, 0)) %>%
-  select(-Interp_Flag_secchiMeanDepth) %>%
+  select(-Shortwave_Wm2) %>%
+  left_join(., sw3, by = c("Lake","DateTime")) %>%
+  mutate(Flag_Shortwave_Wm2 = ifelse(Interp_Flag_sw == TRUE, 1, 0)) %>%
+  select(-Interp_Flag_sw) %>%
   select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
          Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
          Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
          Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
 
 write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
-
-
