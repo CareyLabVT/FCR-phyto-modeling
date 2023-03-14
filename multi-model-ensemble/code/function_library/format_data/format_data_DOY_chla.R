@@ -14,7 +14,7 @@ library(lubridate)
 format_data_DOY_chla <- function(filepath = "./multi-model-ensemble/data/data_raw/FCR_Catwalk_EDI_2018_2022.csv"){
 
 exo <- read_csv(filepath) %>%
-  filter(Flag_EXOChla_ugL_1 == 0 & year(DateTime) %in% c(2018:2021)) %>%
+  filter(Flag_EXOChla_ugL_1 == 0 & year(DateTime) %in% c(2018:2022)) %>%
   select(DateTime, EXOChla_ugL_1) %>%
   mutate(Date = date(DateTime)) %>%
   group_by(Date) %>%

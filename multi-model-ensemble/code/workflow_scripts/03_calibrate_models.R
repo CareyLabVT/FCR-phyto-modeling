@@ -8,19 +8,15 @@
 library(tidyverse)
 library(lubridate)
 
-#Load data formatting functions
-data.format.functions <- list.files("./multi-model-ensemble/code/function_library/format_data")
-sapply(paste0("./multi-model-ensemble/code/function_library/format_data/", data.format.functions),source,.GlobalEnv)
-
 #Load model fitting functions
 fit.model.functions <- list.files("./multi-model-ensemble/code/function_library/fit_models")
 sapply(paste0("./multi-model-ensemble/code/function_library/fit_models/",fit.model.functions),source,.GlobalEnv)
 
-#Format data
-dat_persistence <- format_data_persistence()
-dat_DOY_chla <- format_data_DOY_chla()
+#Read in data
+dat_DOY_chla <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 
 #Fit models (not applicable for persistence model)
-DOY.chla <- fit_DOY_chla(chla_ts = dat_DOY_chla, max_order = 100)
-DOY.chla$RMSE_table
+DOY.chla <- fit_DOY_chla(data = dat_DOY_chla, cal_dates = c("2018-08-06","2021-12-31"))
+DOY.chla$GAM_plot
+DOY.chla$GAM_rmse
 
