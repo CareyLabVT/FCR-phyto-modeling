@@ -16,9 +16,11 @@ sapply(paste0("./multi-model-ensemble/code/function_library/format_data/", data.
 obs <- format_chla_obs()
 dat_persistence <- format_data_persistence()
 dat_DOY_chla <- format_data_DOY_chla()
+dat_ARIMA <- format_data_ARIMA()
 
 #Write processed data to file
 write.csv(obs, "./multi-model-ensemble/data/data_processed/chla_obs.csv",row.names = FALSE)
 write.csv(dat_persistence, "./multi-model-ensemble/data/data_processed/persistence.csv",row.names = FALSE)
 write.csv(dat_DOY_chla, "./multi-model-ensemble/data/data_processed/DOY.csv",row.names = FALSE)
+write.csv(dat_ARIMA, "./multi-model-ensemble/data/data_processed/ARIMA.csv",row.names = FALSE)
 

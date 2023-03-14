@@ -14,6 +14,7 @@ sapply(paste0("./multi-model-ensemble/code/function_library/visualization/",plot
 
 
 #Read in data
+input <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv")
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
@@ -22,7 +23,9 @@ reference_datetime = "2022-03-14"
 forecast_horizon = 7
 
 
-#Plot data
+#Plot 
+PlotInputData(input_data = input)
+
 SevenDayPrediction(observations = obs, 
                          model_output = out, 
                          reference_datetime = reference_datetime, 

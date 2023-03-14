@@ -23,12 +23,20 @@ library(tidyverse)
 library(lubridate)
 library(data.table)
 library(zoo)
+
+#source internal functions
 source("./multi-model-ensemble/code/function_library/format_data/interpolation.R")
 
 #'Function to format data for ARIMA model for chla from 2018-2022
 #'@param filepath_exo filepath to exo data product from EDI for FCR
+#'@param filepath_chemistry filepath to chemistry data product from EDI
+#'@param filepath_Secchi filepath to YSI/Secchi data product from EDI
+#'@param filepath_met filepath to FCR met data product from EDI
+#'@param filepath_inflow filepath to FCR inflow data product from EDI
+#'@param start_date start date of desired formatted data file
+#'@param end_date end date of desired formatted data file
 
-format_data_DOY_chla <- function(filepath_exo = "./multi-model-ensemble/data/data_raw/FCR_Catwalk_EDI_2018_2022.csv",
+format_data_ARIMA <- function(filepath_exo = "./multi-model-ensemble/data/data_raw/FCR_Catwalk_EDI_2018_2022.csv",
                                  filepath_chemistry = "./multi-model-ensemble/data/data_raw/chemistry_2013_2021.csv",
                                  filepath_Secchi = "./multi-model-ensemble/data/data_raw/Secchi_depth_2013-2022.csv",
                                  filepath_met = "./multi-model-ensemble/data/data_raw/FCR_Met_final_2015_2022.csv",
@@ -169,7 +177,9 @@ secchi <- read_csv(filepath_Secchi) %>%
     left_join(., chem2) %>%
     left_join(., secchi2) %>%
     select(Date, AirTemp_C, Shortwave_Wm2, Windspeed_ms, Inflow_cms, WaterTemp_C,
-           SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL)
+           SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+           Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Windspeed_ms, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+           Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
   
   return(df.out)
 }

@@ -86,10 +86,10 @@ interpolate <- function(daily_dates, data, variables, method, DOY_data){
       df[j,variables[i]] <- ifelse(is.na(df[j,variables[i]]),mgcv::predict.gam(my.gam, data.frame(doy=df[j,"doy"])),df[j,variables[i]])
     }
     
+    }
+    
     df <- df %>%
       select(-doy)
-    
-    }
     
   } #end of DOY method
   
