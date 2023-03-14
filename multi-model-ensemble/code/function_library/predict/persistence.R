@@ -18,17 +18,17 @@ persistence <- function(data, pred_dates, forecast_horizon){
   for(t in 1:length(pred_dates)){
   
     #subset to reference_datetime and identify observation
-    forecast_dates <- seq.Date(from = as.Date(pred_dates[t]+1), to = as.Date(pred_dates[t]+forecast_horizon), by = "day")
+    forecast_dates <- seq.Date(from = as.Date(pred_dates[t]), to = as.Date(pred_dates[t]+forecast_horizon), by = "day")
     chla <- data[which(data$Date == pred_dates[t]),"Chla_ugL"]
     
     #set up dataframe for today's prediction
     temp.df <- data.frame(model_id = "persistence",
-                     reference_datetime = rep(pred_dates[t],forecast_horizon),
+                     reference_datetime = rep(pred_dates[t],forecast_horizon+1),
                      datetime = forecast_dates,
                      variable = "chlorophyll-a",
-                     prediction = rep(NA,forecast_horizon))
+                     prediction = rep(NA,forecast_horizon+1))
   
-    for(h in 1:forecast_horizon){
+    for(h in 1:(forecast_horizon+1)){
       
       #make prediction
       temp.df$prediction[h] = chla
@@ -40,5 +40,6 @@ persistence <- function(data, pred_dates, forecast_horizon){
     
   } #end of all prediction loop
   
+  pred.df$prediction <- as.double(pred.df$prediction)
   return(pred.df)
 }

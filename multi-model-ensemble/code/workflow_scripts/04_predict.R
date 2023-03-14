@@ -38,6 +38,8 @@ pred_DOY <- DOY(data = dat_DOY_chla,
                 pred_dates = pred_dates,
                 forecast_horizon = forecast_horizon)
 
+#Stack model output and write to file
+mod_output <- bind_rows(pred_persistence, pred_DOY)
 
-  
- 
+write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
+

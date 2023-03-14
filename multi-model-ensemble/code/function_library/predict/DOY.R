@@ -34,17 +34,17 @@ DOY <- function(data, pred_dates, forecast_horizon){
   for(t in 1:length(pred_dates)){
     
     #subset to reference_datetime and identify doy
-    forecast_dates <- seq.Date(from = as.Date(pred_dates[t]+1), to = as.Date(pred_dates[t]+forecast_horizon), by = "day")
+    forecast_dates <- seq.Date(from = as.Date(pred_dates[t]), to = as.Date(pred_dates[t]+forecast_horizon), by = "day")
     doy = yday(forecast_dates)
 
     #set up dataframe for today's prediction
     temp.df <- data.frame(model_id = "DOY",
-                          reference_datetime = rep(pred_dates[t],forecast_horizon),
+                          reference_datetime = rep(pred_dates[t],forecast_horizon+1),
                           datetime = forecast_dates,
                           variable = "chlorophyll-a",
-                          prediction = rep(NA,forecast_horizon))
+                          prediction = rep(NA,forecast_horizon+1))
     
-    for(h in 1:forecast_horizon){
+    for(h in 1:(forecast_horizon+1)){
       
       #make prediction
       temp.df$prediction = predict.gam(my.gam, data.frame(x=doy))
@@ -57,5 +57,6 @@ DOY <- function(data, pred_dates, forecast_horizon){
   } #end of all prediction loop
   
   #return predictions
+  pred.df$prediction <- as.double(pred.df$prediction)
   return(pred.df)
 }

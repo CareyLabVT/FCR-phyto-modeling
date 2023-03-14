@@ -13,10 +13,12 @@ data.format.functions <- list.files("./multi-model-ensemble/code/function_librar
 sapply(paste0("./multi-model-ensemble/code/function_library/format_data/", data.format.functions),source,.GlobalEnv)
 
 #Format data
+obs <- format_chla_obs()
 dat_persistence <- format_data_persistence()
 dat_DOY_chla <- format_data_DOY_chla()
 
 #Write processed data to file
+write.csv(obs, "./multi-model-ensemble/data/data_processed/chla_obs.csv",row.names = FALSE)
 write.csv(dat_persistence, "./multi-model-ensemble/data/data_processed/persistence.csv",row.names = FALSE)
 write.csv(dat_DOY_chla, "./multi-model-ensemble/data/data_processed/DOY.csv",row.names = FALSE)
 

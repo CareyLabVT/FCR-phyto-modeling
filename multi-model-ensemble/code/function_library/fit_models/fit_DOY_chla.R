@@ -35,9 +35,18 @@ fit_DOY_chla <- function(data, cal_dates){
     geom_smooth()+
     theme_classic()
   GAM_predicted <- mgcv::predict.gam(my.gam, data.frame(x=df$x))
-  GAM_rmse <- sqrt(mean((df$y - GAM_predicted)^2))
+  
+  #get list of calibration dates
+  dates <- data %>%
+    filter(Date >= start_cal & Date <= stop_cal)
+  
+  #build output df
+  df.out <- data.frame(model_id = "DOY",
+                       datetime = dates$Date,
+                       variable = "chlorophyll-a",
+                       prediction = GAM_predicted)
 
   
-  #return model with best fit
-  return(list(gam = my.gam, GAM_plot = GAM_plot, GAM_rmse = GAM_rmse))
+  #return output + model with best fit + plot
+  return(list(out = df.out, DOY = my.gam, plot = GAM_plot))
 }

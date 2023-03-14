@@ -10,7 +10,7 @@
 #'2. inflow at weir (Q)
 #'3. catwalk sensors (EXO chl-a, water temp)
 #'4. water chemistry (SRP, DIN)
-#'5. CTD (Kd)
+#'5. Secchi (Kd)
 
 options(timeout=10000)
 
@@ -38,8 +38,9 @@ infile1 <- paste0("./multi-model-ensemble/data/data_raw/chemistry_2013_2021.csv"
 try(download.file(inUrl1,infile1,method="curl"))
 if (is.na(file.size(infile1))) download.file(inUrl1,infile1,method="auto")
 
-#5. CTD
-inUrl1  <- "https://pasta.lternet.edu/package/data/eml/edi/200/13/27ceda6bc7fdec2e7d79a6e4fe16ffdf" 
-infile1 <- paste0("./multi-model-ensemble/data/data_raw/CTD_2013_2022.csv")
+#5. Secchi
+inUrl1  <- "https://portal.edirepository.org/nis/dataviewer?packageid=edi.198.11&entityid=81f396b3e910d3359907b7264e689052" 
+infile1 <- paste0("./multi-model-ensemble/data/data_raw/Secchi_depth_2013-2022.csv")
 try(download.file(inUrl1,infile1,method="curl"))
 if (is.na(file.size(infile1))) download.file(inUrl1,infile1,method="auto")
+

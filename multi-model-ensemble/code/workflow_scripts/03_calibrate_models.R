@@ -16,7 +16,11 @@ sapply(paste0("./multi-model-ensemble/code/function_library/fit_models/",fit.mod
 dat_DOY_chla <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 
 #Fit models (not applicable for persistence model)
-DOY.chla <- fit_DOY_chla(data = dat_DOY_chla, cal_dates = c("2018-08-06","2021-12-31"))
-DOY.chla$GAM_plot
-DOY.chla$GAM_rmse
+fit_DOY <- fit_DOY_chla(data = dat_DOY_chla, cal_dates = c("2018-08-06","2021-12-31"))
+fit_DOY$plot
+
+#Stack model output and write to file (not applicable for persistence model)
+mod_output <- bind_rows(fit_DOY$out)
+
+write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
 
