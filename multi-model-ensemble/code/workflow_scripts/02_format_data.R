@@ -15,6 +15,7 @@ sapply(paste0("./multi-model-ensemble/code/function_library/format_data/", data.
 #Format data
 obs <- format_chla_obs()
 dat_persistence <- format_data_persistence()
+dat_historicalMean <- format_data_historicalMean()
 dat_DOY_chla <- format_data_DOY_chla()
 dat_ARIMA <- format_data_ARIMA()
 dat_ETS <- format_data_ETS()
@@ -38,6 +39,7 @@ dat_ARIMA <- input_li
 #Write processed data to file
 write.csv(obs, "./multi-model-ensemble/data/data_processed/chla_obs.csv",row.names = FALSE)
 write.csv(dat_persistence, "./multi-model-ensemble/data/data_processed/persistence.csv",row.names = FALSE)
+write.csv(dat_historicalMean, "./multi-model-ensemble/data/data_processed/historicalMean.csv",row.names = FALSE)
 write.csv(dat_DOY_chla, "./multi-model-ensemble/data/data_processed/DOY.csv",row.names = FALSE)
 write.csv(dat_ARIMA, "./multi-model-ensemble/data/data_processed/ARIMA.csv",row.names = FALSE)
 write.csv(dat_ETS, "./multi-model-ensemble/data/data_processed/ETS.csv",row.names = FALSE)
