@@ -12,7 +12,7 @@ library(fable)
 #'@param cal_dates list of two dates (yyyy-mm-dd) for start and
 #'stop of calibration/fit period
 
-fit_ARIMA <- function(data, cal_dates){
+fit_ETS <- function(data, cal_dates){
   
   #assign model fit start and stop dates
   start_cal <- date(cal_dates[1])
@@ -23,15 +23,15 @@ fit_ARIMA <- function(data, cal_dates){
     filter(Date >= start_cal & Date <= stop_cal) 
   
   #fit ARIMA from fable package
-  my.arima <- df %>%
-    model(arima = fable::ARIMA(formula = Chla_ugL ~ AirTemp_C + Shortwave_Wm2 + Windspeed_ms + Inflow_cms + WaterTemp_C + LightAttenuation_Kd + DIN_ugL + SRP_ugL)) 
-  fitted_values <- fitted(my.arima)
+  my.ets <- df %>%
+    model(ets = fable::ETS(Chla_ugL)) 
+  fitted_values <- fitted(my.ets)
   
-  ARIMA_plot <- ggplot()+
+  ETS_plot <- ggplot()+
     xlab("")+
     ylab("Chla (ug/L)")+
     geom_point(data = df, aes(x = Date, y = Chla_ugL, fill = "obs"))+
-    geom_line(data = fitted_values, aes(x = Date, y = .fitted, color = "ARIMA"))+
+    geom_line(data = fitted_values, aes(x = Date, y = .fitted, color = "ETS"))+
     labs(color = NULL, fill = NULL)+
     theme_classic()
 
@@ -40,12 +40,12 @@ fit_ARIMA <- function(data, cal_dates){
     filter(Date >= start_cal & Date <= stop_cal)
   
   #build output df
-  df.out <- data.frame(model_id = "ARIMA",
+  df.out <- data.frame(model_id = "ETS",
                        datetime = dates$Date,
                        variable = "chlorophyll-a",
                        prediction = fitted_values$.fitted)
 
   
   #return output + model with best fit + plot
-  return(list(out = df.out, ARIMA = my.arima, plot = ARIMA_plot))
+  return(list(out = df.out, ETS = my.ets, plot = ETS_plot))
 }

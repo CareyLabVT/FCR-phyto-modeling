@@ -14,10 +14,11 @@ sapply(paste0("./multi-model-ensemble/code/function_library/predict/",fit.model.
 
 #Read in data
 dat_persistence <- read_csv("./multi-model-ensemble/data/data_processed/persistence.csv")
-dat_DOY_chla <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
+dat_DOY <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
+dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 
 #Set prediction window and forecast horizon
-pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-12-31"), by = "day")
+pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-12-24"), by = "day")
 forecast_horizon = 7
 
 #Predict chl-a
@@ -34,12 +35,24 @@ pred_persistence <- persistence(data = dat_persistence,
                                 pred_dates = pred_dates,
                                 forecast_horizon = forecast_horizon)
 
-pred_DOY <- DOY(data = dat_DOY_chla,
+pred_DOY <- DOY(data = dat_DOY,
                 pred_dates = pred_dates,
                 forecast_horizon = forecast_horizon)
 
+pred_ARIMA <- fableARIMA(data = dat_ARIMA,
+                pred_dates = pred_dates,
+                forecast_horizon = forecast_horizon)
+
+pred_ETS <- fableETS(data = dat_ETS,
+                         pred_dates = pred_dates,
+                         forecast_horizon = forecast_horizon)
+
 #Stack model output and write to file
-mod_output <- bind_rows(pred_persistence, pred_DOY)
+mod_output <- bind_rows(pred_persistence, pred_DOY, pred_ARIMA)
+
+#OR if you only want to run one model
+mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
+  bind_rows(.,pred_ETS)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 

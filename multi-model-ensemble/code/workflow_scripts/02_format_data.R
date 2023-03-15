@@ -17,6 +17,7 @@ obs <- format_chla_obs()
 dat_persistence <- format_data_persistence()
 dat_DOY_chla <- format_data_DOY_chla()
 dat_ARIMA <- format_data_ARIMA()
+dat_ETS <- format_data_ETS()
 
 ################################################################################
 #Temporary kludge for input data until have either 2022 observed chemistry or
@@ -39,4 +40,5 @@ write.csv(obs, "./multi-model-ensemble/data/data_processed/chla_obs.csv",row.nam
 write.csv(dat_persistence, "./multi-model-ensemble/data/data_processed/persistence.csv",row.names = FALSE)
 write.csv(dat_DOY_chla, "./multi-model-ensemble/data/data_processed/DOY.csv",row.names = FALSE)
 write.csv(dat_ARIMA, "./multi-model-ensemble/data/data_processed/ARIMA.csv",row.names = FALSE)
+write.csv(dat_ETS, "./multi-model-ensemble/data/data_processed/ETS.csv",row.names = FALSE)
 

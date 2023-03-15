@@ -15,16 +15,25 @@ sapply(paste0("./multi-model-ensemble/code/function_library/fit_models/",fit.mod
 #Read in data
 dat_DOY <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
+dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 
 
 #Fit models (not applicable for persistence model)
 fit_DOY <- fit_DOY_chla(data = dat_DOY, cal_dates = c("2018-08-06","2021-12-31"))
 fit_DOY$plot
 
-fit_ARIMA <- fit_ARIMA(data = dat_DOY, cal_dates = c("2018-08-06","2021-12-31"))
+fit_ARIMA <- fit_ARIMA(data = dat_ARIMA, cal_dates = c("2018-08-06","2021-12-31"))
+fit_ARIMA$plot
+
+fit_ETS <- fit_ETS(data = dat_ETS, cal_dates = c("2018-08-06","2021-12-31"))
+fit_ETS$plot
 
 #Stack model output and write to file (not applicable for persistence model)
-mod_output <- bind_rows(fit_DOY$out)
+mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
+
+#OR if you only want to run one model
+mod_output <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
+  bind_rows(.,fit_ETS$out)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
 

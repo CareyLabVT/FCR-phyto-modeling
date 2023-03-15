@@ -28,12 +28,13 @@ fit_DOY_chla <- function(data, cal_dates){
   #fit GAM following methods in ggplot()
   my.gam <- mgcv::gam(formula = y ~ s(x, bs = "cs"), family = gaussian(),
                       data = df, method = "REML")
-  GAM_plot <- ggplot(data = df, aes(x = x, y = y))+
+  GAM_plot <- ggplot()+
     xlab("DOY")+
     ylab("Chla (ug/L)")+
-    geom_point()+
-    geom_smooth()+
-    theme_classic()
+    geom_point(data = df, aes(x = x, y = y, fill = "obs"))+
+    geom_smooth(data = df, aes(x = x, y = y, color = "DOY"))+
+    theme_classic()+
+    labs(color = NULL, fill = NULL)
   GAM_predicted <- mgcv::predict.gam(my.gam, data.frame(x=df$x))
   
   #get list of calibration dates

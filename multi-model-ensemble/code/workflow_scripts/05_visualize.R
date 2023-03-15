@@ -20,13 +20,15 @@ input_li <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA_LinearInt
 input_doyi <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA_DOYInterp.csv")
 input_glmi <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA_GLM-AEDInterp.csv")
 
-#final dataset
+#input data for models with predictors
 input <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
+
+#final dataset
 out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv")
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
 #Set arguments for plotting functions
-reference_datetime = "2022-03-14"
+reference_datetime = "2022-03-15"
 forecast_horizon = 7
 
 
