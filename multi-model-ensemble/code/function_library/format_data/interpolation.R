@@ -16,6 +16,7 @@ library(tidyverse)
 library(lubridate)
 library(data.table)
 library(zoo)
+library(glmtools)
 
 #'Function to format data for ARIMA model for chla from 2018-2022
 #'@param daily_dates data frame of dates over which to interpolate (yyyy-mm-dd)
@@ -28,8 +29,10 @@ library(zoo)
 #'choose from "linear" or "DOY"
 #'@param DOY_data if interpolation method is "DOY", data frame to use for DOY model
 #'calibration with same format as argument "data"
+#'@param glm_output_filepath if interpolation method is "GLM-AED", data frame of GLM-AED output
+#'to use for interpolation
 
-interpolate <- function(daily_dates, data, variables, method, DOY_data){
+interpolate <- function(daily_dates, data, variables, method, DOY_data, glm_output_filepath){
   
   #linear interpolation to fill in missing values
   df <- left_join(daily_dates, data, by = "Date")
@@ -91,7 +94,82 @@ interpolate <- function(daily_dates, data, variables, method, DOY_data){
     df <- df %>%
       select(-doy)
     
-  } #end of DOY method
+  } else if(method == "GLM-AED"){
+    
+    # Pull model output data from nc files and append to drivers
+    nc_file <- file.path(glm_output_filepath) 
+    
+    for(k in 1:length(variables)){
+      
+      #Assign GLM-AED variable names
+      if(variables[k] == "DIN_ugL"){
+        glm_vars <- c("NIT_amm", "NIT_nit")
+      } else if (variables[k] == "SRP_ugL"){
+        glm_vars <- c("PHS_frp")
+      } else if (variables[k] == "LightAttenuation_Kd"){
+        glm_vars <- c("extc_coef")
+      }
+      
+      depths = 1.6
+      
+      for(v in 1:length(glm_vars)){
+      
+      var <- get_var(nc_file, var_name = glm_vars[v], reference="surface", z_out=depths) 
+      
+      if(length(glm_vars)>1){
+        
+        if(v == 1 & glm_vars[v] == "NIT_amm"){
+          temp <- tibble(var) 
+          temp[,2] <- temp[,2]*18.04
+        } else if(glm_vars[v] == "NIT_nit") {
+          var <- tibble(var)
+          var[,2] <- var[,2]*62.0049
+          temp <- left_join(temp,var, by = "DateTime") 
+        } else {
+          var <- tibble(var)
+          temp <- left_join(temp,var, by = "DateTime") 
+        }
+        
+      } else {
+        temp <- tibble(var)
+      }
+      
+      }
+      
+      if(length(glm_vars)>1){
+        var3 <- data.frame(DateTime = temp$DateTime,
+                           var = rowSums(select(temp,-DateTime)))
+        var4 <- var3 %>%
+          mutate(Date = date(DateTime)) %>%
+          filter(Date %in% daily_dates$Date) %>%
+          group_by(Date) %>%
+          summarize(med = median(var, na.rm = TRUE)) %>%
+          ungroup()
+      } else {
+        colnames(temp) <- c("DateTime","var")
+        var4 <- temp %>%
+          mutate(Date = date(DateTime)) %>%
+          filter(Date %in% daily_dates$Date) %>%
+          group_by(Date) %>%
+          summarize(med = median(var, na.rm = TRUE)) %>%
+          ungroup()
+      }
+      
+      if(variables[k] == "DIN_ugL"){
+        df[1:length(var4$med),variables[k]] <- var4$med 
+        df[1:length(var4$med),flag_names[k]] <- 1
+      } else if(variables[k] == "SRP_ugL"){
+        df[1:length(var4$med),variables[k]] <- var4$med*94.9714 #ADD CONVERSION TO UGL
+        df[1:length(var4$med),flag_names[k]] <- 1
+      } else {
+        df[1:length(var4$med),variables[k]] <- var4$med
+        df[1:length(var4$med),flag_names[k]] <- 1
+      }
+      
+    }
+    
+    
+  }
   
   return(df)
     
