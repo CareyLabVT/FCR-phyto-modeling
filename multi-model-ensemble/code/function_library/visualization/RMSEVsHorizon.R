@@ -40,7 +40,8 @@ RMSEVsHorizon <- function(observations,
     separate(horizon, c("horizon"), sep = " ") %>%
     left_join(., pred_dates, by = "datetime") %>%
     group_by(model_id, horizon) %>%
-    summarize(rmse = sqrt(mean((Chla_ugL - prediction)^2, na.rm = TRUE)))
+    summarize(rmse = sqrt(mean((Chla_ugL - prediction)^2, na.rm = TRUE))) %>%
+    filter(!horizon == 0)
   
   p <- ggplot()+
     geom_point(data = output, aes(x = horizon, y = rmse, 

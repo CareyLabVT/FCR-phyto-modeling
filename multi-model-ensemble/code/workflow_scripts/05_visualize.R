@@ -28,7 +28,7 @@ out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv")
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
 #Set arguments for plotting functions
-reference_datetime = "2022-03-15"
+reference_datetime = "2022-03-31"
 forecast_horizon = 7
 
 

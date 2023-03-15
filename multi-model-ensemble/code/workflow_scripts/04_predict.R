@@ -16,6 +16,7 @@ sapply(paste0("./multi-model-ensemble/code/function_library/predict/",fit.model.
 dat_persistence <- read_csv("./multi-model-ensemble/data/data_processed/persistence.csv")
 dat_DOY <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
+dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 
 #Set prediction window and forecast horizon
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-12-24"), by = "day")
