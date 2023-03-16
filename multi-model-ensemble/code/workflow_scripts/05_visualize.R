@@ -28,7 +28,7 @@ out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv")
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
 #Set arguments for plotting functions
-reference_datetime = "2022-03-31"
+reference_datetime = "2022-11-30"
 forecast_horizon = 7
 
 
@@ -51,5 +51,9 @@ RMSEVsHorizon(observations = obs,
                           model_output = out, 
                           reference_datetime = reference_datetime, 
                           forecast_horizon = forecast_horizon)
+
+OneHorizonTimeseries(observations = obs, 
+                                 model_output = out, 
+                                 forecast_horizon = 7)
 
 
