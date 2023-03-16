@@ -54,9 +54,11 @@ wq_portal <- purrr::map_dfr(sites$field_site_id, function(site){
     #wq_portal <- neonstore::neon_table("waq_instantaneous", site = sites$field_site_id, lazy = TRUE) %>%   # waq_instantaneous
     dplyr::filter(siteID %in% site) %>%
     dplyr::select(siteID, startDateTime, sensorDepth,
-                  chlorophyll, chlorophyllExpUncert,chlorophyllFinalQF) %>%
+                  chlorophyll, chlorophyllExpUncert,chlorophyllFinalQF,
+                  chlaRelativeFluorescence, chlaRelFluoroFinalQF) %>%
     dplyr::mutate(sensorDepth = as.numeric(sensorDepth),
                   chla = as.numeric(chlorophyll),
+                  RFU = as.numeric(chlaRelativeFluorescence),
                   chlorophyllExpUncert = as.numeric(chlorophyllExpUncert)) %>%
     dplyr::rename(site_id = siteID) %>% 
     dplyr::filter(((sensorDepth > 0 & sensorDepth < 1)| is.na(sensorDepth))) |> 
@@ -65,10 +67,12 @@ wq_portal <- purrr::map_dfr(sites$field_site_id, function(site){
     dplyr::mutate(time = as_date(startDateTime)) %>%
     # QF (quality flag) == 0, is a pass (1 == fail), 
     # make NA so these values are not used in the mean summary
-    dplyr::mutate(chla = ifelse(chlorophyllFinalQF == 0, chla, NA)) %>% 
+    dplyr::mutate(chla = ifelse(chlorophyllFinalQF == 0, chla, NA),
+                  RFU = ifelse(chlaRelFluoroFinalQF == 0, RFU, NA)) %>% 
     dplyr::group_by(site_id, time) %>%
-    dplyr::summarize(chla = median(chla, na.rm = TRUE),.groups = "drop") %>%
-    dplyr::select(time, site_id, chla) 
+    dplyr::summarize(chla = median(chla, na.rm = TRUE),
+                     RFU = median(RFU, na.rm = TRUE),.groups = "drop") %>%
+    dplyr::select(time, site_id, chla, RFU) 
 }
 )
 
@@ -84,13 +88,23 @@ chla_min <- 0
 # outside the ranges specified about
 
 wq_cleaned <- wq_full %>%
-  dplyr::mutate(chla = ifelse(is.na(chla),chla, ifelse(chla >= chla_min & chla <= chla_max, chla, NA)))
+  dplyr::mutate(chla = ifelse(is.na(chla),chla, ifelse(chla >= chla_min & chla <= chla_max, chla, NA)),
+                RFU = ifelse(is.na(RFU),RFU, ifelse(RFU >= chla_min & RFU <= chla_max, RFU, NA))) 
   # manual cleaning based on visual inspection
 
-ggplot(data = wq_cleaned, aes(x = time, y = chla))+
+#to handle NEON data snafus 
+wq_kludge <- wq_cleaned %>%
+  dplyr::mutate(chla = ifelse(site_id == "BARC" & time >= "2021-09-21", RFU, 
+                              ifelse(site_id == "SUGG" & time >= "2021-09-21",RFU,
+                                     ifelse(time >= "2022-04-01",RFU, chla))))
+
+##############################################################################
+ggplot(data = wq_kludge, aes(x = time, y = chla))+
   geom_point()+
   facet_wrap(vars(site_id), scales = "free", nrow = 2)+
   theme_bw()
+##############################################################################
+
 #based on this plot I would think TOOK and PRLA are probably not super-well suited
 #for the project in terms of data availability
 
@@ -98,7 +112,7 @@ ggplot(data = wq_cleaned, aes(x = time, y = chla))+
 #going to work up 2019-2021
 
 #linear interpolation to fill in missing values
-wq_tl <- wq_cleaned %>%
+wq_tl <- wq_kludge %>%
   filter(time >= "2019-01-01" & time <= "2021-12-31" & month(time) %in% c(6:10))
 
 check <- wq_tl %>%
@@ -992,3 +1006,18 @@ DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/Data
          Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
 
 write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
+
+
+################################################################################
+#kludge to deal with NEON data issue
+chla_final2 <- chla_final %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, Chla_ugL, Flag_Chla_ugL)
+dat <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv") %>%
+  select(-Chla_ugL, -Flag_Chla_ugL) %>%
+  left_join(., chla_final2, by = c("Lake","DateTime","Site","Depth_m","DataType")) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL)
+write.csv(dat, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv",row.names = FALSE)
+################################################################################
