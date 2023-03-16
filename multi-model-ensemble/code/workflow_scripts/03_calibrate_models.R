@@ -13,12 +13,16 @@ fit.model.functions <- list.files("./multi-model-ensemble/code/function_library/
 sapply(paste0("./multi-model-ensemble/code/function_library/fit_models/",fit.model.functions),source,.GlobalEnv)
 
 #Read in data
+dat_historicalMean <- read_csv("./multi-model-ensemble/data/data_processed/historicalMean.csv")
 dat_DOY <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 
 
 #Fit models (not applicable for persistence model)
+fit_historicalMean <- fit_historicalMean(data = dat_historicalMean, cal_dates = c("2018-08-06","2021-12-31"))
+fit_historicalMean$plot
+
 fit_DOY <- fit_DOY_chla(data = dat_DOY, cal_dates = c("2018-08-06","2021-12-31"))
 fit_DOY$plot
 
