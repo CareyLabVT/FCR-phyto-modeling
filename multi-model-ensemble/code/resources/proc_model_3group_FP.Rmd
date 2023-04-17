@@ -1,0 +1,231 @@
+---
+title: "proc_model_3group"
+author: "Mary Lofton"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#load packages
+pacman::p_load(tidyverse, lubridate)
+```
+
+## Model
+
+
+```{r}
+phyto_model_3group <- function(states, drivers, parms){
+  
+  #declare states
+  PHYTO = states$PHYTO
+  
+  #declare drivers
+  TEMP = drivers$TEMP
+  SWR = drivers$SWR
+  
+  #declare parameters
+  R_growth = parms$R_growth
+  theta_growth = parms$theta_growth
+  Tmin = parms$Tmin
+  Topt = parms$Topt
+  Tmax = parms$Tmax
+  I_K = parms$I_K
+  R_resp = parms$R_resp
+  theta_resp = parms$theta_resp
+  N_0 = parms$N_0
+  K_N = parms$K_N
+  N = parms$N
+  P_0 = parms$P_0
+  K_P = parms$K_P
+  P = parms$P
+  mor = parms$mor
+  Xcc = parms$Xcc
+  
+  #set up output vectors
+  fT <- rep(NA, times = length(PHYTO))
+  fI <- rep(NA, times = length(PHYTO))
+  fN <- rep(NA, times = length(PHYTO))
+  fP <- rep(NA, times = length(PHYTO))
+  growth <- rep(NA, times = length(PHYTO))
+  resp <- rep(NA, times = length(PHYTO))
+  mort <- rep(NA, times = length(PHYTO))
+  PHYTO_flux <- rep(NA, times = length(PHYTO))
+  PHYTO_pred <- rep(NA, times = length(PHYTO))
+  CHLA <- rep(NA, times = length(PHYTO))
+  
+  #loop through groups
+  for(k in 1:length(PHYTO)){
+  #calculate limitation terms
+  fT[k] = ((TEMP - Tmin[k]) / (Topt[k] - Tmin[k])) *((Tmax[k] - TEMP) / (Tmax[k] - Topt[k])) ^((Tmax[k] - Topt[k]) / (Topt[k] - Tmin[k]))
+  if(fT[k] < 0 | is.na(fT[k])){fT[k] <- 0}
+  fI[k] = (SWR/I_K[k])/(1+(SWR/I_K[k]))
+  fN[k] = (N-N_0[k])/((N-N_0[k])+K_N[k])
+  fP[k] = (P-P_0[k])/((P-P_0[k])+K_P[k])
+  
+  #calculate fluxes
+  growth[k] = PHYTO[k] * R_growth[k]*fT[k]*min(fI[k],fN[k],fP[k]) #primary production
+  resp[k] = PHYTO[k] * R_resp[k]*theta_resp[k]^(TEMP-20) #temperature-sensitive turnover
+  mort[k] = PHYTO[k] * mor[k] #non-temperature sensitive turnover
+  
+  PHYTO_flux[k] = growth[k] - resp[k] - mort[k] 
+  
+  PHYTO_pred[k] = PHYTO[k] + PHYTO_flux[k] 
+  
+  CHLA[k] = PHYTO_pred[k] * Xcc[k]
+  }
+  
+  PHYTO_total = sum(PHYTO_pred)
+  
+  CHLA_total = sum(CHLA)
+  
+  return(list(PHYTO_pred = PHYTO_pred, PHYTO_total = PHYTO_total, CHLA = CHLA, CHLA_total = CHLA_total, fT = fT, fI = fI, fN = fN, fP = fP, growth = growth, resp = resp, mort = mort, PHYTO_flux = PHYTO_flux))
+  
+}
+
+```
+
+## Run model
+
+
+```{r}
+#get observations
+obs <- read_csv("C:/Users/Mary Lofton/Documents/RProjects/phyto-data-assimilation/1_Data_wrangling/collated_obs_data.csv") %>%
+  filter(Date >= "2018-10-01" & year(Date) %in% c(2018:2020))
+
+check <- obs %>%
+  filter(is.na(Temp_C))
+
+chem <- read_csv("C:/Users/Mary Lofton/Documents/RProjects/phyto-data-assimilation/00_Data_files/chemistry.csv") %>%
+  filter(Reservoir == "FCR" & Site == 50 & Depth_m == 1.6 & year(DateTime) %in% c(2018:2019) & DateTime >= "2018-10-01") %>%
+  mutate(DIN_ugL = NO3NO2_ugL + NH4_ugL) %>%
+  mutate(Date = date(DateTime))
+
+obs <- left_join(obs, chem, by = "Date")
+
+#set initial conditions (starting with first observation for now)
+yini <- list(PHYTO = c(1,1,1))
+
+#get drivers
+driver.timeseries <- data.frame(TEMP = obs$Temp_C,
+                                SWR = obs$daily_ShortwaveRadiationDown_Average_W_m2)
+
+#define parameters
+parms <- list(R_growth = c(0.6,0.6,0.6),
+              theta_growth = c(1.08,1.08,1.08),
+              Tmin = c(4,4,4),
+              Topt = c(20,23,15),
+              Tmax = c(26,30,20),
+              I_K = c(3.5,3.5,3.5), #using 5 for brown algae gets rid of early peak
+              R_resp = c(0.23,0.23,0.23),
+              theta_resp = c(1.08,1.08,1.08),
+              N_0 = c(0,0,0),
+              K_N = c(2,2,2),
+              N = 16, #mean ugL of DIN at 1.6 m from 2013-2020
+              P_0 = c(0,0,0),
+              K_P = c(0.05,0.05,0.05),
+              P = 8, #mean ugL of SRP at 1.6 m from 2013-2020
+              mor = c(0.2,0.2,0.2),
+              Xcc = c(0.1, 0.001, 0.01))
+
+#define number of steps
+nstep = nrow(obs)
+
+#define number of model variables you want to track
+nstates = 4
+ndiagnostics = 8
+nparms = 0
+n.model.vars = nstates + ndiagnostics + nparms
+ngroups = 3
+
+#define Y matrix
+Y <- array(NA, dim = c(nstep,n.model.vars,ngroups))
+
+for(i in 1:nstep){
+  
+  if(i == 1){
+    states = yini
+  }
+  
+  if(!is.na(obs$DIN_ugL[i])){
+    parms$N <- obs$DIN_ugL[i]
+  }
+  if(!is.na(obs$SRP_ugL[i])){
+    parms$P <- obs$SRP_ugL[i]
+  }
+  
+  drivers <- driver.timeseries[i,]
+  
+  out <- phyto_model_3group(states = states, drivers = drivers, parms = parms)
+  
+  states <- list(PHYTO = out$PHYTO_pred)
+  
+  Y[i,1,] <- out$PHYTO_pred
+  Y[i,2,] <- out$PHYTO_total
+  Y[i,3,] <- out$CHLA
+  Y[i,4,] <- out$CHLA_total
+  Y[i,5,] <- out$fT
+  Y[i,6,] <- out$fI
+  Y[i,7,] <- out$fN
+  Y[i,8,] <- out$fP
+  Y[i,9,] <- out$growth
+  Y[i,10,] <- out$resp
+  Y[i,11,] <- out$mort
+  Y[i,12,] <- out$PHYTO_flux
+  
+  
+}
+
+#pred v. obs
+plot(obs$Date,obs$daily_EXOChla_ugL_1, ylim = c(0,max(Y[,4,1])), main = "points = obs, red = modeled")
+lines(obs$Date, Y[,3,1], col = "red", lwd = 2)
+
+#phyto groups
+plot(obs$Date, obs$GreenAlgae_ugL, main = "FP obs", pch = 16, col = "green")
+points(obs$Date, obs$Bluegreens_ugL,pch = 16, col = "cyan")
+points(obs$Date, obs$BrownAlgae_ugL,pch = 16, col = "brown")
+
+plot(obs$Date, Y[,1,1], ylim = c(0,max(Y[,1,])), main = "phyto groups", type = "l", lwd = 2, col = "green")
+lines(obs$Date, Y[,1,2],lwd = 2, col = "cyan")
+lines(obs$Date, Y[,1,3],lwd = 2, col = "brown")
+
+#drivers
+plot(obs$Date, driver.timeseries$TEMP, type = "l", lwd = 2)
+lines(obs$Date, driver.timeseries$SWR, col = "darkgoldenrod2", lwd = 2)
+lines(obs$Date,obs$daily_EXOChla_ugL_1, lwd = 2, col = "green")
+
+#limiting factors
+plot(obs$Date, Y[,4,1], type = "l", lwd = 2, main = "green")
+lines(obs$Date, Y[,5,1], lwd = 2, col = "darkgoldenrod2")
+lines(obs$Date, Y[,6,1], lwd = 2, col = "orange")
+lines(obs$Date, Y[,7,1], lwd = 2, col = "blue")
+
+plot(obs$Date, Y[,4,2], type = "l", lwd = 2, main = "cyano")
+lines(obs$Date, Y[,5,2], lwd = 2, col = "darkgoldenrod2")
+lines(obs$Date, Y[,6,2], lwd = 2, col = "orange")
+lines(obs$Date, Y[,7,2], lwd = 2, col = "blue")
+
+plot(obs$Date, Y[,4,3], type = "l", lwd = 2, main = "brown")
+lines(obs$Date, Y[,5,3], lwd = 2, col = "darkgoldenrod2")
+lines(obs$Date, Y[,6,3], lwd = 2, col = "orange")
+lines(obs$Date, Y[,7,3], lwd = 2, col = "blue")
+
+#flux processes
+plot(obs$Date, Y[,8,1], col = "darkgreen", type = "l", lwd = 2, main = "green")
+lines(obs$Date, Y[,9,1], col = "brown", lwd = 2)
+lines(obs$Date, Y[,10,1], col = "black", lwd = 2)
+
+plot(obs$Date, Y[,8,2], col = "darkgreen", type = "l", lwd = 2, main = "cyano")
+lines(obs$Date, Y[,9,2], col = "brown", lwd = 2)
+lines(obs$Date, Y[,10,2], col = "black", lwd = 2)
+
+plot(obs$Date, Y[,8,3], col = "darkgreen", type = "l", lwd = 2, main = "brown")
+lines(obs$Date, Y[,9,3], col = "brown", lwd = 2)
+lines(obs$Date, Y[,10,3], col = "black", lwd = 2)
+
+#total flux
+plot(obs$Date, Y[,11,1], type = "l", lwd = 2, col = "green")
+lines(obs$Date, Y[,11,2], lwd = 2, col = "cyan")
+lines(obs$Date, Y[,11,3], lwd = 2, col = "brown")
+
+```
+

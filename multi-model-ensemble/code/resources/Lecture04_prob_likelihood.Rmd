@@ -1,0 +1,493 @@
+---
+title: "Lecture 5: Probability and Likelihood"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+
+Random variable is a quantity that can take on values due to chance - it does not have a single value but instead can on a range of values. The chance of each value is governed by a probability distribution
+
+For example, X is a random variable. A particular value for X is y_i
+
+```{r}
+y_i <- -0.2513233
+```
+
+A random number is associated with a probability of it taking that value
+
+P(X = y_i) = p_i
+
+p_i is defined from a probability distribution (P).  We may have an idea of the shape (i.e., normally distributed), but not the specific distribution (i.e. a normal with a mean = 0, and sd = 1).  For example, the following is a normal distribution with a mean = 0 and sd = 1.  (I created it by randomly drawing 10000 samples from a normal distribution using the rnorm function)
+
+```{r}
+plot(density(rnorm(10000, mean = 0, sd = 1)), xlab = "y")
+```
+
+For our random variable, if is is governed by the distribution above, a single sample (i.e., a measurement of X) will likely be close to 0 but sometimes it will be further away.
+
+Imagine that we are measuring the same thing with the same sensor but the sensor has error that is normally distributed.  We think that the measurement should be zero (mean = 0) but with the sensor uncertainty (sd = 1).
+
+The question is "What is the probability that X = y_i given a normal distribution with mean = 0 and sd = 1?"
+
+```{r}
+plot(density(rnorm(10000, mean = 0, sd = 1)), xlab = "y")
+abline(v = y_i, col = "red")
+```
+
+We could also ask "What is the probability that X = y_i given a normal distribution with mean = 2 and sd = 1?"
+
+
+```{r}
+plot(density(rnorm(10000, mean = 2, sd = 1)), xlab = "y")
+abline(v = y_i, col = "red")
+```
+We can numerically compare the answer to the two questions using the "Probability Density Function".  In R the PDF is represented by the `dnorm` function (d representing "density").  Which mean is more likely given the data point?
+
+```{r}
+message("mean of 0")
+dnorm(y_i, mean = 0, sd = 1)
+message("mean of 2")
+dnorm(y_i, mean = 2, sd = 1)
+
+```
+
+Now, we can collect more data that represent more samples from random variable with an unknown mean.  Here are two data points.
+
+```{r}
+y <- rep(NA, length = 2)
+
+y[1] <- -0.2513233
+y[2] <- -2.662035
+```
+
+What is the probability of both events occurring given the mean of 0?  They are independent so we can multiply them.  
+
+IMPORTANT: If two random events are independent, then the probability that they both occur is the multiplication of the two individual probabilities.  For example the probability of getting two heads in two coin flips is 0.5 * 0.5 = 0.25.  If the events are not independent then we can't just multiply (we will get to this later)  
+
+```{r}
+dnorm(y[1], mean = 0, sd = 1, log = FALSE) * dnorm(y[2], mean = 0, sd = 1, log = FALSE)
+```
+
+What about with a mean of 2?
+
+```{r}
+dnorm(y[1], mean = 2, sd = 1, log = FALSE) * dnorm(y[2], mean = 2, sd = 1, log = FALSE)
+```
+
+Which mean is more likely for the two data points?
+
+IMPORTANT: Since multiplying a lot of small numbers can result in very small numbers, we add the log of the densities.   The ordering of the most to least likely does not change
+
+```{r}
+message("log likelihood: mean of 0")
+dnorm(y[1], mean = 0, sd = 1, log = TRUE) + dnorm(y[2], mean = 0, sd = 1, log = TRUE)
+message("log likelihood: mean of 2")
+dnorm(y[1], mean = 2, sd = 1, log = TRUE) + dnorm(y[2], mean = 2, sd = 1, log = TRUE)
+```
+
+This logically extends to three data points or more.  We will get two likelihood values because we are examining two "models" with three data points.  What are the two "models"?
+
+```{r}
+y <- rep(NA, length = 3)
+
+y[1] <- -0.2513233
+y[2] <- -2.662035
+y[3] <- 4.060981
+
+LL1 <- dnorm(y[1], mean = 0, sd = 1, log = TRUE) + 
+       dnorm(y[2], mean = 0, sd = 1, log = TRUE) + 
+       dnorm(y[3], mean = 0, sd = 1, log = TRUE)
+
+LL2 <- dnorm(y[1], mean = 2, sd = 1, log = TRUE) + 
+       dnorm(y[2], mean = 2, sd = 1, log = TRUE) + 
+       dnorm(y[3], mean = 2, sd = 1, log = TRUE)
+
+message("log likelihood: mean = 0")
+LL1
+message("log likelihood: mean = 2")
+LL2
+```
+
+Which can be replaced with the `sum` function
+
+```{r}
+message("log likelihood: mean = 0")
+sum(dnorm(y, mean = 0, sd = 1, log = TRUE))
+message("log likelihood: mean = 2")
+sum(dnorm(y, mean = 2, sd = 1, log = TRUE))
+```
+
+The data (i.e., the three values in y) are more likely for a PDF with a mean = 0 then a mean = 2.  Clearly we can compare two different guesses for the mean (0 vs. 2) but how do we find the most likely value for the mean? 
+
+First, lets create a vector of different mean values we want to test
+
+```{r}
+#Values for mean that we are going to explore
+mean_values <- seq(from = -4, to = 7, by = 0.1)
+```
+
+Now we will calculate the likelihood of the data for each potential value of the mean.
+
+```{r}
+LL <- rep(NA, length(mean_values))
+
+for(i in 1:length(mean_values)){
+  LL[i] <- sum(dnorm(y, mean = mean_values[i], sd = 1, log = TRUE))
+}
+LL
+```
+Plotting the relationship between the different mean values and the likelihood gives a curve.  
+
+Important:  This curve may look like a probability density function (PDF) but it is not! Why? Because the area under the curve does not sum to 1.  As a result 1) we use the term likelihood rather than density and 2) while the curve gives us the most likelihood estimate for the parameter, it does **not** give us the PDF of the parameter (even if we really really want the PDF...Bayesian statistics are needed for that)
+
+```{r}
+plot(x = mean_values, y = LL, type = "o", xlab = "mean", ylab = "log-likelihood")
+```
+
+The most likely value is the highest value on the curve. Which is
+
+```{r}
+index_of_max <- which.max(LL)
+mean_values[index_of_max]
+```
+
+that compares well to directly calculating the mean
+
+```{r}
+mean(y)
+```
+
+We just calculated the **likelihood of the data GIVEN our model** where our model said that the data are normally distributed.  We found the most likely value for a parameter in the model (the parameter being the mean of the PDF).
+
+For use in R tools that find the minimum of a function, find the minimum of the negative log likelihood
+
+```{r}
+plot(x = mean_values, y = -LL, type = "o", xlab = "mean", ylab = "negative log-likelihood") #Notice negative sign
+abline(v = mean(y), col = "red")
+```
+
+Now we can create a function that defines our likelihood
+
+```{r}
+LL_fn <- function(y, par){
+  #NEED NEGATIVE BECAUSE OPTIM MINIMIZES
+  -sum(dnorm(y, mean = par[1], sd = 1, log = TRUE))
+}
+```
+
+And put it in an optimization function that finds the minimum (don't worry about the details)
+
+```{r}
+#@par are the starting values for the search
+#@fn is the function that is minimized (find parameters that yield the lowest -log(LL)) 
+#@ anything else like x are arguments needed by the LL_fn
+fit <- optim(par = 4, fn = LL_fn, method = "BFGS", y = y)
+fit
+```
+The optimal value from fit is similar to our manual calculation and equal to the actual mean.  
+
+```{r}
+message("From optim")
+fit$par
+message("From manual calcuation")
+mean_values[which.max(LL)]
+message("From the mean function")
+mean(y)
+```
+
+Sweet it works! I know you are thinking "Wow a complicated way to calculate a mean...great thanks!".  But the power is that we can replace the direct estimation of the mean with a "process" model that predicts the mean. 
+
+Here is a simple model that predicts y using a regression y = par[1] + par[2] * x
+
+First we are going to create some simulated data from the regression and add normally distributed noise.
+
+```{r}
+set.seed(100)
+par_true <- c(3, 1.2)
+sd_true <- 0.9
+x <- runif(100, 3, 10)
+y_true <- par_true[1] + par_true[2] * x
+y <- rnorm(length(y_true), mean = y_true, sd = sd_true) #This is the "fake data"
+plot(x, y)
+```
+
+Now we need a function to make the regression calculation from the parameters and inputs (x)
+
+```{r}
+pred_linear <- function(x, par){
+  y <- par[1] + par[2] * x
+}
+```
+
+Now our likelihood function uses the result of `pred_linear` as the mean of the PDF.  This asks how likely each data point is given the parameters and inputs (x).  The mean is allowed to be different for each data point because the value of x is different for each point.  
+
+```{r}
+LL_fn <- function(par, x, y){
+  #NEED NEGATIVE BECAUSE OPTIM MINIMIZES
+  -sum(dnorm(y, mean = pred_linear(x, par), sd = 1, log = TRUE))
+}
+
+```
+
+As an example, for a value of par[1] = 0.2, and par[2] = 1.4 we can calculate the likelihood for the first two data points with the following
+
+```{r}
+dnorm(y[1], mean = pred_linear(x[1], c(0.2, 1.4)), sd = 1, log = TRUE) + dnorm(y[2], mean = pred_linear(x[2], c(0.2, 1.4)), sd = 1, log = TRUE) # + ...
+```
+
+Now use `optim` to solve
+
+```{r}
+pred_linear <- function(x, par){
+  y <- par[1] + par[2] * x
+}
+LL_fn <- function(par, x, y){
+  #NEED NEGATIVE BECAUSE OPTIM MINIMIZES
+  -sum(dnorm(y, mean = pred_linear(x, par), sd = 1, log = TRUE))
+}
+fit <- optim(par = c(0.2, 1.5), fn = LL_fn, method = "BFGS", x = x, y = y)
+
+
+```
+
+How do the estimated parameters compare to the true values?
+
+```{r}
+message("From optim")
+fit$par
+message("True values (those we used to generate the data)")
+par_true
+```
+
+A key take home is that defining the likelihood function requires two steps
+
+1) Write down your *process* model.  This is a deterministic model (meaning that it doesn't have any random component)
+
+```{r}
+#Process model
+pred_linear <- function(x, par){
+  y <- par[1] + par[2] * x
+}
+```
+
+2) Write down your *probability* model.  You can think of this as your *data* model because it represents how you think the underlying process is converted into data through the random processes of data collection, sampling, sensor uncertainty, etc.  In R this will use a "d" function: `dnorm`, `dexp`, `dlnorm`, `dgamma`, etc.
+
+```{r}
+#Probability model
+LL_fn <- function(par, x, y){
+  -sum(dnorm(y, mean = pred_linear(x, par), sd = 1, log = TRUE))
+}
+```
+
+There is one more assumption in our likelihood calculation that we have not addressed:  we are assuming the standard deviation in the data is known (sd = 1).  In reality we don't know what the sd is.  This assumption is simple to fix.  All we need to do is make the sd a parameter that we estimate. 
+
+Now there is a par[3] in in the likelihood function (but it isn't in the process model function)
+
+```{r}
+#Probability model
+LL_fn <- function(par, x, y){
+  -sum(dnorm(y, mean = pred_linear(x, par), sd = par[3], log = TRUE))
+}
+```
+
+Fitting the sd is not necessarily clear.  Think about it this way:  if the sd is too low, there will be very low likelihood for data near the mean. In this case, you can increase the likelihood just by increasing the sd parameter (not changing other parameters).
+
+How we can estimate all three parameters
+
+```{r}
+fit <- optim(par = c(0.2, 1.5, 2), fn = LL_fn, method = "BFGS", x = x, y = y)
+```
+
+How well to they compare to the true values used to generate the simulated data?
+
+```{r}
+message("From optim")
+fit$par
+message("True values (those we used to generate the data)")
+c(par_true, sd_true)
+```
+
+Sweet it works! I know you are thinking "Wow a complicated way to calculate a linear regression...thanks...I can just use the lm() function in R to do this!".  
+
+```{r}
+fit2 <- lm(y ~ x)
+summary(fit2)
+```
+
+Notice how the "Residual standard error" is similar to our sd?  
+
+But the power is that we are not restricted to the assumptions of a linear regression model.  We can use more a complicated and non-linear "process" models (not restricted to y = mx + b) and we can more complicated "data" models than the normal with a single "single sd" example that has constant variance.
+
+For example, we can simulate new data that assumes the standard deviation increases as the prediction increases (larger predictions have more variation).  In this case we multiply y times a scalar (sd_scalar_true)
+
+```{r}
+set.seed(100)
+x <- runif(100, 3, 10)
+par_true <- c(3, 1.2)
+sd_scalar_true <- 0.1
+y_true <- par_true[1] + par_true[2] * x
+y <- rnorm(length(y_true), mean = y_true, sd = sd_scalar_true * y) #This is the "fake data"
+plot(x, y)
+```
+
+We use the same "process model" because we have not changed how we think the underlying process works
+
+```{r}
+#Process model
+pred_linear <- function(x, par){
+  y <- par[1] + par[2] * x
+}
+```
+
+However, we do have to change our "data" or "probability" model.  See how sd in the dnorm is now `sd = par[3] * pred_linear(x, par)` so that the sd increases with the size of the prediction
+
+```{r}
+#Probability model
+LL_fn <- function(par, x, y){
+  -sum(dnorm(y, mean = pred_linear(x, par), sd = par[3] * pred_linear(x, par), log = TRUE))
+}
+```
+
+We can now fit it
+
+```{r}
+fit <- optim(par = c(0.2, 1.5, 1), fn = LL_fn, method = "BFGS", x = x, y = y)
+fit$par
+```
+
+As a result, we now better represent how data is generated from the underlying process.  This will often change and improve parameter estimates for the process model.
+
+As another example, you can change the process model to be non-linear easily.  For example, we will generate simulated data from a saturating function (a Michaelis-Menten function)
+
+```{r}
+set.seed(100)
+x <- runif(100, 0.1, 10)
+par_true <- c(2, 0.5)
+sd_true <- 0.1
+y <- par_true[1] * (x / (x + par_true[2]))
+y <- rnorm(length(y), mean = y, sd = sd_true)
+plot(x, y)
+```
+
+We certainly can't fit a linear regression to these data (will we could be it would not fit well).  Fortunately, fitting it using likelihood is as simple as changing the *process* model
+
+```{r}
+#Process model
+pred_mm <- function(x, par){
+  y <- par[1] * (x / (par[2] + x))
+}
+```
+
+The "data" or "probability" model stays the same
+
+```{r}
+#Probability model
+LL_fn <- function(par, x, y){
+  -sum(dnorm(y, mean = pred_mm(x, par), sd = par[3], log = TRUE))
+}
+```
+
+And we fit it
+
+```{r}
+fit <- optim(par = c(0.2, 1.5, 1), fn = LL_fn, method = "BFGS", x = x, y = y)
+```
+And it fits well
+
+```{r}
+fit$par
+c(par_true, sd_true)
+```
+
+```{r}
+plot(x, y)
+curve(pred_mm(x, par = fit$par), from = 0.1, to = 10, add = TRUE)
+```
+
+Finally, we don't have to assume that the *data* model is a normal distribution.  Here is an example assuming that the data model follows a gamma distribution.  See Section 3.4.4 that starts on page 65 in Hobbs and Hooten.
+
+```{r}
+LL_fn <- function(par, x, y){
+    -sum(dgamma(y, shape = (pred_mm(x, par)^2/par[3]), rate =  pred_mm(x, par)/par[3], log = TRUE))
+}
+
+fit <- optim(par = c(0.2, 1.5, 1), fn = LL_fn, x = x, y = y)
+
+plot(x, y)
+curve(pred_mm(x, par = fit$par), from = 0.1, to = 10, add = TRUE)
+
+```
+
+**Take home messages**
+
+1) Think about what process produces your data.  Consider deterministic mechanisms and random processes.
+2) Write your process model as a function of inputs and parameters.  Your process model should be deterministic (not have any random component)
+3) Write down your data model.  What random processes converts the output of your process model to data? This could include variance in observations, variance in the process models (it doesn't represent the real world perfectly even if we could observe it perfectly), and variation among sample units (like individuals).  In a likelihood analysis, all of these forms are typically combined together.
+4) Embed your process model as the mean for your data model and solve with an optimizing algorithm.  In the normal distribution, the mean is one of the parameters of the PDF so you can use the process model prediction directory in the data model as the mean.  In other distributions the parameters of the PDF are not the mean, instead the mean is a function of the parameters.  Therefore you will need to convert the mean to the parameters of the distribution.  This is called "moment matching."
+
+**Components of a likelihood analysis that is not covered here**
+
+- Estimating uncertainty in the parameters using the shape of the likelihood curve (you can use the shape of the likelihood curve to estimate confidence (steeper = more confidence). In the example below, the blue line has more data in the calculation of the mean than the black line.  The dashed lines are the 2-unit likelihood level (2 log(LL) units were subtracted from the highest likelihood to determine the dashed line).  The values of the dashed lines where they cross the likelihood curve with the same color are approximately the 95% confidence intervals for the parameter.
+
+```{r}
+#Create a dataset
+y_more_data <- rnorm(20, mean = 0, sd = 1)
+#Select only 5 of the values from the larger dataset
+y_small_data <- y_more_data[1:5]
+
+#Calculate the likelihood surface for each of the datasets
+mean_values <- seq(from = -4, to = 7, by = 0.1)
+
+LL_more <- rep(NA, length(mean_values))
+for(i in 1:length(mean_values)){
+  LL_more[i] <- sum(dnorm(y_more_data, mean = mean_values[i], sd = 1, log = TRUE))
+}
+
+LL_small <- rep(NA, length(mean_values))
+for(i in 1:length(mean_values)){
+  LL_small[i] <- sum(dnorm(y_small_data, mean = mean_values[i], sd = 1, log = TRUE))
+}
+
+#Plot the likelihood functions
+plot(x = mean_values, y = LL_small, type = "l", xlab = "mean", ylab = "log-likelihood") #Notice negative sign
+lines(x = mean_values, y = LL_more, col = "blue")
+
+#Find the highest likelihood
+mle_LL_small <- LL_small[which.max(LL_small)]
+mle_LL_more <- LL_more[which.max(LL_more)]
+
+#Plot a line that shows a 2 likelihood reduction
+abline(h = mle_LL_small - 2, lty = "dashed")
+abline(h = mle_LL_more - 2, lty = "dashed", col = "blue")
+
+```      
+
+- Comparing different models to select for the best model (uses the likelihood of the different models + a penalty for having more parameters).  AIC is a common way to compare models (https://en.wikipedia.org/wiki/Akaike_information_criterion).  It is 2 * number of parameters - 2 * ln (likelihood).  Increasing the likelihood by adding more parameters won't necessarily result in lowest AIC (lower is better) because it includes a penalty for having more parameters.
+
+- There are more complete packages for doing likelihood analysis that optimize parameters, calculate AIC, estimate uncertainty, etc.  For example, the `likelihood` package and `mle` function in R do these calculations for you.  Here is an example using the `mle` package (note that the `mle` package assumes that you have created the objects x and y and only has parameters in the function calls...see how pred_mm and LL_fn don't have x and y as arguments)
+
+```{r}
+pred_mm <- function(par1, par2){
+  par1 * (x / (par2 + x))
+}
+LL_fn <- function(par1, par2, par3){
+  mu <- pred_mm(par1, par2)
+  -sum(dnorm(y, mean = mu, sd = par3, log = TRUE))
+}
+library(stats4)
+fit <- mle(minuslogl = LL_fn, start = list(par1 = 0.2, par2 = 1.5, par3 = 1), method = "BFGS", nobs = length(y)) 
+AIC(fit)
+summary(fit)
+logLik(fit)
+confint(fit)
+```
+
+
+**Remember**
+
+Likelihood approach shown here gives us the *likelihood of the particular set of data GIVEN the model*. It does **not** give us the probability of the model given the particular set of data (i.e., the probability distributions of the model parameters).  Ultimately, we want the probability distributions of the model parameters so that we can turn it around forecast the probability of yet to be collected data.  For this we need to use Bayesian statistics!
