@@ -18,7 +18,7 @@ dat_DOY <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
-
+dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
 
 #Fit models (not applicable for persistence model)
 fit_historicalMean <- fit_historicalMean(data = dat_historicalMean, cal_dates = c("2018-08-06","2021-12-31"))
