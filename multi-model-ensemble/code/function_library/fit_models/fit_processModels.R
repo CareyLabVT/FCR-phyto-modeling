@@ -1,8 +1,8 @@
-#Fit DOY model for chl-a
+#Fit process models for chl-a
 #Author: Mary Lofton
-#Date: 28FEB23
+#Date: 19APR23
 
-#Purpose: fit ARIMA model for chla from 2018-2021
+#Purpose: fit process models model for chla from 2018-2021
 
 library(tidyverse)
 
@@ -24,6 +24,23 @@ fit_processModels <- function(data, cal_dates){
   
   #source process model functions
   source("./multi-model-ensemble/code/function_library/fit_models/processModelFunctions.R")
+  
+  wtemp = df$WaterTemp_C
+  swr = df$Shortwave_Wm2
+  chla = df$Chla_ugL
+  par = c(Tmin = 0.62,
+             Topt = 23.81,
+             Tmax = 30.12,
+             muopt = 0.04,
+             I_S = 6,
+             R_resp = 0.25,
+             theta_resp = 1.08,
+             mort = 0.29,
+             stddev = 1,
+             R_growth = 0.95)
+  yini = df$Chla_ugL[1]
+  
+  fit <- optim(par = par, fn = LL_fn, method = "BFGS", wtemp = wtemp, swr = swr, chla = chla, yini = yini)
   
   ARIMA_plot <- ggplot()+
     xlab("")+

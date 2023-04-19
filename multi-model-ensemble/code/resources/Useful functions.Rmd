@@ -233,3 +233,38 @@ f <- function(x,a,k){
 }
 curve(f(x,a = 1, k = 0.5),from=0, to=10,ylab='rate limitation',xlab = 'driver/environmental condition')
 ```
+
+**CTMI**
+
+```{r}
+fT <- function(x, Tmin, Topt, Tmax, muopt){
+  
+  
+  
+    phi = ((x - Tmax)*((x - Tmin)^2)) / ((Topt - Tmin)*(((Topt - Tmin)*(x - Topt)) - ((Topt - Tmax)*(Topt + Tmin - 2*x))))
+    fT = muopt*phi*24
+  
+  
+  return(fT)
+}
+par = list(Tmin = 0.62,
+           Topt = 23.81,
+           Tmax = 30.12,
+           muopt = 0.04)
+curve(fT(x, 
+               Tmin = par$Tmin,
+               Topt = par$Topt,
+               Tmax = par$Tmax, 
+               muopt = par$muopt),from=0.62, to=30.12,ylab='rate',xlab = 'driver/environmental condition')
+```
+
+```{r}
+I_S = 5
+steele <- function(x, I_S){
+  q = x/I_S
+  fI = q * exp(1 - q)
+  return(fI)
+}
+curve(steele(x, I_S),from=0, to=7,ylab='rate',xlab = 'driver/environmental condition')
+```
+

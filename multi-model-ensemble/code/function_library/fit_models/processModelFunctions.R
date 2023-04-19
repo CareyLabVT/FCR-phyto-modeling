@@ -55,29 +55,103 @@ klepper_ebenhoh <- function(swr, I_S, A = 5.0){
 
 ctmi <- function(wtemp, Tmin, Topt, Tmax, muopt){
   
-  if(wtemp < Tmin | wtemp > Tmax){
-    fT = 0
-  }
-  if(wtemp > Tmin & wtemp < Tmax){
-    phi = ((wtemp - Tmax)*((wtemp - Tmin)^2)) / ((Topt - Tmin)*(((Topt - Tmin)*(wtemp - Topt)) - ((Topt - Tmax)*(Topt + Tmin - 2*wtemp))))
-    fT = mu_opt*phi
-  }
+  phi = ((wtemp - Tmax)*((wtemp - Tmin)^2)) / ((Topt - Tmin)*(((Topt - Tmin)*(wtemp - Topt)) - ((Topt - Tmax)*(Topt + Tmin - 2*wtemp))))
+  fT = unname(muopt*phi*24)
+  
   return(fT)
 }
 
 blanchard <- function(wtemp, Topt, Tmax, b, muopt){
-  fT = muopt * ((Tmax - wtemp) / (Tmax - Topt))^b * exp(1)^(-b*((Tmax - wtemp) / (Tmax - Topt)))
+  mumax = muopt * ((Tmax - wtemp) / (Tmax - Topt))^b * exp(1)^(-b*((Tmax - wtemp) / (Tmax - Topt)))
+  fT = mumax*24
   return(fT)
 }
 
 hinshelwood <- function(wtemp, A1, E1, A2, E2, R = 8.3145){
   f1T = A1*exp(1)^(-E1*(R/wtemp))
   f2T = A2*exp(1)^(-E2*(R/wtemp))
-  fT = f1T - f2T
+  mumax = f1T - f2T
+  fT = mumax*24
   return(fT)
 }
 
 eppley_norberg <- function(wtemp, z, w, a, b){
-  fT = (1 - ((wtemp - z) / w )^2) * a * exp(1)^(b*wtemp)
+  mumax = (1 - ((wtemp - z) / w )^2) * a * exp(1)^(b*wtemp)
+  fT = mumax*24
   return(fT)
+}
+
+#build process model
+#@states vector of named states
+#@par vector of named parameters
+proc_model <- function(par, wtemp, swr, yini){
+  
+  #unpack states and parms
+  wtemp = wtemp
+  swr = swr
+  yini = yini
+  Tmin = par[1]
+  Topt = par[2]
+  Tmax = par[3]
+  muopt = par[4]
+  I_S = par[5]
+  R_resp = par[6]
+  theta_resp = par[7]
+  mort = par[8]
+  R_growth = par[10]
+  
+  chla <- c(yini)
+  fT <- NULL
+  fI <- NULL
+  fR <- NULL
+  growth <- NULL
+  respiration <- NULL
+  mortality <- NULL
+  
+  for(i in 2:length(wtemp)){
+    #temp sensitivity
+    fT[i] <- ctmi(wtemp = wtemp[i], 
+               Tmin = Tmin,
+               Topt = Topt,
+               Tmax = Tmax, 
+               muopt = muopt)
+    
+    #light sensitivity
+    fI[i] <- steele(swr = swr[i],
+                 I_S = I_S)
+    
+    #temp sensitive respiration
+    fR[i] <- R_resp*theta_resp^(wtemp[i]-20)
+    
+    #calculate fluxes
+    growth[i] = chla[i-1] * R_growth * fT[i] * fI[i] #primary production
+    respiration[i] = chla[i-1] * fR[i] #temperature-sensitive turnover
+    mortality[i] = chla[i-1] * mort #non-temperature sensitive turnover
+    
+    chla_flux = growth[i] - respiration[i] - mortality[i] 
+    
+    chla[i] <- chla[i-1] + chla_flux
+  }
+  
+  return(chla)
+}
+
+
+plot(c(1:1244), chla)
+plot(c(1:1244), fT)
+plot(c(1:1244), fT*fI)
+plot(c(1:1244), fI)
+plot(c(1:1244), fR)
+plot(c(1:1244), growth)
+plot(c(1:1244), respiration)
+plot(c(1:1244), mortality)
+plot(c(1:1244),df$Chla_ugL)
+plot(c(1:1244),df$WaterTemp_C)
+plot(c(1:1244),df$Shortwave_Wm2)
+
+lines(c(1:600),df$Shortwave_Wm2[1:600])
+#build likelihood model
+LL_fn <- function(par, wtemp, swr, chla, yini){
+  #calculate log likelihood
+  -sum(dnorm(chla, mean = proc_model(par, wtemp, swr, yini), sd = par[9], log = TRUE))
 }
