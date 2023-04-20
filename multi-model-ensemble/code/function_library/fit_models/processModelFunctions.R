@@ -84,74 +84,32 @@ eppley_norberg <- function(wtemp, z, w, a, b){
 #build process model
 #@states vector of named states
 #@par vector of named parameters
-proc_model <- function(par, wtemp, swr, yini){
-  
-  #unpack states and parms
-  wtemp = wtemp
-  swr = swr
-  yini = yini
-  Tmin = par[1]
-  Topt = par[2]
-  Tmax = par[3]
-  muopt = par[4]
-  I_S = par[5]
-  R_resp = par[6]
-  theta_resp = par[7]
-  mort = par[8]
-  R_growth = par[10]
-  
-  chla <- c(yini)
-  fT <- NULL
-  fI <- NULL
-  fR <- NULL
-  growth <- NULL
-  respiration <- NULL
-  mortality <- NULL
-  
-  for(i in 2:length(wtemp)){
-    #temp sensitivity
-    fT[i] <- ctmi(wtemp = wtemp[i], 
-               Tmin = Tmin,
-               Topt = Topt,
-               Tmax = Tmax, 
-               muopt = muopt)
+
+proc_model <- function(par, wtemp, chla, swr){
+  pred_chla = NULL
+  pred_chla[1] <- chla[1]
+  for(i in 2:length(chla)){
     
-    #light sensitivity
-    fI[i] <- steele(swr = swr[i],
-                 I_S = I_S)
+    fT = ctmi(wtemp = wtemp[i],
+              Tmin = par[1],
+              Topt = par[2],
+              Tmax = par[3],
+              muopt = par[4])
     
-    #temp sensitive respiration
-    fR[i] <- R_resp*theta_resp^(wtemp[i]-20)
+    fI = monod(swr = swr[i],
+               I_K = par[5])
     
-    #calculate fluxes
-    growth[i] = chla[i-1] * R_growth * fT[i] * fI[i] #primary production
-    respiration[i] = chla[i-1] * fR[i] #temperature-sensitive turnover
-    mortality[i] = chla[i-1] * mort #non-temperature sensitive turnover
+    growth = chla[i-1] * par[6] * fT * fI
     
-    chla_flux = growth[i] - respiration[i] - mortality[i] 
+    pred_chla[i] = pred_chla[i-1] + growth
     
-    chla[i] <- chla[i-1] + chla_flux
   }
-  
-  return(chla)
+  return(pred_chla)
 }
 
 
-plot(c(1:1244), chla)
-plot(c(1:1244), fT)
-plot(c(1:1244), fT*fI)
-plot(c(1:1244), fI)
-plot(c(1:1244), fR)
-plot(c(1:1244), growth)
-plot(c(1:1244), respiration)
-plot(c(1:1244), mortality)
-plot(c(1:1244),df$Chla_ugL)
-plot(c(1:1244),df$WaterTemp_C)
-plot(c(1:1244),df$Shortwave_Wm2)
-
-lines(c(1:600),df$Shortwave_Wm2[1:600])
 #build likelihood model
-LL_fn <- function(par, wtemp, swr, chla, yini){
+LL_fn <- function(par, chla, wtemp, swr){
   #calculate log likelihood
-  -sum(dnorm(chla, mean = proc_model(par, wtemp, swr, yini), sd = par[9], log = TRUE))
+  -sum(dnorm(chla, mean = proc_model(par, wtemp, chla, swr), sd = par[7], log = TRUE))
 }

@@ -25,22 +25,18 @@ fit_processModels <- function(data, cal_dates){
   #source process model functions
   source("./multi-model-ensemble/code/function_library/fit_models/processModelFunctions.R")
   
+  chla = df$Chla_ugL
   wtemp = df$WaterTemp_C
   swr = df$Shortwave_Wm2
-  chla = df$Chla_ugL
-  par = c(Tmin = 0.62,
-             Topt = 23.81,
-             Tmax = 30.12,
-             muopt = 0.04,
-             I_S = 6,
-             R_resp = 0.25,
-             theta_resp = 1.08,
-             mort = 0.29,
-             stddev = 1,
-             R_growth = 0.95)
-  yini = df$Chla_ugL[1]
   
-  fit <- optim(par = par, fn = LL_fn, method = "BFGS", wtemp = wtemp, swr = swr, chla = chla, yini = yini)
+  par <- c(2, 15, 22, 0.4, 100, 0.8, 3)
+  
+  fit <- optim(par = par, fn = LL_fn, method = "Nelder-Mead", chla = chla, 
+               wtemp = wtemp, swr = swr, hessian = FALSE)
+  
+  pred_chla = proc_model(par = fit$par, wtemp, chla, swr)
+  plot(df$Date, chla)
+  lines(df$Date, pred_chla, col = "red")
   
   ARIMA_plot <- ggplot()+
     xlab("")+
