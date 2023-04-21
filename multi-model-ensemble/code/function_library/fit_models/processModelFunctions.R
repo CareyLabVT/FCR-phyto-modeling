@@ -109,7 +109,12 @@ proc_model <- function(par, wtemp, chla, swr){
 
 
 #build likelihood model
-LL_fn <- function(par, chla, wtemp, swr){
+LL_norm <- function(par, chla, wtemp, swr){
   #calculate log likelihood
   -sum(dnorm(chla, mean = proc_model(par, wtemp, chla, swr), sd = par[7], log = TRUE))
+}
+
+LL_gamma <- function(par, chla, wtemp, swr){
+  #calculate log likelihood
+  -sum(dgamma(chla, shape = (proc_model(par, wtemp, chla, swr)^2/par[7]), rate =  proc_model(par, wtemp, chla, swr)/par[7], log = TRUE))
 }

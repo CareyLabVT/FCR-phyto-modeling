@@ -30,9 +30,12 @@ fit_processModels <- function(data, cal_dates){
   swr = df$Shortwave_Wm2
   
   par <- c(2, 15, 22, 0.4, 100, 0.8, 3)
+  par <- fit$par
   
-  fit <- optim(par = par, fn = LL_fn, method = "Nelder-Mead", chla = chla, 
+  fit1 <- optim(par = par, fn = LL_norm, method = "Nelder-Mead", chla = chla, 
                wtemp = wtemp, swr = swr, hessian = FALSE)
+  fit2 <- optim(par = par, fn = LL_gamma, method = "Nelder-Mead", chla = chla, 
+                wtemp = wtemp, swr = swr, hessian = FALSE)
   
   pred_chla = proc_model(par = fit$par, wtemp, chla, swr)
   plot(df$Date, chla)
