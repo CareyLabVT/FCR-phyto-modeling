@@ -55,15 +55,19 @@ klepper_ebenhoh <- function(swr, I_S, A = 5.0){
 
 ctmi <- function(wtemp, Tmin, Topt, Tmax, muopt){
   
+  if(wtemp < Tmin){fT = 0}
+  if(wtemp > Tmax){fT = 0}
+  if(wtemp > Tmin & wtemp < Tmax){
   phi = ((wtemp - Tmax)*((wtemp - Tmin)^2)) / ((Topt - Tmin)*(((Topt - Tmin)*(wtemp - Topt)) - ((Topt - Tmax)*(Topt + Tmin - 2*wtemp))))
-  fT = unname(muopt*phi*24)
+  fT = muopt*phi*24
+  }
   
   return(fT)
 }
 
 blanchard <- function(wtemp, Topt, Tmax, b, muopt){
   mumax = muopt * ((Tmax - wtemp) / (Tmax - Topt))^b * exp(1)^(-b*((Tmax - wtemp) / (Tmax - Topt)))
-  fT = mumax*24
+  fT = mumax
   return(fT)
 }
 
@@ -71,13 +75,13 @@ hinshelwood <- function(wtemp, A1, E1, A2, E2, R = 8.3145){
   f1T = A1*exp(1)^(-E1*(R/wtemp))
   f2T = A2*exp(1)^(-E2*(R/wtemp))
   mumax = f1T - f2T
-  fT = mumax*24
+  fT = mumax
   return(fT)
 }
 
 eppley_norberg <- function(wtemp, z, w, a, b){
   mumax = (1 - ((wtemp - z) / w )^2) * a * exp(1)^(b*wtemp)
-  fT = mumax*24
+  fT = mumax
   return(fT)
 }
 
@@ -88,20 +92,21 @@ eppley_norberg <- function(wtemp, z, w, a, b){
 proc_model <- function(par, wtemp, chla, swr){
   pred_chla = NULL
   pred_chla[1] <- chla[1]
-  for(i in 2:length(chla)){
+  for(i in 2:length(wtemp)){
     
     fT = ctmi(wtemp = wtemp[i],
               Tmin = par[1],
               Topt = par[2],
               Tmax = par[3],
               muopt = par[4])
-    
     fI = monod(swr = swr[i],
                I_K = par[5])
-    
-    growth = chla[i-1] * par[6] * fT * fI
-    
-    pred_chla[i] = pred_chla[i-1] + growth
+    fR = 1.08^(wtemp[i] - 20)
+
+    growth = pred_chla[i-1] * par[6] * min(fT, fI)
+    respiration = pred_chla[i-1] * par[7] * fR
+
+    pred_chla[i] = pred_chla[i-1] + growth - respiration 
     
   }
   return(pred_chla)
@@ -109,12 +114,12 @@ proc_model <- function(par, wtemp, chla, swr){
 
 
 #build likelihood model
-LL_norm <- function(par, chla, wtemp, swr){
-  #calculate log likelihood
-  -sum(dnorm(chla, mean = proc_model(par, wtemp, chla, swr), sd = par[7], log = TRUE))
+rmse <- function(par, chla, wtemp, swr){
+  #calculate rmse
+  sqrt(mean((chla - proc_model(par, wtemp, chla, swr))^2))
 }
 
 LL_gamma <- function(par, chla, wtemp, swr){
   #calculate log likelihood
-  -sum(dgamma(chla, shape = (proc_model(par, wtemp, chla, swr)^2/par[7]), rate =  proc_model(par, wtemp, chla, swr)/par[7], log = TRUE))
+  -sum(dgamma(chla, shape = (proc_model(par, wtemp, chla, swr)^2/par[8]), rate =  proc_model(par, wtemp, chla, swr)/par[8], log = TRUE))
 }

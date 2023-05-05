@@ -15,9 +15,17 @@ library(fable)
 fableARIMA <- function(data, pred_dates, forecast_horizon){
   
   #Fit model
+  
+  # #define scaling function
+  # scale2 <- function(x, na.rm = FALSE) (x - mean(x, na.rm = na.rm)) / sd(x, na.rm)
+  # 
+  # #define vars
+  # vars <- c("AirTemp_C","Shortwave_Wm2","Windspeed_ms","Inflow_cms", "WaterTemp_C" ,"LightAttenuation_Kd", "DIN_ugL", "SRP_ugL")
+  # 
   #assign target and predictors
   df <- as_tsibble(data) %>%
-    filter(Date < pred_dates[1]) 
+    filter(Date < pred_dates[1]) #%>%
+    #mutate_at(vars, scale2)
   
   #fit ARIMA from fable package
   my.arima <- df %>%
@@ -35,12 +43,14 @@ fableARIMA <- function(data, pred_dates, forecast_horizon){
     
     #build driver dataset
     drivers = as_tsibble(data) %>%
-      filter(Date %in% forecast_dates) 
+      filter(Date %in% forecast_dates) #%>%
+      #mutate_at(vars, scale2)
     drivers[,"Chla_ugL"] <- NA
     
     #refit model
     new.data <- as_tsibble(data) %>%
-      filter(Date <= pred_dates[t])
+      filter(Date <= pred_dates[t]) #%>%
+      #mutate_at(vars, scale2)
     ref <- refit(my.arima, new_data = new.data)
     
     #generate predictions

@@ -18,9 +18,16 @@ fit_TSLM <- function(data, cal_dates){
   start_cal <- date(cal_dates[1])
   stop_cal <- date(cal_dates[2])
   
+  # #define scaling function
+  # scale2 <- function(x, na.rm = FALSE) (x - mean(x, na.rm = na.rm)) / sd(x, na.rm)
+  # 
+  # #define vars
+  # vars <- c("AirTemp_C","Shortwave_Wm2","Windspeed_ms","Inflow_cms", "WaterTemp_C" ,"LightAttenuation_Kd", "DIN_ugL", "SRP_ugL")
+  # 
   #assign target and predictors
   df <- as_tsibble(data) %>%
-    filter(Date >= start_cal & Date <= stop_cal) 
+    filter(Date >= start_cal & Date <= stop_cal) #%>%
+    #mutate_at(vars, scale2) 
   
   #fit TSLM from fable package
   my.tslm <- df %>%

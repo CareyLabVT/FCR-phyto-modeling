@@ -29,15 +29,14 @@ fit_processModels <- function(data, cal_dates){
   wtemp = df$WaterTemp_C
   swr = df$Shortwave_Wm2
   
-  par <- c(2, 15, 22, 0.4, 100, 0.8, 3)
-  par <- fit$par
+  par <- c(1, 20, 30, 0.04, 100, 0.5, 0.1)
+  lower_bounds <- c(1,0,-1,0,0,0)
+  upper_bounds <- c(35, 1, 1000, 1, 1)
+
+  fit2 <- optim(par = par, fn = rmse, chla = chla,
+                wtemp = wtemp, swr = swr, hessian = FALSE, control=list(parscale=c(par)))
   
-  fit1 <- optim(par = par, fn = LL_norm, method = "Nelder-Mead", chla = chla, 
-               wtemp = wtemp, swr = swr, hessian = FALSE)
-  fit2 <- optim(par = par, fn = LL_gamma, method = "Nelder-Mead", chla = chla, 
-                wtemp = wtemp, swr = swr, hessian = FALSE)
-  
-  pred_chla = proc_model(par = fit$par, wtemp, chla, swr)
+  pred_chla = proc_model(par = fit2$par, wtemp, chla, swr)
   plot(df$Date, chla)
   lines(df$Date, pred_chla, col = "red")
   

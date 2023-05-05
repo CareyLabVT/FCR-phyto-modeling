@@ -23,7 +23,6 @@ library(lubridate)
 
 RMSEVsHorizon <- function(observations, 
                                model_output, 
-                               reference_datetime, 
                                forecast_horizon){
   
   #reformat observations
@@ -41,7 +40,9 @@ RMSEVsHorizon <- function(observations,
     left_join(., pred_dates, by = "datetime") %>%
     group_by(model_id, horizon) %>%
     summarize(rmse = sqrt(mean((Chla_ugL - prediction)^2, na.rm = TRUE))) %>%
-    filter(!horizon == 0)
+    filter(!horizon == 0) %>%
+    mutate(horizon = as.numeric(horizon)) %>%
+    arrange(model_id, horizon)
   
   p <- ggplot()+
     geom_point(data = output, aes(x = horizon, y = rmse, 

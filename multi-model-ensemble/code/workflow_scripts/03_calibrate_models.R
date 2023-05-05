@@ -39,9 +39,11 @@ fit_TSLM$plot
 #Stack model output and write to file (not applicable for persistence model)
 mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
 
-#OR if you only want to run one model
+#OR if you only want to run (or re-run) one or a few models
 mod_output <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
-  bind_rows(.,fit_TSLM$out)
+  filter(!model_id %in% c("ARIMA","TSLM")) %>% #names of re-run models if applicable
+  bind_rows(.,fit_TSLM$out) %>% #bind rows with models to add/replace if applicable
+  bind_rows(.,fit_ARIMA$out)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
 

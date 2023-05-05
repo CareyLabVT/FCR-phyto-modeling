@@ -21,8 +21,8 @@ dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
 
 #Set prediction window and forecast horizon
-pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-12-24"), by = "day")
-forecast_horizon = 7
+pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
+forecast_horizon = 35
 
 #Predict chl-a
 #Each function should take processed data, pred_dates, and forecast_horizon
@@ -60,12 +60,13 @@ pred_TSLM <- fableTSLM(data = dat_TSLM,
 
 
 
-#Stack model output and write to file
-mod_output <- bind_rows(pred_persistence, pred_DOY, pred_ARIMA)
+# #Stack model output and write to file
+# mod_output <- bind_rows(pred_persistence, pred_historicalMean, pred_DOY, pred_ETS, pred_ARIMA, pred_TSLM)
 
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
-  bind_rows(.,pred_TSLM)
+  filter(!model_id == "ARIMA") %>%
+  bind_rows(.,pred_ARIMA)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 
