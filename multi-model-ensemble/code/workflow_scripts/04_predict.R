@@ -9,8 +9,8 @@ library(tidyverse)
 library(lubridate)
 
 #Load prediction functions
-fit.model.functions <- list.files("./multi-model-ensemble/code/function_library/predict")
-sapply(paste0("./multi-model-ensemble/code/function_library/predict/",fit.model.functions),source,.GlobalEnv)
+predict.model.functions <- list.files("./multi-model-ensemble/code/function_library/predict")
+sapply(paste0("./multi-model-ensemble/code/function_library/predict/",predict.model.functions),source,.GlobalEnv)
 
 #Read in data
 dat_persistence <- read_csv("./multi-model-ensemble/data/data_processed/persistence.csv")
@@ -19,6 +19,7 @@ dat_DOY <- read_csv("./multi-model-ensemble/data/data_processed/DOY.csv")
 dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
+dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
 
 #Set prediction window and forecast horizon
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
@@ -58,6 +59,10 @@ pred_TSLM <- fableTSLM(data = dat_TSLM,
                          pred_dates = pred_dates,
                          forecast_horizon = forecast_horizon)
 
+pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
+                                  pred_dates = pred_dates,
+                                  forecast_horizon = forecast_horizon)
+
 
 
 # #Stack model output and write to file
@@ -65,8 +70,8 @@ pred_TSLM <- fableTSLM(data = dat_TSLM,
 
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
-  filter(!model_id == "ARIMA") %>%
-  bind_rows(.,pred_ARIMA)
+  #filter(!model_id == "ARIMA") %>%
+  bind_rows(.,pred_OptimumMonod)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 

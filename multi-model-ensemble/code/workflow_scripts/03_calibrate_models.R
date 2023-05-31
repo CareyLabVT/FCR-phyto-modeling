@@ -36,7 +36,45 @@ fit_ARIMA$plot
 fit_TSLM <- fit_TSLM(data = dat_TSLM, cal_dates = c("2018-08-06","2021-12-31"))
 fit_TSLM$plot
 
-#Stack model output and write to file (not applicable for persistence model)
+#process models fit in JAGS may need trimming
+
+#OptimumMonod
+#fit model
+fit_OptimumMonod <- fit_OptimumMonod(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
+
+#plot parameters
+for (i in 1:length(fit_OptimumMonod$params)){
+  return(plot(fit_OptimumMonod$jags.out, vars = fit_OptimumMonod$params[i]))
+}
+
+#trim model
+trim_OptimumMonod <- trim_JAGSmodel(jags.out = jags.out, 
+                                       trim_window = c(50001, 60000))
+
+#write fitted model info to file - eventually this should save fit_OptimumMonod
+#instead of jags.out and params, so can keep straight among models
+save(jags.out, params, trim_OptimumMonod, file = "./multi-model-ensemble/model_output/OptimumMonod_output.rds")
+
+#OptimumSteele
+#fit model
+fit_OptimumSteele <- fit_OptimumSteele(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
+
+#plot parameters
+for (i in 1:length(fit_OptimumSteele$params)){
+  return(plot(fit_OptimumSteele$jags.out, vars = fit_OptimumSteele$params[i]))
+}
+
+#trim model
+trim_OptimumSteele <- trim_JAGSmodel(jags.out = jags.out, 
+                                    trim_window = c(50001, 60000))
+
+#write fitted model info to file - eventually this should save fit_OptimumMonod
+#instead of jags.out and params, so can keep straight among models
+save(fit_OptimumSteele, trim_OptimumSteele, file = "./multi-model-ensemble/model_output/OptimumMonod_output.rds")
+
+
+#Stack model predictions and write to file (not applicable for persistence model
+#and currently not supported for models fit in JAGS)
 mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
 
 #OR if you only want to run (or re-run) one or a few models
