@@ -36,7 +36,8 @@ fit_OptimumMonod <- function(data, cal_dates){
                          "Topt",
                          "I_K",
                          "R_growth",
-                         "R_resp")
+                         "R_resp",
+                         "mu")
 
   init <- list(list(tau_obs = 0.01,
                     muopt = 0.01,
@@ -69,8 +70,8 @@ fit_OptimumMonod <- function(data, cal_dates){
   jags.out <- run.jags(model = model,
                        data = model.data,
                        adapt =  5000,
-                       burnin =  10000,
-                       sample = 50000,
+                       burnin =  5000,
+                       sample = 20000,
                        n.chains = 3,
                        inits = init,
                        monitor = variable.namesout)

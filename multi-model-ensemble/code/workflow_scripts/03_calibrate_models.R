@@ -40,20 +40,26 @@ fit_TSLM$plot
 
 #OptimumMonod
 #fit model
-fit_OptimumMonod <- fit_OptimumMonod(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
+fit_OM <- fit_OptimumMonod(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
 
+fit2_OM <- autoextend.jags(runjags.object = fit_OM$jags.out)
 #plot parameters
-for (i in 1:length(fit_OptimumMonod$params)){
-  return(plot(fit_OptimumMonod$jags.out, vars = fit_OptimumMonod$params[i]))
+for (i in 1:length(fit_OM$params)){
+  plot(fit_OM$jags.out, vars = fit_OM$params[i])
 }
 
 #trim model
-trim_OptimumMonod <- trim_JAGSmodel(jags.out = jags.out, 
-                                       trim_window = c(50001, 60000))
+trim_OM <- trim_OptimumMonod(jags.out = fit_OM$jags.out, 
+                   trim_window = c(30001, 65000),
+                   params = fit_OM$params,
+                   data = dat_processModels,
+                   cal_dates = c("2018-08-06","2021-12-31"),
+                   thin = 3)
+trim_OM$pred_plot
 
 #write fitted model info to file - eventually this should save fit_OptimumMonod
 #instead of jags.out and params, so can keep straight among models
-save(jags.out, params, trim_OptimumMonod, file = "./multi-model-ensemble/model_output/OptimumMonod_output.rds")
+save(fit_OM, file = "./multi-model-ensemble/model_output/OptimumMonod_output.rds")
 
 #OptimumSteele
 #fit model

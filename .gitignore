@@ -5,6 +5,7 @@
 Eco-KGML-transfer-learning/data/data_raw/*
 Eco-KGML-transfer-learning/data/data_processed/*
 multi-model-ensemble/data/data_raw/*
+multi-model-ensemble/figures/*
 .DS_Store
 **/output.nc
 Eco-KGML-transfer-learning/figures/

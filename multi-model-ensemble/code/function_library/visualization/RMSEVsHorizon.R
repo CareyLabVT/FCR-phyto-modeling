@@ -33,29 +33,34 @@ RMSEVsHorizon <- function(observations,
   
   #reformat model output
   output <- model_output %>% 
-    group_by(model_id, reference_datetime) %>%
+    group_by(model_type, model_id, reference_datetime) %>%
     mutate(horizon = datetime - reference_datetime) %>%
     ungroup() %>%
     separate(horizon, c("horizon"), sep = " ") %>%
     left_join(., pred_dates, by = "datetime") %>%
-    group_by(model_id, horizon) %>%
+    group_by(model_type, model_id, horizon) %>%
     summarize(rmse = sqrt(mean((Chla_ugL - prediction)^2, na.rm = TRUE))) %>%
     filter(!horizon == 0) %>%
     mutate(horizon = as.numeric(horizon)) %>%
-    arrange(model_id, horizon)
+    arrange(model_type, model_id, horizon) %>%
+    mutate(model_type = factor(model_type, levels = c("null","statistical","process")))
   
   p <- ggplot()+
-    geom_point(data = output, aes(x = horizon, y = rmse, 
-                                  group = model_id, shape = model_id,
-                                  color = model_id))+
     geom_line(data = output, aes(x = horizon, y = rmse,
-                                   group = model_id, color = model_id))+
+                                   group = model_id, linetype = model_id, color = model_type),
+              linewidth = 1)+
     xlab("Forecast horizon (days)")+
     ylab(expression(paste("RMSE (",mu,g,~L^-1,")")))+
-    scale_color_discrete(name = "Model ID")+
-    scale_shape_discrete(name = "Model ID")+
+    scale_color_manual(name = "Model type", values = c("#71BFB9","#B85233","#F2EC67","#56B4E9"))+
     theme_classic()+
-    theme(axis.text.x = element_text(size = 10))
+    theme(axis.text = element_text(size = 12),
+          axis.title = element_text(size = 16),
+          plot.title = element_text(size = 16, face = "bold", hjust = 1),
+          legend.title = element_text(face = "bold"),
+          panel.background = element_rect(color = "black", linewidth = 1),
+          legend.key.width = unit(2,"cm"))+
+    guides(color = guide_legend(order = 1)) +
+    scale_linetype_discrete(name = "Model ID")
   
   return(p)
     
