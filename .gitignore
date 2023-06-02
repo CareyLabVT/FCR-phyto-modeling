@@ -13,5 +13,6 @@ HABs-ABM/data/FCR_catwalk_EDI_2018_2022.csv
 HABs-ABM/ABM_output.rds
 HABs-ABM/ABM_output_18hr.rds
 neon_token_source.R
+*.rds
 
 

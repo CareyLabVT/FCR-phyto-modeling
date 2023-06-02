@@ -40,7 +40,7 @@ ExamplePrediction <- function(observations,
   #limit model output to relevant dates
   plot_mod <- model_output %>%
     filter(reference_datetime == ref_datetime & datetime %in% plot_dates & model_id %in% model_ids) %>%
-    mutate(model_id = factor(model_id, levels = c("DOY","ARIMA")))
+    mutate(model_id = factor(model_id, levels = model_ids))
   
   p <- ggplot()+
     geom_point(data = plot_obs, aes(x = Date, y = Chla_ugL, 

@@ -13,7 +13,7 @@ PlotModelFits <- function(observations, predictions, model_ids){
     #limit to models you want
     predictions <- predictions %>%
       filter(model_id %in% model_ids) %>%
-      mutate(model_id = factor(model_id, levels = c("DOY","ARIMA")))
+      mutate(model_id = factor(model_id, levels = model_ids))
     
   p <- ggplot()+
     geom_line(data = predictions, aes(x = datetime, y = prediction, group = model_id, color = model_id))+

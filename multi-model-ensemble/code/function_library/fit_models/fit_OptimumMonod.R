@@ -32,7 +32,6 @@ fit_OptimumMonod <- function(data, cal_dates){
                mu1 = df$Chla_ugL[1])
   
   variable.namesout <- c("tau_obs",
-                         "muopt",
                          "Topt",
                          "I_K",
                          "R_growth",
@@ -40,19 +39,16 @@ fit_OptimumMonod <- function(data, cal_dates){
                          "mu")
 
   init <- list(list(tau_obs = 0.01,
-                    muopt = 0.01,
                     Topt = 5,
                     I_K = 1,
                     R_growth = 0.01,
                     R_resp = 0.01),
                list(tau_obs = 0.1,
-                    muopt = 0.1,
                     Topt = 15,
                     I_K = 100,
                     R_growth = 0.1,
                     R_resp = 0.1),
                list(tau_obs = 1,
-                    muopt = 0.5,
                     Topt = 25,
                     I_K = 500,
                     R_growth = 0.5,
@@ -60,7 +56,6 @@ fit_OptimumMonod <- function(data, cal_dates){
                )
 
   params <- c("tau_obs",
-              "muopt",
               "Topt",
               "I_K",
               "R_growth",
@@ -70,8 +65,8 @@ fit_OptimumMonod <- function(data, cal_dates){
   jags.out <- run.jags(model = model,
                        data = model.data,
                        adapt =  5000,
-                       burnin =  5000,
-                       sample = 20000,
+                       burnin =  10000,
+                       sample = 50000,
                        n.chains = 3,
                        inits = init,
                        monitor = variable.namesout)

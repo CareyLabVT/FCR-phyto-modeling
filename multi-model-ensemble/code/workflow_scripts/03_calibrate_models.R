@@ -42,7 +42,6 @@ fit_TSLM$plot
 #fit model
 fit_OM <- fit_OptimumMonod(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
 
-fit2_OM <- autoextend.jags(runjags.object = fit_OM$jags.out)
 #plot parameters
 for (i in 1:length(fit_OM$params)){
   plot(fit_OM$jags.out, vars = fit_OM$params[i])
@@ -50,16 +49,16 @@ for (i in 1:length(fit_OM$params)){
 
 #trim model
 trim_OM <- trim_OptimumMonod(jags.out = fit_OM$jags.out, 
-                   trim_window = c(30001, 65000),
+                   trim_window = c(20001, 50000),
                    params = fit_OM$params,
                    data = dat_processModels,
                    cal_dates = c("2018-08-06","2021-12-31"),
                    thin = 3)
+plot(trim_OM$param.object)
 trim_OM$pred_plot
 
-#write fitted model info to file - eventually this should save fit_OptimumMonod
-#instead of jags.out and params, so can keep straight among models
-save(fit_OM, file = "./multi-model-ensemble/model_output/OptimumMonod_output.rds")
+#write fitted model info to file 
+save(fit_OM, trim_OM, file = "./multi-model-ensemble/model_output/OptimumMonod_output.rds")
 
 #OptimumSteele
 #fit model
@@ -85,9 +84,8 @@ mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
 
 #OR if you only want to run (or re-run) one or a few models
 mod_output <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
-  filter(!model_id %in% c("ARIMA","TSLM")) %>% #names of re-run models if applicable
-  bind_rows(.,fit_TSLM$out) %>% #bind rows with models to add/replace if applicable
-  bind_rows(.,fit_ARIMA$out)
+  filter(!model_id %in% c("OptimumMonod")) %>% #names of re-run models if applicable
+  bind_rows(.,trim_OM$out) #%>% #bind rows with models to add/replace if applicable
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
 

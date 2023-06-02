@@ -9,11 +9,9 @@
 #'format_data_ARIMA() function in 02_format_data.R workflow script
 #'@param pred_dates list of dates on which you are making predictions
 #'@param forecast_horizon maximum forecast horizon of predictions
+#'@param fit trimmed JAGS object w/ parameter values
 
-OptimumMonod <- function(data, pred_dates, forecast_horizon){
-  
-  #load model output
-  load("./multi-model-ensemble/model_output/OptimumMonod_output.rds")
+OptimumMonod <- function(data, pred_dates, forecast_horizon, fit){
   
   #assign target and predictors
   df <- as_tsibble(data) %>%
@@ -23,6 +21,12 @@ OptimumMonod <- function(data, pred_dates, forecast_horizon){
   df.cols = c("model_id","reference_datetime","datetime","variable","prediction") 
   pred.df <- data.frame(matrix(nrow = 0, ncol = length(df.cols))) 
   colnames(pred.df) = df.cols
+  
+  #name parameters
+  Topt <- fit$summary$statistics[3,1]
+  I_K <- fit$summary$statistics[4,1]
+  R_growth <- fit$summary$statistics[5,1]
+  R_resp <- fit$summary$statistics[6,1]
   
   for(t in 1:length(pred_dates)){
     
@@ -40,17 +44,10 @@ OptimumMonod <- function(data, pred_dates, forecast_horizon){
       filter(Date == pred_dates[t]) %>%
       pull(Chla_ugL)
     
-    #name parameters
-    muopt <- trim_OptimumMonod$summary$statistics[2,1]
-    Topt <- trim_OptimumMonod$summary$statistics[3,1]
-    I_K <- trim_OptimumMonod$summary$statistics[4,1]
-    R_growth <- trim_OptimumMonod$summary$statistics[5,1]
-    R_resp <- trim_OptimumMonod$summary$statistics[6,1]
-    
     #generate predictions
     pred <- c(curr_chla)
     for(i in 2:(length(forecast_dates)+1)){
-    pred[i] = pred[i-1] + (pred[i-1] * R_growth * (((wtemp[i-1] - 1) / (Topt - 1)) *((40 - wtemp[i-1]) / (40 - Topt)) ^((40 - Topt) / (Topt - 1))) * ((swr[i-1]/I_K) / (1 + (swr[i-1]/I_K)))) - (pred[i-1] * R_resp * (1.08^(wtemp[i-1] - 20))) 
+    pred[i] = pred[i-1] + (pred[i-1] * R_growth * (((wtemp[i-1] - 0) / (Topt - 0)) *((100 - wtemp[i-1]) / (100 - Topt)) ^((100 - Topt) / (Topt - 0))) * ((swr[i-1]/I_K) / (1 + (swr[i-1]/I_K)))) - (pred[i-1] * R_resp * (1.08^(wtemp[i-1] - 20))) 
     }
     
     #set up dataframe for today's prediction

@@ -28,7 +28,6 @@ df <- data %>%
 
 out <- as.matrix(windowed.object)
 pred <- out[,grep("mu",colnames(out))]
-pred <- pred[,-1]
 pred <- data.frame(pred) %>%
   colMeans(.)
 
@@ -53,6 +52,5 @@ return(list(param.object = param.object,
             summary = summary(param.object),
             crosscorr = crosscorr(param.object),
             prsf = gelman.diag(param.object),
-            param_plot = plot(param.object),
             pred_plot = OptimumMonod_plot))
 }

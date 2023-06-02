@@ -25,6 +25,10 @@ dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/proces
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
 forecast_horizon = 35
 
+#Load model output for JAGS models
+load("./multi-model-ensemble/model_output/OptimumMonod_output.rds")
+
+
 #Predict chl-a
 #Each function should take processed data, pred_dates, and forecast_horizon
 #Each function should subset to pred_dates, run a forecast with max horizon of
@@ -61,7 +65,8 @@ pred_TSLM <- fableTSLM(data = dat_TSLM,
 
 pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
                                   pred_dates = pred_dates,
-                                  forecast_horizon = forecast_horizon)
+                                  forecast_horizon = forecast_horizon,
+                                  fit = trim_OM)
 
 
 
@@ -70,7 +75,7 @@ pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
 
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
-  #filter(!model_id == "ARIMA") %>%
+  filter(!model_id == "OptimumMonod") %>%
   bind_rows(.,pred_OptimumMonod)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
