@@ -25,9 +25,9 @@ dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/proces
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
 forecast_horizon = 35
 
-#Load model output for JAGS models
+#Load model output for JAGS models if needed
 load("./multi-model-ensemble/model_output/OptimumMonod_output.rds")
-
+load("./multi-model-ensemble/model_output/OptimumSteele_output.rds")
 
 #Predict chl-a
 #Each function should take processed data, pred_dates, and forecast_horizon
@@ -68,6 +68,11 @@ pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
                                   forecast_horizon = forecast_horizon,
                                   fit = trim_OM)
 
+pred_OptimumSteele <- OptimumSteele(data = dat_processModels,
+                                  pred_dates = pred_dates,
+                                  forecast_horizon = forecast_horizon,
+                                  fit = trim_OS)
+
 
 
 # #Stack model output and write to file
@@ -75,8 +80,8 @@ pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
 
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
-  filter(!model_id == "OptimumMonod") %>%
-  bind_rows(.,pred_OptimumMonod)
+  filter(!model_id == "OptimumSteele") %>%
+  bind_rows(.,pred_OptimumSteele)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 

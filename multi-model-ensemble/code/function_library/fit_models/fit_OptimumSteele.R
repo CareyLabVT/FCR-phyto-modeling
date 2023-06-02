@@ -32,26 +32,23 @@ fit_OptimumSteele <- function(data, cal_dates){
                mu1 = df$Chla_ugL[1])
   
   variable.namesout <- c("tau_obs",
-                         "muopt",
                          "Topt",
                          "I_S",
                          "R_growth",
-                         "R_resp")
+                         "R_resp",
+                         "mu")
 
   init <- list(list(tau_obs = 0.01,
-                    muopt = 0.01,
                     Topt = 5,
                     I_S = 1,
                     R_growth = 0.01,
                     R_resp = 0.01),
                list(tau_obs = 0.1,
-                    muopt = 0.1,
                     Topt = 15,
                     I_S = 100,
                     R_growth = 0.1,
                     R_resp = 0.1),
                list(tau_obs = 1,
-                    muopt = 0.5,
                     Topt = 25,
                     I_S = 500,
                     R_growth = 0.5,
@@ -59,7 +56,6 @@ fit_OptimumSteele <- function(data, cal_dates){
                )
 
   params <- c("tau_obs",
-              "muopt",
               "Topt",
               "I_S",
               "R_growth",
@@ -68,9 +64,9 @@ fit_OptimumSteele <- function(data, cal_dates){
   #run model
   jags.out <- run.jags(model = model,
                        data = model.data,
-                       adapt =  50,
-                       burnin =  100,
-                       sample = 500,
+                       adapt =  5000,
+                       burnin =  10000,
+                       sample = 50000,
                        n.chains = 3,
                        inits = init,
                        monitor = variable.namesout)

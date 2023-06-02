@@ -78,6 +78,8 @@ p5
 ggsave(p5, filename = "./multi-model-ensemble/figures/RMSEvsHorizon.png",
        device = "png", height = 4, width = 7, units = "in")
 
+#need to figure out how to detach legend from this and make it a separate
+#plot, then add
 p4 <- PerformanceRelativeToBloom(observations = obs,
                            model_output = out,
                            variable_name = "chlorophyll-a",
