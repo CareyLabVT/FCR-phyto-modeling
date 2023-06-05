@@ -59,6 +59,8 @@ fit_OptimumSteeleNP <- function(data, cal_dates){
                list(tau_obs = 1,
                     Topt = 25,
                     I_S = 500,
+                    ksdin = 2,
+                    kssrp = 2,
                     R_growth = 0.5,
                     R_resp = 0.5)
                )
@@ -66,6 +68,8 @@ fit_OptimumSteeleNP <- function(data, cal_dates){
   params <- c("tau_obs",
               "Topt",
               "I_S",
+              "ksdin",
+              "kssrp",
               "R_growth",
               "R_resp")
   

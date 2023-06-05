@@ -28,6 +28,8 @@ forecast_horizon = 35
 #Load model output for JAGS models if needed
 load("./multi-model-ensemble/model_output/OptimumMonod_output.rds")
 load("./multi-model-ensemble/model_output/OptimumSteele_output.rds")
+load("./multi-model-ensemble/model_output/OptimumSteeleNP_output.rds")
+
 
 #Predict chl-a
 #Each function should take processed data, pred_dates, and forecast_horizon
@@ -73,6 +75,11 @@ pred_OptimumSteele <- OptimumSteele(data = dat_processModels,
                                   forecast_horizon = forecast_horizon,
                                   fit = trim_OS)
 
+pred_SteeleNP <- OptimumSteeleNP(data = dat_processModels,
+                                    pred_dates = pred_dates,
+                                    forecast_horizon = forecast_horizon,
+                                    fit = trim_SNP)
+
 
 
 # #Stack model output and write to file
@@ -80,8 +87,8 @@ pred_OptimumSteele <- OptimumSteele(data = dat_processModels,
 
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
-  filter(!model_id == "OptimumSteele") %>%
-  bind_rows(.,pred_OptimumSteele)
+  filter(!model_id == "OptimumSteeleNP") %>%
+  bind_rows(.,pred_SteeleNP)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 

@@ -86,6 +86,30 @@ trim_OS$pred_plot
 #instead of jags.out and params, so can keep straight among models
 save(fit_OS, trim_OS, file = "./multi-model-ensemble/model_output/OptimumSteele_output.rds")
 
+#OptimumSteeleNP
+#fit model
+fit_SNP <- fit_OptimumSteeleNP(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
+
+#plot parameters
+for (i in 1:length(fit_SNP$params)){
+  plot(fit_SNP$jags.out, vars = fit_SNP$params[i])
+}
+
+#trim model
+trim_SNP <- trim_OptimumSteeleNP(jags.out = fit_SNP$jags.out, 
+                              trim_window = c(30001, 60000),
+                              params = fit_SNP$params,
+                              data = dat_processModels,
+                              cal_dates = c("2018-08-06","2021-12-31"),
+                              thin = 3)
+plot(trim_SNP$param.object)
+trim_SNP$pred_plot
+
+#write fitted model info to file - eventually this should save fit_OptimumMonod
+#instead of jags.out and params, so can keep straight among models
+save(fit_SNP, trim_SNP, file = "./multi-model-ensemble/model_output/OptimumSteeleNP_output.rds")
+
+
 
 #Stack model predictions and write to file (not applicable for persistence model
 #and currently not supported for models fit in JAGS)
@@ -94,7 +118,8 @@ mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
 #OR if you only want to run (or re-run) one or a few models
 mod_output <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
   #filter(!model_id %in% c("OptimumMonod")) %>% #names of re-run models if applicable
-  bind_rows(.,trim_OS$out) #%>% #bind rows with models to add/replace if applicable
-
+  bind_rows(.,trim_SNP$out) %>% #bind rows with models to add/replace if applicable
+  bind_rows(.,trim_OS$out)
+  
 write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
 

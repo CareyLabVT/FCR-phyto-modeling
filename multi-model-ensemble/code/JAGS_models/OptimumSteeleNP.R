@@ -12,7 +12,7 @@ model{
   for(i in 2:length(chla)){
     
     #Process model
-    mu[i] = mu[i-1] + (mu[i-1] * R_growth * (((wtemp[i] - 0) / (Topt - 0)) *((100 - wtemp[i]) / (100 - Topt)) ^((100 - Topt) / (Topt - 0))) * ((swr[i]/I_S) * exp(1 - (swr[i]/I_S))) (DIN[i]/(DIN[i]+ksdin)) * (SRP[i]/(SRP[i]+kssrp))) - (mu[i-1] * R_resp * (1.08^(wtemp[i] - 20))) 
+    mu[i] = mu[i-1] + (mu[i-1] * R_growth * (((wtemp[i] - 0) / (Topt - 0)) *((100 - wtemp[i]) / (100 - Topt)) ^((100 - Topt) / (Topt - 0))) * ((swr[i]/I_S) * exp(1 - (swr[i]/I_S))) * (DIN[i]/(DIN[i]+ksdin)) * (SRP[i]/(SRP[i]+kssrp))) - (mu[i-1] * R_resp * (1.08^(wtemp[i] - 20))) 
   
   } #end process model
   

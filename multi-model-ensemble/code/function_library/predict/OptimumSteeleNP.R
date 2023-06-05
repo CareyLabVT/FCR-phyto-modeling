@@ -11,7 +11,7 @@
 #'@param forecast_horizon maximum forecast horizon of predictions
 #'@param fit trimmed JAGS object w/ parameter values
 
-OptimumSteele <- function(data, pred_dates, forecast_horizon, fit){
+OptimumSteeleNP <- function(data, pred_dates, forecast_horizon, fit){
   
   #assign target and predictors
   df <- as_tsibble(data) %>%
@@ -25,8 +25,10 @@ OptimumSteele <- function(data, pred_dates, forecast_horizon, fit){
   #name parameters
   Topt <- fit$summary$statistics[2,1]
   I_S <- fit$summary$statistics[3,1]
-  R_growth <- fit$summary$statistics[4,1]
-  R_resp <- fit$summary$statistics[5,1]
+  ksdin <- fit$summary$statistics[4,1]
+  kssrp <- fit$summary$statistics[5,1]
+  R_growth <- fit$summary$statistics[6,1]
+  R_resp <- fit$summary$statistics[7,1]
   
   for(t in 1:length(pred_dates)){
     
@@ -38,6 +40,8 @@ OptimumSteele <- function(data, pred_dates, forecast_horizon, fit){
       filter(Date %in% forecast_dates)
     wtemp <- drivers$WaterTemp_C
     swr <- drivers$Shortwave_Wm2
+    DIN <- drivers$DIN_ugL
+    SRP <- drivers$SRP_ugL
 
     #set initial conditions
     curr_chla <- data %>%
@@ -51,7 +55,7 @@ OptimumSteele <- function(data, pred_dates, forecast_horizon, fit){
     }
     
     #set up dataframe for today's prediction
-    temp.df <- data.frame(model_id = "OptimumSteele",
+    temp.df <- data.frame(model_id = "OptimumSteeleNP",
                           reference_datetime = rep(pred_dates[t],forecast_horizon+1),
                           datetime = c(pred_dates[t],forecast_dates),
                           variable = "chlorophyll-a",

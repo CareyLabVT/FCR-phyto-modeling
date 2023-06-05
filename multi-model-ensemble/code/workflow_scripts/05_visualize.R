@@ -57,7 +57,7 @@ PlotInterpMethods(interp_methods = c("Linear","DOY","GLM-AED"),
 
 p3 <- PlotModelFits(observations = obs, 
                         predictions = cal, 
-                        model_ids = c("DOY","ARIMA","OptimumMonod"))
+                        model_ids = c("DOY","ARIMA","OptimumSteeleNP"))
 p3
 ggsave(p3, filename = "./multi-model-ensemble/figures/exampleModelFits.png",
        device = "png", height = 3, width = 6, units = "in")
@@ -66,7 +66,7 @@ p2 <- ExamplePrediction(observations = obs,
                         model_output = out, 
                         reference_datetime = reference_datetime, 
                         forecast_horizon = forecast_horizon,
-                        model_ids = c("DOY","ARIMA","OptimumMonod"))
+                        model_ids = c("DOY","ARIMA","OptimumSteeleNP"))
 p2
 ggsave(p2, filename = "./multi-model-ensemble/figures/examplePrediction.png",
        device = "png", height = 3, width = 7, units = "in")
@@ -80,15 +80,17 @@ ggsave(p5, filename = "./multi-model-ensemble/figures/RMSEvsHorizon.png",
 
 #need to figure out how to detach legend from this and make it a separate
 #plot, then add
+# 2022-03-26, 2022, 06-05, 2022-09-21
 p4 <- PerformanceRelativeToBloom(observations = obs,
                            model_output = out,
                            variable_name = "chlorophyll-a",
                            max_horizon_past = -35,
                            score = "rmse",
-                           focal_date = "2022-11-06")
+                           focal_dates = c("2022-03-26","2022-06-05","2022-09-21","2022-11-06"),
+                           data_plot = FALSE)
 p4
 ggsave(p4, filename = "./multi-model-ensemble/figures/performanceRelativeToBloom.png",
-       device = "png", height = 6, width = 7, units = "in")
+       device = "png", height = 4, width = 7, units = "in")
 
 OneHorizonTimeseries(observations = obs, 
                                  model_output = out, 

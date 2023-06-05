@@ -15,17 +15,21 @@ pacman::p_load(cowplot)
 #'@param max_horizon_past maximum days prior to event that you would like to plot scores for as a *negative* number (e.g., -35)
 #'@param score character string of the column name containing the score you would like to plot (e.g., "crps")
 #'@param group_id character string of the column name containing the variable you would like to group by in plot (e.g., "model_id" or "depth")
-#'@param focal_date character string of event date (e.g., date of turnover)
+#'@param focal_dates character string of event date(s) (e.g., date of turnover)
+#'@param data_plot plot observational data leading up to event?
 
 PerformanceRelativeToBloom <- function(observations,
                                        model_output,
                                        variable_name,
                                        max_horizon_past,
                                        score,
-                                       focal_date){
+                                       focal_dates,
+                                       data_plot){
 
+  for(d in 1:length(focal_dates)){
+    
   #set plot dates
-  plot_dates <- seq.Date(from = as.Date(focal_date)-(-1*max_horizon_past), to = as.Date(focal_date), by = "day")
+  plot_dates <- seq.Date(from = as.Date(focal_dates[d])-(-1*max_horizon_past), to = as.Date(focal_dates[d]), by = "day")
   
   #reformat observations
   pred_dates <- data.frame(Date = plot_dates) %>%
@@ -47,11 +51,25 @@ PerformanceRelativeToBloom <- function(observations,
     mutate(horizon = as.numeric(horizon)) %>%
     arrange(model_type, model_id, horizon)
   
-  plot_data <- output %>%
+  plot_data_temp <- output %>%
     mutate(horizon_past = -horizon) %>%
     filter(horizon_past >= max_horizon_past) %>%
     rename(score = any_of(score)) %>%
     mutate(model_type = factor(model_type, levels = c("null","statistical","process","machine learning")))
+  
+  if(d == 1){
+    plot_data <- plot_data_temp
+  } else {
+    plot_data <- bind_rows(plot_data, plot_data_temp)
+  }
+  
+  } #end for loop
+  
+  plot_data <- plot_data %>%
+    select(-horizon) %>%
+    mutate(horizon_past = as.double(horizon_past)) %>%
+    group_by(model_type, model_id, horizon_past) %>%
+    summarize(score = mean(score, na.rm = TRUE))
 
   #a bunch of if statements for y axis label
   if(score == "crps"){
@@ -71,9 +89,9 @@ PerformanceRelativeToBloom <- function(observations,
     geom_line(linewidth = 1) +
     xlim(max_horizon_past,0) +
     geom_vline(xintercept = 0, linetype = "dashed") +
-    annotate("text", x = -7.2, y = max(plot_data$score), 
-             label = "date of maximum chl-a")+
-    labs(x = "Days prior to maximum observed chl-a", y = ylab, title = paste0("Predictions for ",focal_date)) +
+    annotate("text", x = -6.5, y = max(plot_data$score), 
+             label = "date of chl-a peak")+
+    labs(x = "Days prior to chl-a peak", y = ylab, title = paste0("Predictions for day of chl-a peak")) +
     theme_classic() +
     theme(axis.text = element_text(size = 12),
           axis.title.y = element_text(size = 16),
@@ -86,7 +104,7 @@ PerformanceRelativeToBloom <- function(observations,
     scale_linetype_discrete(name = "Model ID") +
     scale_color_manual(name = "Model type", values = c("#71BFB9","#B85233","#F2EC67","#56B4E9"))
       
-  
+  if(data_plot == TRUE){
   p1 <- ggplot(data = pred_dates, aes(x = datetime, y = Chla_ugL)) +
     geom_point() +
     geom_vline(xintercept = as.Date(focal_date), linetype = "dashed") +
@@ -105,5 +123,8 @@ PerformanceRelativeToBloom <- function(observations,
   p2 <- plot_grid(p, p1, align = "v", nrow = 2, axis = "lr", rel_heights = c(2,1.5))
 
   return(p2)
+  } else {
+    return(p)
+  }
 
 }
