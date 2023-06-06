@@ -20,6 +20,7 @@ dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
 dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
+dat_XGBoost <- read_csv("./multi-model-ensemble/data/data_processed/XGBoost.csv")
 
 #Set prediction window and forecast horizon
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
@@ -29,6 +30,10 @@ forecast_horizon = 35
 load("./multi-model-ensemble/model_output/OptimumMonod_output.rds")
 load("./multi-model-ensemble/model_output/OptimumSteele_output.rds")
 load("./multi-model-ensemble/model_output/OptimumSteeleNP_output.rds")
+
+#Load XGBoost model output
+load("./multi-model-ensemble/model_output/XGBoost_output.rds")
+
 
 
 #Predict chl-a
@@ -80,6 +85,16 @@ pred_SteeleNP <- OptimumSteeleNP(data = dat_processModels,
                                     forecast_horizon = forecast_horizon,
                                     fit = trim_SNP)
 
+pred_MonodNP <- OptimumMonodNP(data = dat_processModels,
+                                 pred_dates = pred_dates,
+                                 forecast_horizon = forecast_horizon,
+                                 fit = trim_MNP)
+
+pred_XGBoost <- parsnipXGBoost(data = dat_XGBoost,
+                         pred_dates = pred_dates,
+                         forecast_horizon = forecast_horizon, 
+                         model = fit_XGBoost$XGBoost)
+
 
 
 # #Stack model output and write to file
@@ -87,8 +102,9 @@ pred_SteeleNP <- OptimumSteeleNP(data = dat_processModels,
 
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
-  filter(!model_id == "OptimumSteeleNP") %>%
-  bind_rows(.,pred_SteeleNP)
+  #filter(!model_id == "XGBoost") %>%
+  bind_rows(.,pred_MonodNP)
+unique(mod_output$model_id)
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 

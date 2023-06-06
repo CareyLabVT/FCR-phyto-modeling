@@ -43,7 +43,7 @@ RMSEVsHorizon <- function(observations,
     filter(!horizon == 0) %>%
     mutate(horizon = as.numeric(horizon)) %>%
     arrange(model_type, model_id, horizon) %>%
-    mutate(model_type = factor(model_type, levels = c("null","statistical","process")))
+    mutate(model_type = factor(model_type, levels = c("null","statistical","process","machine learning")))
   
   p <- ggplot()+
     geom_line(data = output, aes(x = horizon, y = rmse,

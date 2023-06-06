@@ -25,9 +25,10 @@ fit_XGBoost <- function(data, cal_dates){
     filter(Date >= start_cal & Date <= stop_cal) %>%
     select(Date)
   df <- as_tibble(data) %>%
+    mutate(lag_Chla_ugL = stats::lag(Chla_ugL, k = 1)) %>%
     filter(Date >= start_cal & Date <= stop_cal) %>%
-    select(AirTemp_C,Shortwave_Wm2,Windspeed_ms,Inflow_cms, WaterTemp_C ,LightAttenuation_Kd, DIN_ugL, SRP_ugL, Chla_ugL) 
-  
+    select(AirTemp_C,Shortwave_Wm2,Windspeed_ms,Inflow_cms, WaterTemp_C ,LightAttenuation_Kd, DIN_ugL, SRP_ugL, Chla_ugL, lag_Chla_ugL) 
+
   #set recipe
   xgboost_recipe <- df |> 
     recipe(Chla_ugL ~ . )

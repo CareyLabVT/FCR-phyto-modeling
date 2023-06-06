@@ -19,6 +19,7 @@ dat_ETS <- read_csv("./multi-model-ensemble/data/data_processed/ETS.csv")
 dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
 dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
+dat_XGBoost <- read_csv("./multi-model-ensemble/data/data_processed/XGBoost.csv")
 
 #Fit models (not applicable for persistence model)
 fit_historicalMean <- fit_historicalMean(data = dat_historicalMean, cal_dates = c("2018-08-06","2021-12-31"))
@@ -35,6 +36,11 @@ fit_ARIMA$plot
 
 fit_TSLM <- fit_TSLM(data = dat_TSLM, cal_dates = c("2018-08-06","2021-12-31"))
 fit_TSLM$plot
+
+fit_XGBoost <- fit_XGBoost(data = dat_XGBoost, cal_dates = c("2018-08-06","2021-12-31"))
+fit_XGBoost$plot
+save(fit_XGBoost, file = "./multi-model-ensemble/model_output/XGBoost_output.rds")
+
 
 #process models fit in JAGS may need trimming
 
@@ -105,9 +111,28 @@ trim_SNP <- trim_OptimumSteeleNP(jags.out = fit_SNP$jags.out,
 plot(trim_SNP$param.object)
 trim_SNP$pred_plot
 
+#OptimumMonodNP
+#fit model
+fit_MNP <- fit_OptimumMonodNP(data = dat_processModels, cal_dates = c("2018-08-06","2021-12-31"))
+
+#plot parameters
+for (i in 1:length(fit_MNP$params)){
+  plot(fit_MNP$jags.out, vars = fit_MNP$params[i])
+}
+
+#trim model
+trim_MNP <- trim_OptimumMonodNP(jags.out = fit_MNP$jags.out, 
+                                 trim_window = c(30001, 60000),
+                                 params = fit_MNP$params,
+                                 data = dat_processModels,
+                                 cal_dates = c("2018-08-06","2021-12-31"),
+                                 thin = 3)
+plot(trim_MNP$param.object)
+trim_MNP$pred_plot
+
 #write fitted model info to file - eventually this should save fit_OptimumMonod
 #instead of jags.out and params, so can keep straight among models
-save(fit_SNP, trim_SNP, file = "./multi-model-ensemble/model_output/OptimumSteeleNP_output.rds")
+save(fit_MNP, trim_MNP, file = "./multi-model-ensemble/model_output/OptimumMonodNP_output.rds")
 
 
 
@@ -118,8 +143,7 @@ mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
 #OR if you only want to run (or re-run) one or a few models
 mod_output <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
   #filter(!model_id %in% c("OptimumMonod")) %>% #names of re-run models if applicable
-  bind_rows(.,trim_SNP$out) %>% #bind rows with models to add/replace if applicable
-  bind_rows(.,trim_OS$out)
-  
+  bind_rows(.,trim_MNP$out) # %>% #bind rows with models to add/replace if applicable
+
 write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
 

@@ -57,7 +57,7 @@ PlotInterpMethods(interp_methods = c("Linear","DOY","GLM-AED"),
 
 p3 <- PlotModelFits(observations = obs, 
                         predictions = cal, 
-                        model_ids = c("DOY","ARIMA","OptimumSteeleNP"))
+                        model_ids = c("DOY","ARIMA","OptimumSteeleNP","XGBoost"))
 p3
 ggsave(p3, filename = "./multi-model-ensemble/figures/exampleModelFits.png",
        device = "png", height = 3, width = 6, units = "in")
@@ -66,7 +66,7 @@ p2 <- ExamplePrediction(observations = obs,
                         model_output = out, 
                         reference_datetime = reference_datetime, 
                         forecast_horizon = forecast_horizon,
-                        model_ids = c("DOY","ARIMA","OptimumSteeleNP"))
+                        model_ids = c("DOY","ARIMA","OptimumSteeleNP","XGBoost"))
 p2
 ggsave(p2, filename = "./multi-model-ensemble/figures/examplePrediction.png",
        device = "png", height = 3, width = 7, units = "in")
@@ -90,7 +90,7 @@ p4 <- PerformanceRelativeToBloom(observations = obs,
                            data_plot = FALSE)
 p4
 ggsave(p4, filename = "./multi-model-ensemble/figures/performanceRelativeToBloom.png",
-       device = "png", height = 4, width = 7, units = "in")
+       device = "png", height = 5, width = 7, units = "in")
 
 OneHorizonTimeseries(observations = obs, 
                                  model_output = out, 
