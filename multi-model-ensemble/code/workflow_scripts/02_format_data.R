@@ -21,13 +21,14 @@ dat_ETS <- format_data_ETS()
 dat_ARIMA <- format_data_ARIMA()
 dat_TSLM <- format_data_TSLM()
 dat_XGBoost <- format_data_XGBoost()
+dat_LSTM <- format_data_LSTM()
 dat_processModels <- format_data_processModels()
 
 ################################################################################
-#Temporary kludge for input data for ARIMA, TSLM, and XGBoost until have either 2022 observed chemistry or
+#Temporary kludge for input data for ARIMA, TSLM, XGBoost, and LSTM until have either 2022 observed chemistry or
 #GLM-AED output in hand: linear interpolation until 2021, then GLM-AED output for
 #2021 used as driver data for 2022 for DIN and SRP
-input_li <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
+input_li <- read_csv("./multi-model-ensemble/data/data_processed/LSTM.csv")
 input_glmi <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA_GLM-AEDInterp.csv") 
 dates_2022 <- as.Date(unlist(c(input_li[which(year(input_li$Date) == 2022),"Date"])))
 dates_2021 <- as.Date(unlist(c(input_li[which(year(input_li$Date) == 2021),"Date"])))
@@ -35,7 +36,7 @@ dates_2021 <- as.Date(unlist(c(input_li[which(year(input_li$Date) == 2021),"Date
 #sub in GLM-AED 2021 output for DIN and SRP for 2022
 input_li[which(input_li$Date %in% dates_2022),"DIN_ugL"] <- input_glmi[which(input_li$Date %in% dates_2021),"DIN_ugL"]
 input_li[which(input_li$Date %in% dates_2022),"SRP_ugL"] <- input_glmi[which(input_li$Date %in% dates_2021),"SRP_ugL"]
-dat_processModels <- input_li
+dat_LSTM$df.out <- input_li
 #end kludge
 ################################################################################
 
@@ -49,4 +50,6 @@ write.csv(dat_ARIMA, "./multi-model-ensemble/data/data_processed/ARIMA.csv",row.
 write.csv(dat_TSLM, "./multi-model-ensemble/data/data_processed/TSLM.csv",row.names = FALSE)
 write.csv(dat_XGBoost, "./multi-model-ensemble/data/data_processed/XGBoost.csv",row.names = FALSE)
 write.csv(dat_processModels, "./multi-model-ensemble/data/data_processed/processModels.csv",row.names = FALSE)
+write.csv(dat_LSTM$df.out, "./multi-model-ensemble/data/data_processed/LSTM.csv",row.names = FALSE)
+write.csv(dat_LSTM$metadata, "./multi-model-ensemble/data/data_processed/LSTM_metadata.csv",row.names = FALSE)
 

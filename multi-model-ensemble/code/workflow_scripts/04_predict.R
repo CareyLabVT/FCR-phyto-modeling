@@ -106,5 +106,18 @@ mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.cs
   bind_rows(.,pred_MonodNP)
 unique(mod_output$model_id)
 
+#OR if you are reading in LSTM output
+LSTM_output <- read_csv("./multi-model-ensemble/model_output/LSTM_output.csv") %>%
+  add_column(horizon = c(1:21)) %>%
+  gather(-horizon,key = "reference_datetime", value = "prediction") %>%
+  mutate(datetime = as.Date(reference_datetime) + horizon,
+         reference_datetime = as.Date(reference_datetime)) %>%
+  add_column(variable = "chlorophyll-a",
+             model_id = "LSTM") %>%
+  select(model_id, reference_datetime, datetime, variable, prediction)
+mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
+  bind_rows(.,LSTM_output)
+unique(mod_output$model_id)
+
 write.csv(mod_output, "./multi-model-ensemble/model_output/validation_output.csv", row.names = FALSE)
 

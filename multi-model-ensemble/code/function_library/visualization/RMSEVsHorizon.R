@@ -42,6 +42,7 @@ RMSEVsHorizon <- function(observations,
     summarize(rmse = sqrt(mean((Chla_ugL - prediction)^2, na.rm = TRUE))) %>%
     filter(!horizon == 0) %>%
     mutate(horizon = as.numeric(horizon)) %>%
+    filter(horizon <= forecast_horizon) %>%
     arrange(model_type, model_id, horizon) %>%
     mutate(model_type = factor(model_type, levels = c("null","statistical","process","machine learning")))
   

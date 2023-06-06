@@ -36,17 +36,21 @@ PerformanceRelativeToBloom <- function(observations,
     left_join(., observations, by = "Date") %>%
     rename(datetime = Date)
   
+  #focal chl-a
+  focal_chla <- observations %>%
+    filter(Date == focal_dates[d]) %>%
+    pull(Chla_ugL)
   
   #reformat model output
   output <- model_output %>% 
-    filter(reference_datetime %in% plot_dates) %>%
+    filter(reference_datetime %in% plot_dates & datetime == focal_dates[d]) %>%
     group_by(model_type, model_id, reference_datetime) %>%
     mutate(horizon = datetime - reference_datetime) %>%
     ungroup() %>%
     separate(horizon, c("horizon"), sep = " ") %>%
     left_join(., pred_dates, by = "datetime") %>%
     group_by(model_type, model_id, horizon) %>%
-    summarize(rmse = sqrt(mean((Chla_ugL - prediction)^2, na.rm = TRUE))) %>%
+    summarize(rmse = sqrt(mean((focal_chla - prediction)^2, na.rm = TRUE))) %>%
     filter(!horizon == 0) %>%
     mutate(horizon = as.numeric(horizon)) %>%
     arrange(model_type, model_id, horizon)

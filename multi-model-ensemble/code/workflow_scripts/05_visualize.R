@@ -12,6 +12,7 @@ library(lubridate)
 plot.functions <- list.files("./multi-model-ensemble/code/function_library/visualization")
 sapply(paste0("./multi-model-ensemble/code/function_library/visualization/",plot.functions),source,.GlobalEnv)
 
+##ADD FUNCTION TO DO WHICH DAY IS PREDICTED TO BE PEAK DAY!!!!!!
 
 #Read in data
 
@@ -36,7 +37,7 @@ obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
 #Set arguments for plotting functions
 reference_datetime = "2022-10-06"
-forecast_horizon = 35
+forecast_horizon = 21
 
 
 
@@ -86,7 +87,7 @@ ggsave(p5, filename = "./multi-model-ensemble/figures/RMSEvsHorizon.png",
 p4 <- PerformanceRelativeToBloom(observations = obs,
                            model_output = out,
                            variable_name = "chlorophyll-a",
-                           max_horizon_past = -35,
+                           max_horizon_past = -21,
                            score = "rmse",
                            focal_dates = c("2022-03-26","2022-06-05","2022-09-21","2022-11-06"),
                            data_plot = FALSE)
