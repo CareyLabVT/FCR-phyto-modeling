@@ -42,9 +42,11 @@ forecast_horizon = 35
 
 #Plot 
 
-p1 <- PlotObservations(observations = obs, pred_only = TRUE)
+p1 <- PlotObservations(observations = obs, pred_only = TRUE,
+                       focal_dates = c("2022-03-26","2022-06-05","2022-09-21","2022-11-06"),
+                       forecast_horizon = forecast_horizon)
 p1
-ggsave(p1, filename = "./multi-model-ensemble/figures/observations2022.png",
+ggsave(p1, filename = "./multi-model-ensemble/figures/observationsWithBoundingBoxes2022.png",
        device = "png", height = 3, width = 5, units = "in")
 
 PlotInputData(input_data = input)
