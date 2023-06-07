@@ -36,7 +36,7 @@ out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
 #Set arguments for plotting functions
-reference_datetime = "2022-10-06"
+reference_datetime = "2022-10-20"
 forecast_horizon = 21
 
 
@@ -79,7 +79,7 @@ p5 <- RMSEVsHorizon(observations = obs,
                           forecast_horizon = forecast_horizon)
 p5
 ggsave(p5, filename = "./multi-model-ensemble/figures/RMSEvsHorizon.png",
-       device = "png", height = 4, width = 7, units = "in")
+       device = "png", height = 5.2, width = 8.5, units = "in")
 
 #need to figure out how to detach legend from this and make it a separate
 #plot, then add

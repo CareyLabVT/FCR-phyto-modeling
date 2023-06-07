@@ -49,7 +49,7 @@ ExamplePrediction <- function(observations,
     geom_line(data = plot_mod, aes(x = datetime, y = prediction,
                                    group = model_id, color = model_id))+
     geom_vline(xintercept = ref_datetime, linetype = "dashed")+
-    annotate("text", x = ref_datetime + 5.5, y = max(plot_obs$Chla_ugL), 
+    annotate("text", x = ref_datetime + 3.5, y = max(plot_obs$Chla_ugL), 
              label = "date prediction generated", hjust = 0.25)+
     xlab("")+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+

@@ -92,9 +92,9 @@ PerformanceRelativeToBloom <- function(observations,
   p <- ggplot(data = plot_data, aes(x = horizon_past, y = score, group = model_id, linetype = model_id, color = model_type)) +
     geom_line(linewidth = 1) +
     xlim(max_horizon_past,0) +
-    geom_vline(xintercept = 0, linetype = "dashed") +
-    annotate("text", x = -6.5, y = max(plot_data$score), 
-             label = "date of chl-a peak")+
+    geom_vline(xintercept = 0, linetype = "dashed", linewidth = 1) +
+    annotate("text", x = -4.25, y = max(plot_data$score)+1, 
+             label = "date of chl-a peak", fontface = 2)+
     labs(x = "Days prior to chl-a peak", y = ylab, title = paste0("Predictions for day of chl-a peak")) +
     theme_classic() +
     theme(axis.text = element_text(size = 12),
