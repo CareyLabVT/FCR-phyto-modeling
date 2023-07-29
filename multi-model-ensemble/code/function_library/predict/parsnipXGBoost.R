@@ -43,7 +43,7 @@ parsnipXGBoost <- function(data, pred_dates, forecast_horizon, model){
     
     #build driver dataset
     drivers = as_tibble(data) %>%
-      mutate(lag_Chla_ugL = stats::lag(Chla_ugL, k = 1)) %>%
+      mutate(lag_Chla_ugL = dplyr::lag(Chla_ugL, 1)) %>%
       filter(Date %in% forecast_dates) %>%
       select(AirTemp_C,Shortwave_Wm2,Windspeed_ms,Inflow_cms, WaterTemp_C ,LightAttenuation_Kd, DIN_ugL, SRP_ugL, Chla_ugL, lag_Chla_ugL) 
     

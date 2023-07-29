@@ -27,11 +27,11 @@ input <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 #final dataset
 cal <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
   mutate(model_type = ifelse(model_id %in% c("DOY","persistence","historical mean"),"null",
-                             ifelse(model_id %in% c("ARIMA","ETS","TSLM"),"statistical",
+                             ifelse(model_id %in% c("ARIMA","ETS","TSLM","prophet"),"statistical",
                                     ifelse(model_id %in% c("LSTM","XGBoost"),"machine learning","process"))))
 out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
   mutate(model_type = ifelse(model_id %in% c("DOY","persistence","historical mean"),"null",
-                             ifelse(model_id %in% c("ARIMA","ETS","TSLM"),"statistical",
+                             ifelse(model_id %in% c("ARIMA","ETS","TSLM","prophet"),"statistical",
                                     ifelse(model_id %in% c("LSTM","XGBoost"),"machine learning","process"))))
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
@@ -69,7 +69,7 @@ p2 <- ExamplePrediction(observations = obs,
                         model_output = out, 
                         reference_datetime = reference_datetime, 
                         forecast_horizon = forecast_horizon,
-                        model_ids = c("DOY","ARIMA","OptimumSteeleNP","XGBoost"))
+                        model_ids = c("DOY","prophet","OptimumSteeleNP","XGBoost"))
 p2
 ggsave(p2, filename = "./multi-model-ensemble/figures/examplePrediction.png",
        device = "png", height = 3, width = 7, units = "in")
@@ -79,7 +79,7 @@ p5 <- RMSEVsHorizon(observations = obs,
                           forecast_horizon = forecast_horizon)
 p5
 ggsave(p5, filename = "./multi-model-ensemble/figures/RMSEvsHorizon.png",
-       device = "png", height = 5.2, width = 8.5, units = "in")
+       device = "png", height = 5.5, width = 8.5, units = "in")
 
 #need to figure out how to detach legend from this and make it a separate
 #plot, then add

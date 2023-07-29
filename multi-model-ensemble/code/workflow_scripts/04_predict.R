@@ -21,6 +21,7 @@ dat_ARIMA <- read_csv("./multi-model-ensemble/data/data_processed/ARIMA.csv")
 dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
 dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
 dat_XGBoost <- read_csv("./multi-model-ensemble/data/data_processed/XGBoost.csv")
+dat_prophet <- read_csv("./multi-model-ensemble/data/data_processed/prophet.csv")
 
 #Set prediction window and forecast horizon
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
@@ -33,8 +34,6 @@ load("./multi-model-ensemble/model_output/OptimumSteeleNP_output.rds")
 
 #Load XGBoost model output
 load("./multi-model-ensemble/model_output/XGBoost_output.rds")
-
-
 
 #Predict chl-a
 #Each function should take processed data, pred_dates, and forecast_horizon
@@ -70,6 +69,12 @@ pred_TSLM <- fableTSLM(data = dat_TSLM,
                          pred_dates = pred_dates,
                          forecast_horizon = forecast_horizon)
 
+pred_prophet <- pred_prophet(data = dat_prophet,
+                     pred_dates = pred_dates,
+                     forecast_horizon = forecast_horizon)
+
+# process models
+
 pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
                                   pred_dates = pred_dates,
                                   forecast_horizon = forecast_horizon,
@@ -103,7 +108,7 @@ pred_XGBoost <- parsnipXGBoost(data = dat_XGBoost,
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
   #filter(!model_id == "XGBoost") %>%
-  bind_rows(.,pred_MonodNP)
+  bind_rows(.,pred_prophet)
 unique(mod_output$model_id)
 
 #OR if you are reading in LSTM output

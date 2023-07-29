@@ -16,9 +16,9 @@ PlotModelFits <- function(observations, predictions, model_ids){
       mutate(model_id = factor(model_id, levels = model_ids))
     
   p <- ggplot()+
-    geom_line(data = predictions, aes(x = datetime, y = prediction, group = model_id, color = model_id))+
     geom_point(data = observations, aes(x = Date, y = Chla_ugL,
                                         group = variable, fill = variable), size = 1) + 
+    geom_line(data = predictions, aes(x = datetime, y = prediction, group = model_id, color = model_id))+
     xlab("")+
     ylab(expression(paste("Chlorophyll-a (",mu,g,~L^-1,")")))+
     theme_bw()+
@@ -27,7 +27,7 @@ PlotModelFits <- function(observations, predictions, model_ids){
           plot.title = element_text(hjust = 0.98, vjust = -8, face = "bold",
                                     size = 16),
           legend.title = element_text(face = "bold"))+
-    scale_color_manual(name = "Model ID", values = c("#71BFB9","#B85233","#F2EC67","#56B4E9"))+
+    scale_color_manual(name = "Model ID", values = c("#71BFB9","#B85233","#E69F00","#0072B2"))+
     scale_fill_discrete(name = "")
     
 

@@ -23,6 +23,7 @@ dat_TSLM <- format_data_TSLM()
 dat_XGBoost <- format_data_XGBoost()
 dat_LSTM <- format_data_LSTM()
 dat_processModels <- format_data_processModels()
+dat_prophet <- format_data_prophet()
 
 ################################################################################
 #Temporary kludge for input data for ARIMA, TSLM, XGBoost, and LSTM until have either 2022 observed chemistry or
@@ -52,4 +53,5 @@ write.csv(dat_XGBoost, "./multi-model-ensemble/data/data_processed/XGBoost.csv",
 write.csv(dat_processModels, "./multi-model-ensemble/data/data_processed/processModels.csv",row.names = FALSE)
 write.csv(dat_LSTM$df.out, "./multi-model-ensemble/data/data_processed/LSTM.csv",row.names = FALSE)
 write.csv(dat_LSTM$metadata, "./multi-model-ensemble/data/data_processed/LSTM_metadata.csv",row.names = FALSE)
+write.csv(dat_prophet, "./multi-model-ensemble/data/data_processed/prophet.csv",row.names = FALSE)
 

@@ -59,7 +59,9 @@ PerformanceRelativeToBloom <- function(observations,
     mutate(horizon_past = -horizon) %>%
     filter(horizon_past >= max_horizon_past) %>%
     rename(score = any_of(score)) %>%
-    mutate(model_type = factor(model_type, levels = c("null","statistical","process","machine learning")))
+    mutate(model_type = factor(model_type, levels = c("null","statistical","process","machine learning"))) %>%
+    mutate(model_id = factor(model_id, levels = c("DOY","historical mean","persistence","ARIMA","ETS","TSLM","prophet","OptimumMonod","OptimumSteele","OptimumMonodNP","OptimumSteeleNP","LSTM","XGBoost")))
+  
   
   if(d == 1){
     plot_data <- plot_data_temp
@@ -105,8 +107,8 @@ PerformanceRelativeToBloom <- function(observations,
           panel.background = element_rect(color = "black", linewidth = 1),
           legend.key.width = unit(2,"cm"))+
     guides(color = guide_legend(order = 1)) +
-    scale_linetype_discrete(name = "Model ID") +
-    scale_color_manual(name = "Model type", values = c("#71BFB9","#B85233","#F2EC67","#56B4E9"))
+    scale_linetype_manual(name = "Model ID", values = c("solid", "dashed", "dotted", "solid", "dashed", "dotted","dotdash", "solid", "dashed", "dotted", "dotdash","solid", "dashed"))+
+    scale_color_manual(name = "Model type", values = c("#71BFB9","#B85233","#E69F00","#0072B2"))
       
   if(data_plot == TRUE){
   p1 <- ggplot(data = pred_dates, aes(x = datetime, y = Chla_ugL)) +
