@@ -79,7 +79,7 @@ p5 <- RMSEVsHorizon(observations = obs,
                           forecast_horizon = forecast_horizon)
 p5
 ggsave(p5, filename = "./multi-model-ensemble/figures/RMSEvsHorizon.png",
-       device = "png", height = 5.5, width = 8.5, units = "in")
+       device = "png", height = 5.5, width = 5.5, units = "in")
 
 #need to figure out how to detach legend from this and make it a separate
 #plot, then add
