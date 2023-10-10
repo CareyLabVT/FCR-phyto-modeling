@@ -21,6 +21,7 @@ dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
 dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
 dat_XGBoost <- read_csv("./multi-model-ensemble/data/data_processed/XGBoost.csv")
 dat_prophet <- read_csv("./multi-model-ensemble/data/data_processed/prophet.csv")
+dat_NNETAR <- read_csv("./multi-model-ensemble/data/data_processed/NNETAR.csv")
 
 #Fit models (not applicable for persistence model)
 fit_historicalMean <- fit_historicalMean(data = dat_historicalMean, cal_dates = c("2018-08-06","2021-12-31"))
@@ -44,6 +45,9 @@ save(fit_XGBoost, file = "./multi-model-ensemble/model_output/XGBoost_output.rds
 
 fit_prophet <- fit_prophet(data = dat_prophet, cal_dates = c("2018-08-06","2021-12-31"))
 fit_prophet$plot
+
+fit_NNETAR <- fit_NNETAR(data = dat_NNETAR, cal_dates = c("2018-08-06","2021-12-31"))
+fit_NNETAR$plot
 
 #process models fit in JAGS may need trimming
 
@@ -146,7 +150,7 @@ mod_output <- bind_rows(fit_DOY$out, fit_ARIMA$out, fit_ETS$out)
 #OR if you only want to run (or re-run) one or a few models
 mod_output <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>%
   #filter(!model_id %in% c("OptimumMonod")) %>% #names of re-run models if applicable
-  bind_rows(.,fit_prophet$out) # %>% #bind rows with models to add/replace if applicable
+  bind_rows(.,fit_NNETAR$out) # %>% #bind rows with models to add/replace if applicable
 
 write.csv(mod_output, "./multi-model-ensemble/model_output/calibration_output.csv", row.names = FALSE)
-
+unique(mod_output$model_id)

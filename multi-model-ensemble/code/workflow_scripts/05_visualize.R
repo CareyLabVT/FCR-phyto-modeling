@@ -32,12 +32,12 @@ cal <- read_csv("./multi-model-ensemble/model_output/calibration_output.csv") %>
 out <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
   mutate(model_type = ifelse(model_id %in% c("DOY","persistence","historical mean"),"null",
                              ifelse(model_id %in% c("ARIMA","ETS","TSLM","prophet"),"statistical",
-                                    ifelse(model_id %in% c("LSTM","XGBoost"),"machine learning","process"))))
+                                    ifelse(model_id %in% c("LSTM","XGBoost","NNETAR"),"machine learning","process"))))
 obs <- read_csv("./multi-model-ensemble/data/data_processed/chla_obs.csv")
 
 #Set arguments for plotting functions
 reference_datetime = "2022-10-20"
-forecast_horizon = 21
+forecast_horizon = 35
 
 
 

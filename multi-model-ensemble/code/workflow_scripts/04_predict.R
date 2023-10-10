@@ -22,6 +22,7 @@ dat_TSLM <- read_csv("./multi-model-ensemble/data/data_processed/TSLM.csv")
 dat_processModels <- read_csv("./multi-model-ensemble/data/data_processed/processModels.csv")
 dat_XGBoost <- read_csv("./multi-model-ensemble/data/data_processed/XGBoost.csv")
 dat_prophet <- read_csv("./multi-model-ensemble/data/data_processed/prophet.csv")
+dat_NNETAR <- read_csv("./multi-model-ensemble/data/data_processed/NNETAR.csv")
 
 #Set prediction window and forecast horizon
 pred_dates <- seq.Date(from = as.Date("2022-01-01"), to = as.Date("2022-11-26"), by = "day")
@@ -73,6 +74,10 @@ pred_prophet <- pred_prophet(data = dat_prophet,
                      pred_dates = pred_dates,
                      forecast_horizon = forecast_horizon)
 
+pred_NNETAR <- fableNNETAR(data = dat_NNETAR,
+                         pred_dates = pred_dates,
+                         forecast_horizon = forecast_horizon)
+
 # process models
 
 pred_OptimumMonod <- OptimumMonod(data = dat_processModels,
@@ -108,7 +113,7 @@ pred_XGBoost <- parsnipXGBoost(data = dat_XGBoost,
 #OR if you only want to run one model
 mod_output <- read_csv("./multi-model-ensemble/model_output/validation_output.csv") %>%
   #filter(!model_id == "XGBoost") %>%
-  bind_rows(.,pred_prophet)
+  bind_rows(.,pred_NNETAR)
 unique(mod_output$model_id)
 
 #OR if you are reading in LSTM output

@@ -45,7 +45,7 @@ RMSEVsHorizon <- function(observations,
     filter(horizon <= forecast_horizon) %>%
     arrange(model_type, model_id, horizon) %>%
     mutate(model_type = factor(model_type, levels = c("null","statistical","process","machine learning"))) %>%
-    mutate(model_id = factor(model_id, levels = c("DOY","historical mean","persistence","ARIMA","ETS","TSLM","prophet","OptimumMonod","OptimumSteele","OptimumMonodNP","OptimumSteeleNP","LSTM","XGBoost")))
+    mutate(model_id = factor(model_id, levels = c("DOY","historical mean","persistence","ARIMA","ETS","TSLM","prophet","OptimumMonod","OptimumSteele","OptimumMonodNP","OptimumSteeleNP","LSTM","XGBoost","NNETAR")))
   
   p <- ggplot()+
     geom_line(data = output, aes(x = horizon, y = rmse,
@@ -54,7 +54,7 @@ RMSEVsHorizon <- function(observations,
     xlab("Forecast horizon (days)")+
     ylab(expression(paste("RMSE (",mu,g,~L^-1,")")))+
     scale_color_manual(name = "Model type", values = c("#71BFB9","#B85233","#E69F00","#0072B2"))+
-    scale_linetype_manual(name = "Model ID", values = c("solid", "dashed", "dotted", "solid", "dashed", "dotted","dotdash", "solid", "dashed", "dotted", "dotdash","solid", "dashed"))+
+    scale_linetype_manual(name = "Model ID", values = c("solid", "dashed", "dotted", "solid", "dashed", "dotted","dotdash", "solid", "dashed", "dotted", "dotdash","solid", "dashed","dotted"))+
     theme_classic()+
     theme(axis.text = element_text(size = 12),
           axis.title = element_text(size = 16),
