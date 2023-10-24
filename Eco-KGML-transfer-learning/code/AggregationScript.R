@@ -14,7 +14,7 @@ pacman::p_load(tidyverse, lubridate)
 DataFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataFCR.csv")
 ModelOutputFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputFCR.csv")
 ModelOutputMendotaSunapee <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputMendotaSunapee.csv")
-DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes.csv")
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv")
 
 final <- bind_rows(DataFCR, ModelOutputFCR) %>%
   mutate(Site = as.character(Site)) %>%
@@ -25,3 +25,26 @@ final <- bind_rows(DataFCR, ModelOutputFCR) %>%
 unique(final$Lake)
 
 write.csv(final, "./Eco-KGML-transfer-learning/data/TransferLearningData.csv", row.names = FALSE)
+
+#Read in and combine lakes including winter months
+
+DataFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataFCR.csv")
+ModelOutputFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputFCR.csv")
+ModelOutputMendotaSunapee <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputMendotaSunapee.csv")
+DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv")
+
+final <- bind_rows(DataFCR, ModelOutputFCR) %>%
+  mutate(Site = as.character(Site)) %>%
+  bind_rows(., ModelOutputMendotaSunapee) %>%
+  bind_rows(., DataNEONLakes) 
+
+unique(final$Lake)
+
+write.csv(final, "./Eco-KGML-transfer-learning/data/TransferLearningData.csv", row.names = FALSE)
+
+
+colnames(DataFCR)
+ggplot(data = DataNEONLakes, aes(x = DateTime, y = Chla_ugL, group = Lake, color = Lake))+
+  geom_point()+
+  theme_bw()
+unique(DataNEONLakes$Lake)

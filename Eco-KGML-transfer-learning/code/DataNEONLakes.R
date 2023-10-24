@@ -99,6 +99,10 @@ wq_kludge <- wq_cleaned %>%
                                      ifelse(time >= "2022-04-01",RFU, chla))))
 
 ##############################################################################
+ggplot(data = wq_cleaned, aes(x = time, y = chla))+
+  geom_point()+
+  facet_wrap(vars(site_id), scales = "free", nrow = 2)+
+  theme_bw()
 ggplot(data = wq_kludge, aes(x = time, y = chla))+
   geom_point()+
   facet_wrap(vars(site_id), scales = "free", nrow = 2)+
