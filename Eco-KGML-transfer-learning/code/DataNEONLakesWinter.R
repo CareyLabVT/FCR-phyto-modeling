@@ -139,7 +139,9 @@ for(i in 1:length(lakes)){
     if(lakes[i] %in% lakes_with_winter){
   
   mylake <- wq_tl %>%
-    filter(site_id == lakes[i] & year(time) == years[j]) 
+    filter(site_id == lakes[i] & year(time) == years[j] & !is.na(chla)) 
+  
+  if(length(mylake$time) == 0) next
 
   temp <- left_join(subset(daily_dates, year(daily_dates$time) == years[j]), mylake, by = "time") %>%
     mutate(site_id = ifelse(is.na(site_id),lakes[i],site_id)) %>%
@@ -171,9 +173,11 @@ for(i in 1:length(lakes)){
     else{
       
       mylake <- wq_tl %>%
-        filter(site_id == lakes[i] & year(time) == years[j]) 
+        filter(site_id == lakes[i] & year(time) == years[j] & !is.na(chla)) 
       
-      temp <- left_join(subset(daily_dates, year(daily_dates$time) == years[j] & daily_dates$time %in% mylake$time), mylake, by = "time") %>%
+      if(length(mylake$time) == 0) next
+      
+      temp <- left_join(subset(daily_dates, daily_dates$time %in% get_model_dates(model_start = first(mylake$time), model_stop = last(mylake$time), time_step = 'days')), mylake, by = "time") %>%
         mutate(site_id = ifelse(is.na(site_id),lakes[i],site_id)) %>%
         mutate(chla_interp = replace(chla, cumall(is.na(chla)), chla[!is.na(chla)][1]))
       
@@ -211,39 +215,20 @@ ggplot(data = final, aes(x = time, y = chla_interp, group = Interp_Flag_chla, co
   facet_wrap(vars(site_id), scales = "free", nrow = 2)+
   theme_bw()
 
-join_df <- tibble(time = rep(daily_dates$time, times = 7),
-                  site_id = rep(lakes, each = nrow(daily_dates)))
+join_df <- tibble(DateTime = rep(daily_dates$time, times = 7),
+                  Lake = rep(lakes, each = nrow(daily_dates)))
 
-chla_final <- left_join(join_df, final) %>%
+chla <- final %>%
   rename(Lake = site_id,
          DateTime = time,
          Chla_ugL = chla_interp) %>%
   mutate(Flag_Chla_ugL = ifelse(Interp_Flag_chla == TRUE,1,0)) %>%
-  add_column(Depth_m = 0.5,
-             Site = "buoy",
-             DataType = "observed",
-             ModelRunType = NA,
-             AirTemp_C = NA,
-             Shortwave_Wm2 = NA,
-             Inflow_cms = 0,
-             WaterTemp_C = NA,
-             SRP_ugL = NA,
-             DIN_ugL = NA,
-             LightAttenuation_Kd = NA,
-             Flag_AirTemp_C = NA,
-             Flag_Shortwave_Wm2 = NA,
-             Flag_Inflow_cms = 2,
-             Flag_WaterTemp_C = NA,
-             Flag_SRP_ugL = NA,
-             Flag_DIN_ugL = NA,
-             Flag_LightAttenuation_Kd = NA) %>%
-  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
-         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
-         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
-         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL) %>%
-  arrange(Lake, DateTime)
+  select(-Interp_Flag_chla, -chla, -RFU)
 
-write.csv(chla_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv",row.names = FALSE)
+chla_final <- left_join(join_df, chla, by = c("DateTime","Lake")) %>%
+  arrange(Lake,DateTime) 
+
+write.csv(chla_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes_Chla_ugL.csv",row.names = FALSE)
 
 
 ##########WATER TEMP===============================================#####
@@ -457,6 +442,9 @@ hourly_temp_profile_lakes <- bind_rows(hourly_temp_profile_portal, hourly_temp_p
   mutate(variable = "temperature") |> 
   select(time, site_id, depth, variable, observation)
 
+check <- hourly_temp_profile_portal %>%
+  filter(site_id == "PRLA" & year(time) == 2020 & depth <= 1)
+
 #======================================================#
 
 message("#### Generate surface (< 1 m) temperature #############")
@@ -525,6 +513,8 @@ for(i in 1:length(lakes)){
     mylake <- temp_tl %>%
       filter(site_id == lakes[i] & year(time) == years[j]) 
     
+    if(length(mylake$time) == 0) next
+    
     temp <- left_join(subset(daily_dates, year(daily_dates$time) == years[j]), mylake, by = "time") %>%
       mutate(site_id = ifelse(is.na(site_id),lakes[i],site_id)) %>%
       mutate(wtemp_interp = replace(wtemp, cumall(is.na(wtemp)), wtemp[!is.na(wtemp)][1]))
@@ -556,7 +546,10 @@ for(i in 1:length(lakes)){
       mylake <- temp_tl %>%
         filter(site_id == lakes[i] & year(time) == years[j]) 
       
-      temp <- left_join(subset(daily_dates, year(daily_dates$time) == years[j] & daily_dates$time %in% mylake$time), mylake, by = "time") %>%
+      if(length(mylake$time) == 0) next
+      if(lakes[i] == "PRLA" & years[j] == 2020) next
+      
+      temp <- left_join(subset(daily_dates, daily_dates$time %in% get_model_dates(model_start = first(mylake$time), model_stop = last(mylake$time), time_step = 'days')), mylake, by = "time") %>%
         mutate(site_id = ifelse(is.na(site_id),lakes[i],site_id)) %>%
         mutate(wtemp_interp = replace(wtemp, cumall(is.na(wtemp)), wtemp[!is.na(wtemp)][1]))
       
@@ -599,17 +592,13 @@ join_df <- tibble(time = rep(daily_dates$time, times = 7),
 
 wtemp_final <- left_join(join_df, final) %>%
   rename(Lake = site_id,
-         DateTime = time) %>%
-  mutate(Interp_Flag_wtemp = ifelse(Interp_Flag_wtemp == TRUE,1,0)) %>%
-  arrange(Lake,DateTime) 
-
-
-DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv") %>%
+         DateTime = time,
+         WaterTemp_C = wtemp_interp) %>%
+  mutate(Flag_WaterTemp_C = ifelse(Interp_Flag_wtemp == TRUE,1,0)) %>%
   arrange(Lake,DateTime) %>%
-  mutate(WaterTemp_C = wtemp_final$wtemp_interp,
-         Flag_WaterTemp_C = ifelse(wtemp_final$Interp_Flag_wtemp == TRUE, 1, 0))
+  select(-Interp_Flag_wtemp, -wtemp)
 
-write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv",row.names = FALSE)
+write.csv(wtemp_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter_WaterTemp_C.csv",row.names = FALSE)
 
 
 ########### Light attenuation
@@ -698,7 +687,7 @@ for(i in 1:length(lakes)){
       mylake <- sec_tl %>%
         filter(Lake == lakes[i] & year(DateTime) == years[j] & !is.na(secchiMeanDepth)) 
       
-      temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j] & month(daily_dates$DateTime) %in% month(mylake$DateTime)), mylake, by = "DateTime") %>%
+      temp <- left_join(subset(daily_dates, daily_dates$DateTime %in% get_model_dates(model_start = first(mylake$DateTime), model_stop = last(mylake$DateTime), time_step = 'days')), mylake, by = "DateTime") %>%
         mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake)) %>%
         mutate(secchiMeanDepth_interp = replace(secchiMeanDepth, cumall(is.na(secchiMeanDepth)), secchiMeanDepth[!is.na(secchiMeanDepth)][1]))
       
@@ -745,14 +734,10 @@ join_df <- tibble(DateTime = rep(daily_dates$DateTime, times = 7),
 
 secchi_final <- left_join(join_df, sec3, by = c("DateTime","Lake")) %>%
   arrange(Lake,DateTime) %>%
-  mutate(Interp_Flag_secchiMeanDepth = ifelse(Interp_Flag_secchiMeanDepth == TRUE,1,0)) 
+  mutate(Flag_LightAttenuation_Kd = ifelse(Interp_Flag_secchiMeanDepth == TRUE,1,0)) %>%
+  select(-Interp_Flag_secchiMeanDepth)
 
-DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv") %>%
-  arrange(Lake,DateTime) %>%
-  mutate(LightAttenuation_Kd = secchi_final$LightAttenuation_Kd,
-         Flag_LightAttenuation_Kd = ifelse(secchi_final$Interp_Flag_secchiMeanDepth == TRUE, 1, 0))
-
-write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv",row.names = FALSE)
+write.csv(secchi_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes_LightAttenuation_Kd.csv",row.names = FALSE)
 
 ########### DIN and SRP
 
@@ -868,7 +853,7 @@ for(i in 1:length(lakes)){
       mylake <- nuts_tl %>%
         filter(Lake == lakes[i] & year(DateTime) == years[j]) 
       
-      temp <- left_join(subset(daily_dates, year(daily_dates$DateTime) == years[j] & month(daily_dates$DateTime) %in% month(mylake$DateTime)), mylake, by = "DateTime") %>%
+      temp <- left_join(subset(daily_dates, daily_dates$DateTime %in% get_model_dates(model_start = first(mylake$DateTime), model_stop = last(mylake$DateTime), time_step = 'days')), mylake, by = "DateTime") %>%
         mutate(Lake = ifelse(is.na(Lake),lakes[i],Lake)) %>%
         mutate(DIN_ugL_interp = replace(DIN_ugL, cumall(is.na(DIN_ugL)), DIN_ugL[!is.na(DIN_ugL)][1]),
                SRP_ugL_interp = replace(SRP_ugL, cumall(is.na(SRP_ugL)), SRP_ugL[!is.na(SRP_ugL)][1]))
@@ -934,20 +919,10 @@ join_df <- tibble(DateTime = rep(daily_dates$DateTime, times = 7),
 nuts_final <- left_join(join_df, nuts3, by = c("DateTime","Lake")) %>%
   arrange(Lake,DateTime) %>%
   mutate(Flag_DIN_ugL = ifelse(Interp_Flag_DIN_ugL == TRUE, 1, 0),
-         Flag_SRP_ugL = ifelse(Interp_Flag_SRP_ugL == TRUE, 1, 0))
+         Flag_SRP_ugL = ifelse(Interp_Flag_SRP_ugL == TRUE, 1, 0)) %>%
+  select(-Interp_Flag_DIN_ugL, -Interp_Flag_SRP_ugL)
 
-
-
-DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv") %>%
-  arrange(Lake,DateTime) %>%
-  mutate(DIN_ugL = nuts_final$DIN_ugL,
-         SRP_ugL = nuts_final$SRP_ugL,
-         Flag_DIN_ugL = ifelse(nuts_final$Interp_Flag_DIN_ugL == TRUE, 1, 0),
-         Flag_SRP_ugL = ifelse(nuts_final$Interp_Flag_SRP_ugL == TRUE, 1, 0))
-
-
-write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv",row.names = FALSE)
-
+write.csv(nuts_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter_SRP_DIN_ugL.csv",row.names = FALSE)
 
 ########### Air temp 
 
@@ -1279,4 +1254,33 @@ ggplot(data = DataNEONLakes, aes(x = DateTime, y = Shortwave_Wm2, group = Flag_S
 
 write.csv(DataNEONLakes, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv",row.names = FALSE)
 
+# get df of just airtemp and swr
+met <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv") %>%
+  select(Lake, DateTime, AirTemp_C, Shortwave_Wm2, Flag_AirTemp_C, Flag_Shortwave_Wm2)
+write.csv(met, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes_met.csv", row.names = FALSE)
 
+## FINAL AGGREGATION
+
+chla <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes_Chla_ugL.csv")
+wtemp <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter_WaterTemp_C.csv")
+kd <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes_LightAttenuation_Kd.csv")
+nuts <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter_SRP_DIN_ugL.csv")
+met <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakes_met.csv")
+
+neon_final <- left_join(chla, wtemp, by = c("Lake","DateTime")) %>%
+  left_join(., kd, by = c("Lake","DateTime")) %>%
+  left_join(., nuts, by = c("Lake","DateTime")) %>%
+  left_join(., met, by = c("Lake","DateTime")) %>%
+  add_column(Depth_m = 0.5,
+             Site = "buoy",
+             DataType = "observed",
+             ModelRunType = NA,
+             Inflow_cms = 0,
+             Flag_Inflow_cms = 2) %>%
+  select(Lake, DateTime, Site, Depth_m, DataType, ModelRunType, AirTemp_C, Shortwave_Wm2,
+         Inflow_cms, WaterTemp_C, SRP_ugL, DIN_ugL, LightAttenuation_Kd, Chla_ugL,
+         Flag_AirTemp_C, Flag_Shortwave_Wm2, Flag_Inflow_cms, Flag_WaterTemp_C, Flag_SRP_ugL,
+         Flag_DIN_ugL, Flag_LightAttenuation_Kd, Flag_Chla_ugL) %>%
+  arrange(Lake, DateTime)
+
+write.csv(neon_final, "./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv",row.names = FALSE)

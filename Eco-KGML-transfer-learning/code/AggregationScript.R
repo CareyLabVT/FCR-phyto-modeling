@@ -33,6 +33,9 @@ ModelOutputFCR <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/Mod
 ModelOutputMendotaSunapee <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/ModelOutputMendotaSunapee.csv")
 DataNEONLakes <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/DataNEONLakesWinter.csv")
 
+check <- DataNEONLakes %>%
+  filter(Lake == "LIRO")
+
 final <- bind_rows(DataFCR, ModelOutputFCR) %>%
   mutate(Site = as.character(Site)) %>%
   bind_rows(., ModelOutputMendotaSunapee) %>%
@@ -44,7 +47,8 @@ write.csv(final, "./Eco-KGML-transfer-learning/data/TransferLearningData.csv", r
 
 
 colnames(DataFCR)
-ggplot(data = DataNEONLakes, aes(x = DateTime, y = Chla_ugL, group = Lake, color = Lake))+
-  geom_point()+
+ggplot(data = DataNEONLakes, aes(x = DateTime, y = AirTemp_C, group = Lake, color = Lake))+
+  geom_line()+
+  facet_wrap(vars(Lake))+
   theme_bw()
 unique(DataNEONLakes$Lake)
