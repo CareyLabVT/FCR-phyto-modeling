@@ -2,7 +2,7 @@
 # Author: Mary Lofton
 # Date: 16OCT23
 
-# Purpose: Design model run corpus for Abhilash transfer learning project
+# Purpose: Explore model run corpus for Abhilash transfer learning project
 
 # Read packages
 library(tidyverse)
