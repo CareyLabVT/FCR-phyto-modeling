@@ -1,44 +1,131 @@
 ###########################################################
 ### Downloading NLDAS2 data for meteorological hourly forcing
 ### http://ldas.gsfc.nasa.gov/nldas/NLDAS2forcing.php
-### Author: Hilary Dugan hilarydugan@gmail.com
-### Date: 2017-01-20
-######################################################z #####
+### Author: Hilary Dugan hilarydugan@gmail.com and Mary Lofton melofton@vt.edu
+### Date last modified: 2023-11-29
+###########################################################
+
+###########################################################
+### Install and load packages 
+###########################################################
+
 rm(list=ls())
-library(RCurl)
-library(lubridate)
-library(raster)
-library(ncdf4)
-library(rgdal)
+#install.packages("httr")
+#install.packages("tidyverse")
+#install.packages("lubridate")
+#install.packages("raster")
 library(httr)
 library(tidyverse)
+library(lubridate)
+library(raster)
+
 ###########################################################
-### Enter password information
+### Set up 
 ###########################################################
-#https://urs.earthdata.nasa.gov/profile <-- GET A EARTHDATA LOGIN
+
+##### Step 1: Get an EarthData account ##
+# Instructions: https://disc.gsfc.nasa.gov/information/documents?title=Data%20Access
+# EarthData: https://urs.earthdata.nasa.gov/profile <-- GET AN EARTHDATA LOGIN
 username = "melofton"
 password = "@Chlorophylla2023"
+####
+
+#### Step 2: Authorize GES DISC ## 
+# Instructions: https://disc.gsfc.nasa.gov/earthdata-login
+####
+
+#### Step 3: Set up .netrc and cookie file in Terminal ##
+# Instructions: https://wiki.earthdata.nasa.gov/display/EL/How+To+Access+Data+With+cURL+And+Wget
+
+# If you plan to use R to download the data, you only need to complete steps 1-3
+# in these instructions; you will paste the commands into your terminal
+
+# Remember, the cd function specifies what file directory you are creating files in
+# Example of commands: 
+# cd /Users/MaryLofton/RProjects/FCR-phyto-modeling/Eco-KGML-transfer-learning/data/NLDAS-2
+# touch .netrc 
+# echo "machine urs.earthdata.nasa.gov login melofton password @Chlorophylla2023" > .netrc
+# chmod 0600 .netrc
+# touch .urs_cookies
+####
 
 ###########################################################
-### Get coordinates of EPA NLA lakes
+### Set filepaths and configure
+###########################################################
+netrc_path <- "/Users/MaryLofton/RProjects/FCR-phyto-modeling/Eco-KGML-transfer-learning/data/NLDAS-2/.netrc"
+cookie_path <- "/Users/MaryLofton/RProjects/FCR-phyto-modeling/Eco-KGML-transfer-learning/data/NLDAS-2/.urs_cookies"
+downloaded_file_path <- "/Users/MaryLofton/RProjects/FCR-phyto-modeling/Eco-KGML-transfer-learning/data/NLDAS-2/test3.txt"
+set_config(config(followlocation=1,netrc=1,netrc_file=netrc_path,cookie=cookie_path,cookiefile=cookie_path,cookiejar=cookie_path))
+
+###########################################################
+### Get coordinates and sampling dates of EPA NLA lakes
 ###########################################################
 # read in lake metadata to get lat long
-morph_metadata <- read_tsv("./Eco-KGML-transfer-learning/data/NLA 2017 Report Data Files/nla_2017_site_information-metadata.txt")
-morph <- read_csv("./Eco-KGML-transfer-learning/data/NLA 2017 Report Data Files/nla_2017_site_information-data.csv") %>%
-  filter(SITESAMP == "Y" & FRAME17 == "Include") %>%
-  select(AREA_HA, LAT_DD83, LON_DD83, SITE_ID) %>%
-  distinct()
+# Read in data
+ic <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/NLA_interpolated_initial_conditions.csv")
+bth <- read_csv("./Eco-KGML-transfer-learning/data/data_processed/NLA_interpolated_bathymetry.csv")
+
+all <- left_join(bth, ic) %>%
+  select(SITE_ID, LAT_DD83, LON_DD83, DATE_COL) %>%
+  distinct() %>%
+  filter(complete.cases(.)) %>%
+  mutate(DATE_COL = dmy(DATE_COL))
+
+sites <- unique(all$SITE_ID)
+
+# will want to subset to individual site and also the date of sampling to start;
+# may want to start with just a year...?
 
 ###########################################################
-### Set timeframe
+### Specify outputs
 ###########################################################
-out = seq.POSIXt(as.POSIXct('2012-01-01 00:00',tz = 'GMT'),as.POSIXct('2012-01-01 23:00',tz='GMT'),by = 'hour')
+
+# Variables we want, see guide to variables here:
+# APCP = Precipitation hourly total (kg/m^2)
+# CAPE = 180-0 mb above ground Convective Available Potential Energy (J/kg)
+# CONVfrac = Fraction of total precipitation that is convective (unitless)
+# DLWRF = Longwave radiation flux downwards (surface) (W/m^2)
+# DSWRF = Shortwave radiation flux downwards (surface) (W/m^2)
+# PEVAP = Potential evaporation hourly total (kg/m^2)
+# PRES = Surface pressure (Pa)
+# SPFH = 2-m above ground Specific humidity (kg/kg)
+# TMP = 2-m above ground Temperature (K)
+# UGRD = 10-m above ground Zonal wind speed (m/s)
+# VGRD = 10-m above ground Meridional wind speed (m/s)
 vars = c('PEVAPsfc_110_SFC_acc1h', 'DLWRFsfc_110_SFC', 'DSWRFsfc_110_SFC', 'CAPE180_0mb_110_SPDY',
          'CONVfracsfc_110_SFC_acc1h', 'APCPsfc_110_SFC_acc1h', 'SPFH2m_110_HTGL',
          'VGRD10m_110_HTGL', 'UGRD10m_110_HTGL', 'TMP2m_110_HTGL', 'PRESsfc_110_SFC')
 
 # Create output list of tables
 output = list()
+
+cellNum = 1 #How many output cells will there be? Need to check this beforehand
+for (l in 1:11){
+  colClasses = c("POSIXct", rep("numeric",cellNum))
+  col.names = c('dateTime',rep(vars[l],cellNum))
+  output[[l]] = read.table(text = "",colClasses = colClasses,col.names = col.names)
+  attributes(output[[l]]$dateTime)$tzone = 'GMT'
+}
+
+###########################################################
+### Download data
+###########################################################
+lat_south = 39.54
+lat_north = 39.55
+lon_west = -119.8
+lon_east = -119.7
+httr::GET(url = paste0("https://hydro1.gesdisc.eosdis.nasa.gov/daac-bin/OTF/HTTP_services.cgi?FILENAME=%2Fdata%2FNLDAS%2FNLDAS_FORA0125_H.002%2F",
+          yearOut,"%2F",doyOut,"%2FNLDAS_FORA0125_H.A",yearOut,monthOut,dayOut,".",hourOut,".002.grb&SHORTNAME=NLDAS_FORA0125_H&LABEL=NLDAS_FORA0125_H.A",
+          yearOut,monthOut,dayOut,'.',hourOut,".002.grb.SUB.netCDF&SERVICE=L34RS_LDAS&DATASET_VERSION=002&VERSION=1.02&BBOX=",
+          lat_south,"%2C",lon_west,"%2C",lat_north,"%2C",lon_east,"&FORMAT=netCDF%2F"),
+          write_disk(downloaded_file_path, overwrite = TRUE))
+httr::GET(url = "https://hydro1.gesdisc.eosdis.nasa.gov/daac-bin/OTF/HTTP_services.cgi?FILENAME=%2Fdata%2FNLDAS%2FNLDAS_FORA0125_H.002%2F2017%2F137%2FNLDAS_FORA0125_H.A20170517.0000.002.grb&VERSION=1.02&DATASET_VERSION=002&SERVICE=L34RS_LDAS&FORMAT=bmV0Q0RGLw&LABEL=NLDAS_FORA0125_H.A20170517.0000.002.grb.SUB.netCDF&SHORTNAME=NLDAS_FORA0125_H&BBOX=39.54%2C-119.8%2C39.55%2C-119.7",
+          write_disk(downloaded_file_path, overwrite = TRUE))
+###########################################################
+### Set timeframe
+###########################################################
+out = seq.POSIXt(as.POSIXct('2013-01-01 00:00',tz = 'GMT'),as.POSIXct('2013-01-01 23:00',tz='GMT'),by = 'hour')
+
 
 ###########################################################
 ### Need to know how many cells your lake falls within
@@ -60,6 +147,7 @@ for (l in 1:11){
 ptm <- proc.time()
 #
 for(j in 1:length(morph$SITE_ID)){
+  print(morph$SITE_ID[j])
 for (i in 1:length(out)) {
   print(out[i])
   yearOut = year(out[i])
@@ -69,13 +157,14 @@ for (i in 1:length(out)) {
   doyOut = format(out[i],'%j')
   
   filename = format(out[i], "%Y%m%d%H%M")
+  filename = "./Eco-KGML-transfer-learning/data/NLDAS-2/test3.nc"
   
-  URL3 = paste('http://',username,':',password,'@hydro1.gesdisc.eosdis.nasa.gov/daac-bin/OTF/HTTP_services.cgi?',
+  URL3 = paste('https://',username,':',password,'@hydro1.gesdisc.eosdis.nasa.gov/daac-bin/OTF/HTTP_services.cgi?',
                'FILENAME=%2Fdata%2FNLDAS%2FNLDAS_FORA0125_H.002%2F',yearOut,'%2F',doyOut,'%2FNLDAS_FORA0125_H.A',yearOut,monthOut,dayOut,'.',hourOut,'.002.grb&',
                'FORMAT=bmV0Q0RGLw&BBOX=',morph$LAT_DD83[j],'%2C',morph$LON_DD83[j],'%2C',morph$LAT_DD83[j],'%2C',morph$LON_DD83[j],'&',
                'LABEL=NLDAS_FORA0125_H.A',yearOut,monthOut,dayOut,'.',hourOut,'.002.2017013163409.pss.nc&',
                'SHORTNAME=NLDAS_FORA0125_H&SERVICE=SUBSET_GRIB&VERSION=1.02&DATASET_VERSION=002',sep='')
-  
+  URL3 = paste0("https://hydro1.gesdisc.eosdis.nasa.gov/daac-bin/OTF/HTTP_services.cgi?FILENAME=%2Fdata%2FNLDAS%2FNLDAS_FORA0125_H.002%2F2013%2F001%2FNLDAS_FORA0125_H.A20130101.0000.002.grb&SHORTNAME=NLDAS_FORA0125_H&LABEL=NLDAS_FORA0125_H.A20130101.0000.002.grb.SUB.netCDF&SERVICE=L34RS_LDAS&DATASET_VERSION=002&VERSION=1.02&BBOX=39.54%2C-119.8%2C39.55%2C-119.7&FORMAT=netCDF%2F")
   
   # IMPORTANT MESSAGE Dec 05, 2016    The GES DISC will be migrating from http to https throughout December
   # As part of our ongoing migration to HTTPS, the GES DISC will begin redirecting all HTTP traffic to HTTPS.
@@ -87,7 +176,7 @@ for (i in 1:length(out)) {
   x = download.file(URL3,destfile = paste(filename,'.nc',sep=''),mode = 'wb',quiet = T)
   
   for (v in 1:11) {
-    br = brick(paste(filename,'.nc',sep=''),varname = vars[v])
+    br = brick(paste(filename),varname = vars[v])
     output[[v]][i,1] = out[i]
     output[[v]][i,-1] = getValues(br[[1]])
   }
